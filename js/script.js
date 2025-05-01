@@ -120,7 +120,6 @@ function buscarEndereco() {
   function consultarDocumento() {
     const campo = document.getElementById('cpf_cnpj');
     const nomeCampo = document.getElementById('nome');
-    const telefoneCampo = document.getElementById('contato');
     const cepCampo = document.getElementById('cep');
     const numeroCampo = document.getElementById('numero');
     const logradouroCampo = document.getElementById('rua');
@@ -132,7 +131,6 @@ function buscarEndereco() {
   
     campo.classList.remove('is-invalid', 'is-valid');
     nomeCampo.value = '';
-    telefoneCampo.value = '';
     cepCampo.value = '';
     numeroCampo.value = '';
     logradouroCampo.value = '';
@@ -156,14 +154,13 @@ function buscarEndereco() {
           .then(res => res.ok ? res.json() : Promise.reject())
           .then(data => {
             nomeCampo.value = data.razao_social || '';
-            telefoneCampo.value = '';  // A API não retorna telefone
             cepCampo.value = data.cep || ''; 
             numeroCampo.value = data.numero || ''; 
             logradouroCampo.value = data.logradouro || ''; 
             bairroCampo.value = data.bairro || '';
             cidadeCampo.value = data.municipio || '';
             estadoCampo.value = data.uf || '';
-            paisCampo.value = 'Brasil';  // Preenchendo com 'Brasil'
+            paisCampo.value = 'Brasil';  
           })
           .catch(() => {
             alert('Erro ao buscar as informações do CNPJ. Verifique a conexão.');
@@ -181,6 +178,5 @@ function buscarEndereco() {
         campo.classList.add('is-invalid');
       }
     }
-  }
-  
+  }  
   
