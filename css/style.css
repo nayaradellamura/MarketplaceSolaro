@@ -210,3 +210,17 @@ h1 {
 .tab-content {
   padding-top: 20px;
 }
+
+.nav-pills .nav-link {
+  pointer-events: none;
+  border-bottom: 2px solid transparent;
+  color: #6c757d;
+  background-color: transparent;
+  font-weight: 500;
+}
+
+.nav-pills .nav-link.active {
+  pointer-events: auto;
+  border-bottom: 3px solid #0d6efd; 
+  background-color: transparent;
+}

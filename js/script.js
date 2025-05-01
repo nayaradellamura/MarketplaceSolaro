@@ -193,4 +193,15 @@ function buscarEndereco() {
       }
     }
   }  
+  function irParaAba(index) {
+    const navLinks = ['pills-tab1-tab', 'pills-tab2-tab', 'pills-tab3-tab'];
+    const tabTrigger = new bootstrap.Tab(document.getElementById(navLinks[index]));
+    tabTrigger.show();
+  
+    // Atualizar barra de progresso
+    const progressBar = document.getElementById('progressBar');
+    const porcentagens = [33, 66, 100];
+    progressBar.style.width = porcentagens[index] + '%';
+    progressBar.setAttribute('aria-valuenow', porcentagens[index]);
+  }
   
