@@ -1,23 +1,28 @@
-/* Estilos gerais */
+/* Variáveis de cor */
 :root {
-  --primary-color: #003366;
-  --secondary-color: #002244;
-  --background-color: #f8f9fa;
+  --primary-color: #003366; 
+  --secondary-color: #002244; 
+  --background-color: #f8f9fa; 
   --button-radius: 30px;
 }
 
+/* Estilo geral do body */
 body {
   background-color: var(--background-color);
   font-family: 'Poppins', sans-serif;
   color: #333;
-  padding-top: 50px;
+  margin: 0; 
+  padding: 0;
+  min-height: 100vh; 
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
   max-width: 600px;
   margin: 0 auto;
-  padding-left: 15px;
-  padding-right: 15px; 
+  padding: 0 15px;
+  flex: 1; 
 }
 
 h1, .form-label {
@@ -27,19 +32,26 @@ h1, .form-label {
 h1 {
   font-weight: 600;
   font-size: 2.5rem;
-  color: #333;
+  color: var(--primary-color); 
   margin-bottom: 30px;
 }
 
 .form-label {
-  font-weight: 500;
+  font-weight: 400;
   font-size: 1rem;
   color: #6c757d;
+  transition: color 0.3s ease; 
+  padding-bottom: 5px;
 }
 
-/* Estilos dos campos de formulário */
+/* Hover nas labels */
+.form-label:hover {
+  color: var(--primary-color);
+}
+
+/* Estilo dos campos de entrada */
 .form-control {
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid #ced4da;
   background-color: #f9f9f9;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -47,13 +59,19 @@ h1 {
   margin-bottom: 1rem;
 }
 
+/* Efeito de foco no campo de entrada */
 .form-control:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 5px rgba(0, 51, 102, 0.5);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Estilos do botão */
+/* Estilo do titulo */
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+/* Estilo do botão principal */
 .btn-primary {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
@@ -64,11 +82,13 @@ h1 {
   transition: background-color 0.3s ease;
 }
 
+/* Hover no botão principal */
 .btn-primary:hover {
   background-color: var(--secondary-color);
   border-color: var(--secondary-color);
 }
 
+/* Estilo do botão de fechar */
 .btn-close {
   background-color: transparent;
   border: none;
@@ -79,6 +99,7 @@ h1 {
   z-index: 1050; 
 }
 
+/* Botão de cadastro */
 .btn-cadastrar {
   font-size: 0.875rem;
   padding: 6px 20px;
@@ -89,8 +110,7 @@ h1 {
   outline: none;
 }
 
-
-/* Estilos da Modal */
+/* Estilo da modal */
 .modal-dialog {
   max-width: 70%;
   padding: 10px !important;
@@ -132,25 +152,42 @@ h1 {
   font-weight: 500;
   padding: 8px 20px;
   transition: all 0.3s ease;
-  border: none;                 
+  border: none;                  
   box-shadow: none; 
-  margin-right: 10px             
+  margin-right: 10px;              
 }
 
+/* Aba ativa */
 .nav-pills .nav-link.active {
   background-color: transparent;         
-  color: #003366;                        
-  border-bottom: 3px solid #003366; 
+  color: var(--primary-color);                        
+  border-bottom: 3px solid var(--primary-color); 
   border-radius: 0;                   
 }
 
+/* Hover nas abas */
 .nav-pills .nav-link:hover {
   background-color: #e4e3e3;      
   color: #333;
 }
 
+/* Estilos do fundo */
+.hero {
+  min-height: 100vh;
+}
 
-/* Responsividade */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1); 
+  z-index: -1;
+}
+
+/* Responsividade para dispositivos pequenos */
 @media (max-width: 576px) {
   h1 {
     font-size: 2rem;
