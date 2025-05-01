@@ -55,8 +55,22 @@ function buscarEndereco() {
           document.getElementById('cidade').value = data.localidade;
           document.getElementById('estado').value = data.uf;
           document.getElementById('pais').value = "Brasil";
-        } else {
-          alert("CEP não encontrado.");
+          document.getElementById('rua').readOnly = true;
+          document.getElementById('bairro').readOnly = true;
+          document.getElementById('cidade').readOnly = true;
+          document.getElementById('estado').readOnly = true;
+          document.getElementById('pais').readOnly = true;
+        } else{
+          document.getElementById('rua').value = '';
+          document.getElementById('bairro').value = '';
+          document.getElementById('cidade').value = '';
+          document.getElementById('estado').value = '';
+          document.getElementById('pais').value = '';
+          document.getElementById('rua').readOnly = false;
+          document.getElementById('bairro').readOnly = false;
+          document.getElementById('cidade').readOnly = false;
+          document.getElementById('estado').readOnly = false;
+          document.getElementById('pais').readOnly = false;
         }
       })
       .catch(error => {
