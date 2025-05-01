@@ -1,0 +1,115 @@
+/* Estilos gerais */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+    padding-top: 50px;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-weight: 600;
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 30px;
+  }
+
+  .form-label {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #6c757d;
+  }
+
+  .form-control {
+    border-radius: 10px;
+    border: 1px solid #ced4da;
+    background-color: #f9f9f9;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #003366; 
+    box-shadow: 0 0 5px rgba(0, 51, 102, 0.5); 
+  }
+
+  .btn-primary {
+    background-color: #003366;
+    border-color: #003366;
+    border-radius: 30px;
+    padding: 10px 30px;
+    width: 100%;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #002244; 
+    border-color: #002244;
+  }
+
+  .btn-close {
+    background-color: transparent;
+    border: none;
+    font-size: 1.2rem; 
+    position: absolute;
+    right: 15px;
+    top: 15px;
+  }
+
+  .modal-content {
+    border-radius: 15px;
+    border: none;
+    padding: 20px;
+  }
+
+  .modal-dialog {
+    max-width: 70%; 
+  }
+
+  .modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Estilo das abas */
+  .nav-pills .nav-link {
+    background-color: #ced5dc; 
+    color: #ffffff;
+    border-radius: 25px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+
+  .nav-pills .nav-link.active {
+    background-color: #ffffff;
+    color: #003366; 
+  }
+
+  .nav-pills .nav-link:hover {
+    background-color: #c1d3e9; 
+  }
+
+  /* Responsividade */
+  @media (max-width: 576px) {
+    h1 {
+      font-size: 2rem;
+    }
+  }
+
+  .mb-3 {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-control {
+    margin-bottom: 1rem;
+  }
+
+  .tab-content {
+    padding-top: 20px; 
+  }
