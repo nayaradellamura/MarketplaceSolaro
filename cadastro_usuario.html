@@ -22,14 +22,14 @@
 
     <!-- Modal Button -->
     <div class="d-grid gap-2">
-      <button onclick="openModal()" class="btn btn-primary">Iniciar Cadastro</button>
+      <button onclick="openFormularioModal()" class="btn btn-primary">Iniciar Cadastro</button>
     </div>
 
     <!-- Modal -->
     <div id="modal" class="modal fade" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <button type="button" class="btn-close" onclick="closeModal()" aria-label="Fechar"></button>
+          <button type="button" class="btn-close" onclick="closeFormularioModal()" aria-label="Fechar"></button>
           <form class="bg-white p-4">
             <!-- Abas -->
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -66,9 +66,8 @@
                   <div class="col-md-6 mb-3">
                     <label for="tipo" class="form-label">Tipo de Usuário</label>
                     <select class="form-select" id="tipo">
-                      <option>Cliente</option>
-                      <option>Administrador</option>
-                      <option>Outro</option>
+                      <option>Fornecedor de Energia</option>
+                      <option>Consumidor</option>
                     </select>
                   </div>
                 </div>
@@ -115,12 +114,12 @@
               <!--Aba Acesso -->
               <div class="tab-pane fade" id="pills-tab3" role="tabpanel" aria-labelledby="pills-tab3-tab">
                 <div class="mb-3">
-                  <label for="usuario" class="form-label">Usuário</label>
-                  <input type="text" class="form-control" id="usuario" placeholder="Usuário">
+                  <label for="login" class="form-label">Login</label>
+                  <input type="text" class="form-control" id="login" placeholder="Digite seu email">
                 </div>
                 <div class="mb-3">
                   <label for="senha" class="form-label">Senha</label>
-                  <input type="password" class="form-control" id="senha" placeholder="Senha">
+                  <input type="password" class="form-control" id="senha" placeholder="Digite sua senha">
                 </div>
               </div>
 
