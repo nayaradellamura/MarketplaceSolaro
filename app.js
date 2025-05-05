@@ -37,6 +37,10 @@ app.use('/', require('./routes/pages'));
 app.get('/index', (req, res) => {
     res.render('index'); 
   });
+
+  app.get('/home', (req, res) => {
+    res.render('const_index'); 
+  });
   
   app.post('/cadastro', (req, res) => {
     const {
