@@ -46,11 +46,15 @@ app.get('/index', (req, res) => {
 });
 
 app.get('/home', (req, res) => {
-    res.render('const_index');
+    res.render('home');
 });
 
 app.get('/login', (req, res) => {
     res.render('login');
+});
+
+app.get('/cadastro', (req, res) => {
+    res.render('form_cadastro');
 });
 
 // Rota para cadastro de usuários
@@ -78,7 +82,7 @@ app.post('/cadastro', (req, res) => {
             console.error("Erro ao cadastrar usuário:", err);
             return res.send('Erro ao cadastrar usuário.');
         }
-        res.send('Usuário cadastrado com sucesso!');
+        res.redirect('/home');
     });
 });
 
