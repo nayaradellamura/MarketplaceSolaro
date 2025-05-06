@@ -2,6 +2,7 @@ const express = require("express");
 const path = require('path');
 const mysql = require("mysql"); 
 const dotenv = require('dotenv');
+const e = require("express");
 
 dotenv.config({ pat: './.env' })
 
@@ -30,12 +31,15 @@ db.connect( (error) => {
     }
 })
 
-app.get("/", (req, res) =>{
-    res.render("index")
-});
+// Definir Rotas
+app.use('/', require('./routes/pages'));
 
 app.get('/index', (req, res) => {
     res.render('index'); 
+  });
+
+  app.get('/home', (req, res) => {
+    res.render('const_index'); 
   });
   
   app.post('/cadastro', (req, res) => {
