@@ -25,6 +25,6 @@ exports.cadastrarUsuario = (req, res) => {
             console.error("Erro ao cadastrar usuário:", err);
             return res.send('Erro ao cadastrar usuário.');
         }
-        res.send('Usuário cadastrado com sucesso!');
+        res.redirect('/home');
     });
 };
