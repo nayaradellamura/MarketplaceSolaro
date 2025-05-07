@@ -204,4 +204,3 @@ function openFormularioModal() {
       progressBar.style.width = porcentagens[index] + '%';
       progressBar.setAttribute('aria-valuenow', porcentagens[index]);
     }
-    
