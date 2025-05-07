@@ -18,7 +18,7 @@ body {
   flex-direction: column;
 }
 
-/* Header */
+/* Header 
 header {
   background-color: #003f7f;
   color: white;
@@ -27,8 +27,9 @@ header {
   justify-content: space-between;
   align-items: center;
 }
+*/
 
-/* Nav bar */
+/* Nav bar 
 nav a {
   color: white;
   padding: 10px 15px;
@@ -37,7 +38,43 @@ nav a {
   cursor: pointer;
   text-decoration: none;
   margin: 0 15px;
+}*/
+
+/* Header personalizado */
+.custom-header {
+  background-color: #003f7f;
+  padding: 10px 20px;
 }
+
+/* Corrige a cor do ícone sanduíche */
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255,1)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Corrige o fundo ao colapsar o menu */
+.navbar-collapse {
+  background-color: #003f7f;
+}
+
+/* Alinha o botão de login */
+.entrar-btn {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.entrar-btn:hover {
+  background-color: #ffffff;
+  color: var(--primary-color);
+}
+
 
 nav a:hover {
   background-color: var(--primary-color);
@@ -54,8 +91,13 @@ footer {
   background-color: #003f7f;
   color: white;
   text-align: center;
-  padding: 10px;
+  padding: 15px 10px;
+  font-size: 0.9rem;
+  width: 100%;
+  margin-top: auto;
+  word-break: break-word;
 }
+
 
 /* Conteúdo principal da tela inicial */
 .main-content {
@@ -290,3 +332,26 @@ h1 {
   border-bottom: 3px solid #0d6efd; 
   background-color: transparent;
 }/* Variáveis de cor */
+
+/* Responsividade do Header */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: center;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  nav a {
+    margin: 5px 8px;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+}
