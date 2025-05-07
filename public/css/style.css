@@ -1,52 +1,23 @@
-/* Variáveis de cor */
 :root {
-  --primary-color: #003366; 
-  --secondary-color: #002244; 
-  --background-color: #f8f9fa; 
+  --primary-color: #003366;
+  --secondary-color: #002244;
+  --background-color: #f8f9fa;
   --button-radius: 30px;
 }
 
-/* Estilo geral do body */
+/* Estilo geral */
 body {
   background-color: var(--background-color);
   font-family: 'Poppins', sans-serif;
   color: #333;
-  margin: 0; 
+  margin: 0;
   padding: 0;
-  min-height: 100vh; 
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Header 
-header {
-  background-color: #003f7f;
-  color: white;
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-*/
-
-/* Nav bar 
-nav a {
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  text-decoration: none;
-  margin: 0 15px;
-}*/
-
-/* Header personalizado */
-.custom-header {
-  background-color: #003f7f;
-  padding: 10px 20px;
-}
-
-/* Corrige a cor do ícone sanduíche */
+/* Navbar */
 .navbar-toggler {
   border: none;
 }
@@ -55,35 +26,52 @@ nav a {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255,1)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 
-/* Corrige o fundo ao colapsar o menu */
 .navbar-collapse {
-  background-color: #003f7f;
+  background-color: #0f3a66;
 }
 
-/* Alinha o botão de login */
-.entrar-btn {
-  background-color: var(--primary-color);
+nav a {
+  font-size: 0.9rem;
+  border-radius: 8px;
+  margin: 0 10px;
+  text-decoration: none;
   color: white;
   padding: 8px 12px;
-  border-radius: 8px;
-  text-decoration: none;
-  display: inline-block;
 }
-
-.entrar-btn:hover {
-  background-color: #ffffff;
-  color: var(--primary-color);
-}
-
 
 nav a:hover {
   background-color: var(--primary-color);
-  color: #ffffff;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Header */
+.custom-header {
+  background-color: #0f3a66;
+  padding: 10px 20px;
+}
+
+/* Botões */
+.entrar-btn,
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
   padding: 10px 15px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.entrar-btn:hover{
+  background-color: #ffffff;
+  color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+  color: #fff;
 }
 
 /* Footer */
@@ -98,8 +86,7 @@ footer {
   word-break: break-word;
 }
 
-
-/* Conteúdo principal da tela inicial */
+/* Conteúdo principal */
 .main-content {
   flex: 1;
   display: flex;
@@ -109,7 +96,6 @@ footer {
   margin: 20px;
 }
 
-/* Seção informativa */
 .informativo {
   width: 100%;
   max-width: 800px;
@@ -120,7 +106,6 @@ footer {
   align-items: center;
 }
 
-/* Card */
 .card {
   flex: 1;
   margin: 10px;
@@ -129,52 +114,32 @@ footer {
   height: 100%;
 }
 
-/* Botões */
-.entrar-btn, .btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
-}
-
-/* Hover nos botões */
-.btn-primary:hover, .entrar-btn:hover {
-  background-color: #fff;
-  color: #333;
-}
-
-
 .container {
   max-width: 600px;
   margin: 0 auto;
   padding: 0 15px;
-  flex: 1; 
+  flex: 1;
 }
 
-h1, .form-label {
-  font-family: 'Poppins', sans-serif;
-}
-
+/* Tipografia */
 h1 {
+  font-family: 'Poppins', sans-serif;
   font-weight: 600;
   font-size: 2.5rem;
-  color: var(--primary-color); 
+  color: var(--primary-color);
   margin-bottom: 30px;
 }
 
 .form-label {
+  font-family: 'Poppins', sans-serif;
   font-weight: 400;
   font-size: 1rem;
   color: #6c757d;
-  transition: color 0.3s ease; 
   padding-bottom: 5px;
+  transition: color 0.3s ease;
 }
 
-/* Foco nos campos de entrada */
+/* Formulário */
 .form-control {
   border-radius: 8px;
   border: 1px solid #ced4da;
@@ -189,29 +154,7 @@ h1 {
   box-shadow: 0 0 5px rgba(0, 51, 102, 0.5);
 }
 
-/* Estilo do titulo */
-.text-primary {
-  color: var(--primary-color) !important;
-}
-
-/* Estilo do botão principal */
-.btn-primary {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  border-radius: var(--button-radius);
-  padding: 10px 30px;
-  width: 100%;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-}
-
-/* Hover no botão principal */
-.btn-primary:hover {
-  background-color: var(--secondary-color);
-  border-color: var(--secondary-color);
-}
-
-/* Estilo do botão de fechar */
+/* Botões e ações */
 .btn-close {
   background-color: transparent;
   border: none;
@@ -219,32 +162,21 @@ h1 {
   position: absolute;
   right: 8px;
   top: 8px;
-  z-index: 1050; 
+  z-index: 1050;
 }
 
-/* Botão de cadastro */
 .btn-cadastrar {
   font-size: 0.875rem;
   padding: 6px 20px;
-  width: auto;
-  height: auto;
   border-radius: 25px;
   border: none;
-  outline: none;
 }
 
-/* Estilo da modal */
+/* Modal */
 .modal-dialog {
   max-width: 70%;
   padding: 10px !important;
   animation: fadeIn 0.3s ease-in-out;
-}
-
-.modal-content {
-  background-color: #fff;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  padding: 10px;
 }
 
 .modal-dialog-login {
@@ -257,58 +189,95 @@ h1 {
   justify-content: center;
 }
 
-.barra {
-  background-color: var(--primary-color);
-  width: 33%;
+.modal-content {
+  background-color: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+/* Seção hero com altura fixa */
+.solaro-hero {
+  width: 100%;
+  height: 800px;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Div que contém a imagem de fundo */
+.hero-image {
+  background-image: url('../img/painel.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Gradiente sobre a imagem */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(2, 4, 37, 0.728),   /* azul escuro mais opaco */
+    rgba(8, 12, 45, 0.5),  /* azul intermediário */
+    rgba(93, 103, 249, 0)        /* termina transparente */
+  );
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: 1;
+}
+
+/* Texto sobre o gradiente */
+.hero-text {
+  width: 40vw;
+  padding: 2rem;
+  color: #fff;
+  z-index: 2;
+  position: relative;
+}
+
+.solaro-hero h1 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+}
+
+.solaro-hero p {
+  font-size: 1.2rem;
+  color: #fff;
 }
 
 
-/* Animação de fade-in */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Estilo das abas */
+/* Abas */
 .nav-pills .nav-link {
-  background-color: #ffffff;      
-  color: #333;                    
-  border-radius: 10px;             
+  background-color: transparent;
+  color: #6c757d;
+  border-radius: 10px;
   font-weight: 500;
   padding: 8px 20px;
-  transition: all 0.3s ease;
-  border: none;                  
-  box-shadow: none; 
-  margin-right: 10px;              
+  margin-right: 10px;
+  border-bottom: 2px solid transparent;
+  pointer-events: none;
 }
-
-/* Aba ativa */
 
 .nav-pills .nav-link.active {
-  background-color: transparent;         
-  color: var(--primary-color);                        
-  border-bottom: 3px solid var(--primary-color) !important; 
-  border-radius: 0;                   
+  background-color: transparent;
+  color: var(--primary-color);
+  border-bottom: 3px solid var(--primary-color);
+  pointer-events: auto;
+  border-radius: 0;
 }
 
-/* Responsividade */
-@media (max-width: 576px) {
-  h1 {
-      font-size: 2rem;
-  }
-
-  .container {
-      padding-left: 15px;
-      padding-right: 15px;
-  }
-
-  .btn-primary {
-      padding: 8px 20px; 
-  }
+/* Utilitários */
+.text-primary {
+  color: #fff !important;
 }
 
 .mb-3 {
@@ -319,39 +288,73 @@ h1 {
   padding-top: 20px;
 }
 
-.nav-pills .nav-link {
-  pointer-events: none;
-  border-bottom: 2px solid transparent;
-  color: #6c757d;
-  background-color: transparent;
-  font-weight: 500;
+.barra {
+  background-color: var(--primary-color);
+  width: 33%;
 }
 
-.nav-pills .nav-link.active {
-  pointer-events: auto;
-  border-bottom: 3px solid #0d6efd; 
-  background-color: transparent;
-}/* Variáveis de cor */
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-/* Responsividade do Header */
+/* Responsividade */
 @media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
+  .solaro-hero {
+    height: 400px;
+    padding-left: 2%;
+    background-position: center right;
+  }
+
+  .hero-text,
+  .solaro-hero h1,
+  .solaro-hero p {
     text-align: center;
+    width: 100%;
+  }
+
+  .solaro-hero .btn {
+    display: block;
+    margin: 0 auto;
   }
 
   nav {
-    display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    width: 100%;
     margin-top: 10px;
   }
 
   nav a {
     margin: 5px 8px;
-    font-size: 0.9rem;
     padding: 8px 12px;
+  }
+
+  nav a:hover {
+    background-color: #ffffff06;
+  }
+}
+
+@media (max-width: 576px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  .container {
+    padding: 0 15px;
+  }
+
+  .btn-primary {
+    padding: 8px 20px;
+  }
+
+  .hero-img {
+    border-radius: 0;
+    max-height: 300px;
+  }
+
+  nav a:hover {
+    background-color: #ffffff06;
+    padding: 10px;
   }
 }
