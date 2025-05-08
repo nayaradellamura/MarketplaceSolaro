@@ -323,7 +323,7 @@ h1 {
 }
 
 .text-tertiary {
-  color: #333 !important;
+  color: var(--primary-color) !important;
   font-weight: bold;
   font-size: 25px;
   padding-right: 30px;
