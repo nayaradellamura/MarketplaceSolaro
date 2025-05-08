@@ -27,7 +27,7 @@ body {
 }
 
 .navbar-collapse {
-  background-color: #0f3a66;
+  background-color: #002850;
 }
 
 nav a {
@@ -47,7 +47,7 @@ nav a:hover {
 
 /* Header */
 .custom-header {
-  background-color: #0f3a66;
+  background-color: #002850;
   padding: 10px 20px;
 }
 
@@ -76,7 +76,7 @@ nav a:hover {
 
 /* Footer */
 footer {
-  background-color: #003f7f;
+  background-color: #17212c;
   color: white;
   text-align: center;
   padding: 15px 10px;
@@ -207,7 +207,7 @@ h1 {
 
 /* Div que contém a imagem de fundo */
 .hero-image {
-  background-image: url('../img/painel.png');
+  background-image: url('../img/placa-solar.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -278,6 +278,10 @@ h1 {
 /* Utilitários */
 .text-primary {
   color: #fff !important;
+}
+
+.text-secondary {
+  color: #333 !important;
 }
 
 .mb-3 {
