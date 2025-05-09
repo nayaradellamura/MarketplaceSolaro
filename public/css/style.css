@@ -352,6 +352,11 @@ h1 {
   width: 33%;
 }
 
+.progress-bar.barra {
+  background-color: #003366;
+  transition: width 0.3s ease;
+}
+
 /* Animações */
 @keyframes fadeIn {
   from { opacity: 0; }
