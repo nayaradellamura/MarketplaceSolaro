@@ -120,7 +120,7 @@
       </div>
     </div> 
 </div> 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById('modal');
@@ -132,7 +132,19 @@
       primeiraAba.show();
       document.getElementById("progressBar").style.width = "0%";
     });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault(); 
+      Swal.fire({
+        title: "Cadastrado com Sucesso!",
+        icon: "success",
+        confirmButtonText: "OK"
+      }).then(() => {
+        form.submit(); 
+      });
+    });
   });
+  
 </script>
 
 
