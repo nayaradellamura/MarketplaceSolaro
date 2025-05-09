@@ -59,6 +59,17 @@
     </div>
   </section>
 
+
+<!-- MatheusO: Abre o Login após o POST do cadastro -->
+  <script>
+  window.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('showLoginModal') === 'true') {
+      openLoginModal();
+    }
+  });
+</script>
+
 <!-- Footer e JS -->
 {{> footer }}    
 </body>
