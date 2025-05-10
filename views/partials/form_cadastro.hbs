@@ -31,7 +31,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                     <label for="cpf_cnpj" class="form-label">CPF ou CNPJ</label>
-                    <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" required onkeyup="consultarDocumento()">
+                    <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" required oninput="atualizarCampoDocumento(this)" onblur="consultarDocumento()">
                     </div>
                     <div class="col-md-6 mb-3">
                     <label for="nome" class="form-label">Nome ou Razão Social</label>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                    <label for="contato" class="form-label">Contato</label>
+                    <label for="contato" class="form-label">Telefone</label>
                     <input type="text" class="form-control" id="contato" name="contato" required>
                     </div>
                     <div class="col-md-6 mb-3">
