@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <!-- Head -->
+  {{> head }}
+
+  <body>
+    <header class="custom-header">
+      {{> navbar_home }}
+    </header>
+    <br />
+
+    <section class="py-5 bg-light">
+      <div class="container">
+        <h2 class="text-center mb-4">Bem-vindo, {{NomeFornecedor.nome}}!</h2>
+        <p class="text-center mb-5">
+          Gerencie sua presença na plataforma e acompanhe seu desempenho.
+        </p>
+
+        <div class="row g-4 justify-content-center text-center">
+          <div class="col-md-10 col-lg-6">
+            <div class="card shadow-sm p-4 card-dashboard mx-auto">
+              <h4 class="text-primary">Ofertas Ativas</h4>
+              <p class="display-6 fw-bold">12</p>
+            </div>
+          </div>
+
+          <div class="col-md-10 col-lg-6">
+            <div class="card shadow-sm p-4 card-dashboard mx-auto">
+              <h4 class="text-success">Clientes Interessados</h4>
+              <p class="display-6 fw-bold">28</p>
+            </div>
+          </div>
+
+          <div class="col-md-10 col-lg-6">
+            <div class="card shadow-sm p-4 card-dashboard mx-auto">
+              <h4 class="text-warning">Energia Vendida</h4>
+              <p class="display-6 fw-bold">8.500 kWh</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-5" />
+
+        <div class="text-center">
+          <a href="/cadastro_oferta" class="btn btn-primary btn-lg">Cadastrar Nova Oferta</a>
+          <a href="/meus_clientes" class="btn btn-outline-secondary btn-lg ms-3">Ver Clientes</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5 bg-white">
+      <div class="container">
+        <h3 class="mb-4">Dicas para aumentar suas vendas</h3>
+        <ul>
+          <li>Mantenha suas ofertas sempre atualizadas</li>
+          <li>Use descrições claras e objetivas</li>
+          <li>Ofereça preços e condições competitivas</li>
+          <li>Interaja rapidamente com os consumidores</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Espaço -->
+    <div style="height: 100px;"></div>
+
+    <!-- Footer -->
+    {{> footer }}
+  </body>
+</html>
