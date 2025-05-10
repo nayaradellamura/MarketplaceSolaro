@@ -41,7 +41,7 @@ function openFormularioModal() {
     alert('Login enviado!');
   }
   
-  
+  // MOD
   // Função para buscar o endereço pelo CEP
   function buscarEndereco() {
     var cep = document.getElementById('cep').value.replace('-', ''); 
