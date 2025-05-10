@@ -1,17 +1,69 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<!-- Head -->
-{{> head }}
+  <!-- Head -->
+  {{> head }}
 
-<body>
-<header>
-{{> navbar_home }}
-</header>
+  <body>
+    <header class="custom-header">
+      {{> navbar_home }}
+    </header>
+    <br />
 
- <h1>Consumidor</h1>
-    
+    <section class="py-5 bg-light">
+      <div class="container">
+        <h2 class="text-center mb-4">Bem-vindo, Consumidor!</h2>
+        <p class="text-center mb-5">
+          Acompanhe seu consumo de energia e aproveite as melhores ofertas.
+        </p>
 
-<!-- Footer e JS -->
-{{> footer }}   
-</body>
+        <div class="row g-4 justify-content-center text-center">
+          <div class="col-md-10 col-lg-6">
+            <div class="card shadow-sm p-4 card-dashboard mx-auto">
+              <h4 class="text-primary">Ofertas Disponíveis</h4>
+              <p class="display-6 fw-bold">15</p>
+            </div>
+          </div>
+
+          <div class="col-md-10 col-lg-6">
+            <div class="card shadow-sm p-4 card-dashboard mx-auto">
+              <h4 class="text-success">Energia Contratada</h4>
+              <p class="display-6 fw-bold">3.200 kWh</p>
+            </div>
+          </div>
+
+          <div class="col-md-10 col-lg-6">
+            <div class="card shadow-sm p-4 card-dashboard mx-auto">
+              <h4 class="text-warning">Economia Estimada</h4>
+              <p class="display-6 fw-bold">R$ 460,00</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-5" />
+
+        <div class="text-center">
+          <a href="/ofertas" class="btn btn-primary btn-lg">Explorar Ofertas</a>
+          <a href="/historico_consumo" class="btn btn-outline-secondary btn-lg ms-3">Ver Histórico</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5 bg-white">
+      <div class="container">
+        <h3 class="mb-4">Dicas para economizar com energia solar</h3>
+        <ul>
+          <li>Compare as ofertas antes de contratar</li>
+          <li>Prefira fornecedores próximos da sua região</li>
+          <li>Monitore seu consumo regularmente</li>
+          <li>Utilize aparelhos fora dos horários de pico</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Espaço -->
+    <div style="height: 100px;"></div>
+
+    <!-- Footer -->
+    {{> footer }}
+  </body>
 </html>

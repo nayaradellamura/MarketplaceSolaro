@@ -546,6 +546,14 @@ h1 span {
   color: #444;
 }
 
+/* dash */
+.card-dashboard {
+  min-width: 280px;
+  max-width: 100%;
+  width: 100%;
+}
+
+
 
 /* Animações */
 @keyframes fadeIn {
