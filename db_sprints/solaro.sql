@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 02/05/2025 às 15:17
+-- Tempo de geração: 06/05/2025 às 02:18
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.0.30
 
@@ -45,13 +45,28 @@ CREATE TABLE `endereco` (
 --
 
 CREATE TABLE `usuarios` (
-  `ID` int(11) NOT NULL,
-  `NOME` varchar(100) NOT NULL,
-  `IDENTIFICACAO` varchar(18) NOT NULL,
-  `TIPO_USUARIO` varchar(11) NOT NULL,
-  `EMAIL` varchar(255) NOT NULL,
-  `SENHA` varchar(255) NOT NULL
+  `id` int(11) NOT NULL,
+  `cpf_cnpj` varchar(20) DEFAULT NULL,
+  `nome` varchar(100) DEFAULT NULL,
+  `contato` varchar(100) DEFAULT NULL,
+  `tipo` varchar(50) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `rua` varchar(100) DEFAULT NULL,
+  `numero` varchar(10) DEFAULT NULL,
+  `bairro` varchar(50) DEFAULT NULL,
+  `cidade` varchar(50) DEFAULT NULL,
+  `estado` varchar(50) DEFAULT NULL,
+  `pais` varchar(50) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `senha` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `usuarios`
+--
+
+INSERT INTO `usuarios` (`id`, `cpf_cnpj`, `nome`, `contato`, `tipo`, `cep`, `rua`, `numero`, `bairro`, `cidade`, `estado`, `pais`, `email`, `senha`) VALUES
+(3, '47917279839', 'Matheus Opuscolo', '19996912705', 'Consumidor', '13846601', 'Rua Fábio Tomaz', '189', 'Jardim São José', 'Mogi Guaçu', 'SP', 'Brasil', 'matheus.opuscolo@gmail.com', '1234567890');
 
 --
 -- Índices para tabelas despejadas
@@ -67,7 +82,7 @@ ALTER TABLE `endereco`
 -- Índices de tabela `usuarios`
 --
 ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`ID`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT para tabelas despejadas
@@ -83,7 +98,7 @@ ALTER TABLE `endereco`
 -- AUTO_INCREMENT de tabela `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
