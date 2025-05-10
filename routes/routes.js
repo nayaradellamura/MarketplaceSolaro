@@ -14,6 +14,7 @@ router.get('/home_consumidor', (req, res) => res.render('home_consumidor'));
 router.get('/home_fornecedor', (req, res) => res.render('home_fornecedor'));
 
 // Partials
+router.get('/tawkto', (req, res) => res.render('tawkto'));
 router.get('/login', (req, res) => res.render('login'));
 router.get('/cadastro', (req, res) => res.render('form_cadastro'));
 router.get('/head', (req, res) => res.render('head'));
