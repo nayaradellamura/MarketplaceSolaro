@@ -5,7 +5,7 @@
 
 <body>
 <header class="custom-header">
-{{> navbar_index }}
+  {{> navbar_index }}
 </header>
 <br>
 
@@ -22,55 +22,118 @@
   </div>
 </section>
 
-   <!-- Modal de Login -->
-   {{> login }}
+<!-- Modal de Login -->
+{{> login }}
 
-   <!-- Modal de Cadastro -->
-   {{> form_cadastro }}
+<!-- Modal de Cadastro -->
+{{> form_cadastro }}
 
-    <div class="main-content">
-        <h1>OFERTAS</h1>
-        <div class="informativo">
-            <div class="card"></div>
-            <div class="card"></div>
-            <div class="card"></div>
+<br> 
+<div class="main-content">
+    <h1>As vantagens de comercializar a <span>Energia Solar</span></h1>
+    <p>Aqui vão alguns motivos:</p>
+    <div class="informativo row gx-4 gy-4">
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card-informativo">
+                Os sistemas de energia requerem pouca manutenção
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card-informativo">
+                Os sistemas de energia requerem pouca manutenção
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card-informativo">
+                Economia na conta de energia e retorno de investimento
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card-informativo">
+                Sistemas de geração de energia têm longa durabilidade
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card-informativo">
+                Painéis solares podem gerar valorização imobiliária
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card-informativo">
+                Podem ser instaladas em áreas isoladas da rede elétrica
+            </div>
         </div>
     </div>
+</div>
 
 
-  <section class="solaro-hero d-flex align-items-center">
-    <div class="container-fluid">
-      <div class="row align-items-center">
+<!-- Espaçamento -->
+<div style="height: 200px;"></div>
 
-      <!-- Texto à esquerda -->
-      <div class="col-lg-6 col-md-12 px-5 py-4">
+<section class="clear-after-hero d-flex align-items-center">
+  <div class="container-fluid">
+    <div class="row align-items-center flex-lg-row flex-column-reverse">
+      <!-- Texto à esquerda no desktop / abaixo da imagem no mobile -->
+      <div class="col-lg-6 col-md-12 px-5 py-4 text-center text-lg-start">
         <h1 class="display-5 fw-bold">Marketplace SOLARO</h1>
         <p class="lead mt-3 text-secondary">
           Energia Solar é Sustentabilidade em Ação! Transforme a luz do sol em energia limpa e diga adeus à poluição. Com a energia solar, você economiza e ainda ajuda a preservar o planeta. O futuro é renovável.
         </p>
       </div>
 
-      <!-- Imagem à direita -->
+      <!-- Imagem à direita no desktop / acima do texto no mobile -->
       <div class="col-lg-6 col-md-12 p-0">
-        <img src="img/placa-solar.jpg" alt="Placa Solar" class="img-fluid w-100 hero-img" style="border-top-left-radius: 15px; border-bottom-left-radius: 15px;" />
-      </div>
-
+        <img src="img/placa-solar.jpg" alt="Placa Solar" class="img-fluid w-100 hero-img2" />
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
 
-<!-- MatheusO: Abre o Login após o POST do cadastro -->
-  <script>
-  window.addEventListener('DOMContentLoaded', function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('showLoginModal') === 'true') {
-      openLoginModal();
-    }
+<!-- Seção de FAQ -->
+<div class="faq-container" style="width: 90vw; max-width: 100%; margin: 0 auto;">
+    <h1>Dúvidas Frequentes</h1>
+
+  <div class="faq-item">
+    <div class="faq-question">Qual o prazo de entrega?</div>
+    <div class="faq-answer">O prazo de entrega é de até 5 dias úteis após a confirmação do pagamento.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">Como funciona a garantia?</div>
+    <div class="faq-answer">Todos os nossos produtos têm garantia de 12 meses contra defeitos de fabricação.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">Vocês fazem instalação?</div>
+    <div class="faq-answer">Sim, temos uma equipe técnica que realiza instalação sob agendamento.</div>
+  </div>
+</div>
+
+<!-- Espaçamento -->
+<div style="height: 50px;"></div>
+
+<!-- Footer e JS -->
+{{> footer }}
+
+<!-- Abrir e fechar FAQ -->
+<script>
+  // Seleciona todas as perguntas e adiciona evento de clique
+  document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+      const item = question.parentElement;
+      // Fecha todas as outras perguntas
+      document.querySelectorAll('.faq-item').forEach(i => {
+        if (i !== item) {
+          i.classList.remove('active');
+        }
+      });
+      // Alterna a classe 'active' para mostrar ou ocultar a resposta
+      item.classList.toggle('active');
+    });
   });
 </script>
 
-<!-- Footer e JS -->
-{{> footer }}    
 </body>
 </html>

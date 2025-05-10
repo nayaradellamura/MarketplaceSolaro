@@ -204,3 +204,11 @@ function openFormularioModal() {
       progressBar.style.width = porcentagens[index] + '%';
       progressBar.setAttribute('aria-valuenow', porcentagens[index]);
     }
+
+   // MatheusO: Abre o Login após o POST do cadastro 
+    window.addEventListener('DOMContentLoaded', function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('showLoginModal') === 'true') {
+        openLoginModal();
+      }
+    });
