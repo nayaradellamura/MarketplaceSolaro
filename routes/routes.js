@@ -7,6 +7,8 @@ const usuarioController = require('../controllers/usuarioController');
 router.get('/', (req, res) => res.render('index'));
 router.get('/index', (req, res) => res.render('index'));
 router.get('/home', (req, res) => res.render('home'));
+router.get('/home_consumidor', (req, res) => res.render('home_consumidor'));
+router.get('/home_fornecedor', (req, res) => res.render('home_fornecedor'));
 
 // Partials
 router.get('/login', (req, res) => res.render('login'));
