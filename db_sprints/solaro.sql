@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 06/05/2025 às 02:18
+-- Tempo de geração: 10/05/2025 às 03:51
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.0.30
 
@@ -24,18 +24,19 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `endereco`
+-- Estrutura para tabela `enderecos`
 --
 
-CREATE TABLE `endereco` (
-  `CEP` varchar(8) NOT NULL,
-  `RUA` varchar(100) NOT NULL,
-  `NRO` varchar(20) NOT NULL,
-  `BAIRRO` varchar(50) NOT NULL,
-  `CIDADE` varchar(50) NOT NULL,
-  `ESTADO` varchar(2) NOT NULL,
-  `PAIS` varchar(50) NOT NULL,
-  `ID` int(11) NOT NULL
+CREATE TABLE `enderecos` (
+  `id` int(11) NOT NULL,
+  `usuario_id` int(11) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `rua` varchar(100) DEFAULT NULL,
+  `numero` varchar(10) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `cidade` varchar(100) DEFAULT NULL,
+  `estado` varchar(100) DEFAULT NULL,
+  `pais` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -49,34 +50,21 @@ CREATE TABLE `usuarios` (
   `cpf_cnpj` varchar(20) DEFAULT NULL,
   `nome` varchar(100) DEFAULT NULL,
   `contato` varchar(100) DEFAULT NULL,
-  `tipo` varchar(50) DEFAULT NULL,
-  `cep` varchar(10) DEFAULT NULL,
-  `rua` varchar(100) DEFAULT NULL,
-  `numero` varchar(10) DEFAULT NULL,
-  `bairro` varchar(50) DEFAULT NULL,
-  `cidade` varchar(50) DEFAULT NULL,
-  `estado` varchar(50) DEFAULT NULL,
-  `pais` varchar(50) DEFAULT NULL,
+  `tipo` varchar(20) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
-  `senha` varchar(100) DEFAULT NULL
+  `senha` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `usuarios`
---
-
-INSERT INTO `usuarios` (`id`, `cpf_cnpj`, `nome`, `contato`, `tipo`, `cep`, `rua`, `numero`, `bairro`, `cidade`, `estado`, `pais`, `email`, `senha`) VALUES
-(3, '47917279839', 'Matheus Opuscolo', '19996912705', 'Consumidor', '13846601', 'Rua Fábio Tomaz', '189', 'Jardim São José', 'Mogi Guaçu', 'SP', 'Brasil', 'matheus.opuscolo@gmail.com', '1234567890');
 
 --
 -- Índices para tabelas despejadas
 --
 
 --
--- Índices de tabela `endereco`
+-- Índices de tabela `enderecos`
 --
-ALTER TABLE `endereco`
-  ADD PRIMARY KEY (`ID`);
+ALTER TABLE `enderecos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usuario_id` (`usuario_id`);
 
 --
 -- Índices de tabela `usuarios`
@@ -89,16 +77,26 @@ ALTER TABLE `usuarios`
 --
 
 --
--- AUTO_INCREMENT de tabela `endereco`
+-- AUTO_INCREMENT de tabela `enderecos`
 --
-ALTER TABLE `endereco`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `enderecos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Restrições para tabelas despejadas
+--
+
+--
+-- Restrições para tabelas `enderecos`
+--
+ALTER TABLE `enderecos`
+  ADD CONSTRAINT `enderecos_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
