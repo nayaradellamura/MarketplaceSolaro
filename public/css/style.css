@@ -454,6 +454,12 @@ h1 span {
   transition: color 0.3s ease;
 }
 
+.logo-solaro {
+  font-size: 1.4rem; 
+  font-weight: 700;  
+  letter-spacing: 1px; 
+}
+
 .mb-3 {
   margin-bottom: 1.5rem;
 }
@@ -471,6 +477,75 @@ h1 span {
   background-color: #003366;
   transition: width 0.3s ease;
 }
+
+/* Contato */
+#contato h2 {
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+#contato p {
+  color: #666;
+}
+
+#contato .form-control {
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+#contato .btn {
+  padding: 10px 30px;
+  border-radius: 30px;
+}
+
+/* Sustentabilidade */
+.sustentabilidade-section {
+  background-color: #ffffff;
+}
+
+.titulo-sustentabilidade {
+  color: #2d6a4f;
+  font-weight: bold;
+}
+
+.texto-introducao {
+  font-size: 1rem;
+  color: #555;
+}
+
+.card-sustentavel {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.card-sustentavel:hover {
+  transform: scale(1.02);
+}
+
+.imagem-card {
+  height: 180px;
+  width: 100%;
+  object-fit: cover;
+  border-bottom: 3px solid #2d6a4f;
+}
+
+.conteudo-card {
+  padding: 15px;
+}
+
+.titulo-card {
+  font-size: 1.2rem;
+  color: #1b4332;
+  margin-bottom: 0.5rem;
+}
+
+.descricao-card {
+  font-size: 0.95rem;
+  color: #444;
+}
+
 
 /* Animações */
 @keyframes fadeIn {

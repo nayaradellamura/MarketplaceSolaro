@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<!-- Head -->
+{{> head }}
+
+<body>
+<header class="custom-header">
+  {{> navbar_index }}
+</header>
+<br>
+
+<!-- Espaçamento -->
+<div style="height: 100px;"></div>
+
+<!-- Seção de FAQ -->
+<div class="faq-container" style="width: 90vw; max-width: 100%; margin: 0 auto;">
+    <h1>Dúvidas Frequentes</h1>
+
+  <div class="faq-item">
+    <div class="faq-question">Como funciona a comercialização de energia solar no SOLARO?</div>
+    <div class="faq-answer">Explicação</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">É necessário ter painéis solares para comprar energia no marketplace?</div>
+    <div class="faq-answer">Explicação</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">Posso vender minha energia excedente mesmo sendo pessoa física?</div>
+    <div class="faq-answer">Explicação</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">A energia solar do marketplace é mais barata que a da distribuidora?</div>
+    <div class="faq-answer">Explicação</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">Como é feito o pagamento da energia contratada?</div>
+    <div class="faq-answer">Explicação</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">É seguro contratar energia solar pelo SOLARO?</div>
+    <div class="faq-answer">Explicação</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">Preciso assinar contrato? Tem fidelidade?</div>
+    <div class="faq-answer">Explicação</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">Como sei que estou realmente usando energia solar?</div>
+    <div class="faq-answer">Explicação</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">Quais regiões o marketplace atende atualmente?</div>
+    <div class="faq-answer">Explicação</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">O que acontece em dias nublados ou chuvosos?</div>
+    <div class="faq-answer">Explicação</div>
+  </div>
+</div>
+
+<!-- Espaçamento -->
+<div style="height: 100px;"></div>
+
+<!-- Footer e JS -->
+{{> footer }}
+
+<!-- Abrir e fechar FAQ -->
+<script>
+  // Seleciona todas as perguntas e adiciona evento de clique
+  document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+      const item = question.parentElement;
+      // Fecha todas as outras perguntas
+      document.querySelectorAll('.faq-item').forEach(i => {
+        if (i !== item) {
+          i.classList.remove('active');
+        }
+      });
+      // Alterna a classe 'active' para mostrar ou ocultar a resposta
+      item.classList.toggle('active');
+    });
+  });
+</script>
+
+</body>
+</html>
