@@ -204,3 +204,26 @@ function openFormularioModal() {
       progressBar.style.width = porcentagens[index] + '%';
       progressBar.setAttribute('aria-valuenow', porcentagens[index]);
     }
+
+    function formatarDocumento(campo) {
+      let valor = campo.value.replace(/\D/g, ''); // Remove tudo o que não é dígito
+  
+      if (valor.length <= 11) { // Formatação de CPF
+          valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+          valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+          valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      } else { // Formatação de CNPJ
+          valor = valor.substring(0, 14); // Limita ao tamanho máximo de CNPJ
+          valor = valor.replace(/^(\d{2})(\d)/, '$1.$2');
+          valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+          valor = valor.replace(/\.(\d{3})(\d)/, '.$1/$2');
+          valor = valor.replace(/(\d{4})(\d)/, '$1-$2');
+      }
+      campo.value = valor;
+  }
+  function atualizarCampoDocumento(campo) {
+      formatarDocumento(campo);
+      if (campo.value.length === 14 || campo.value.length === 18) {
+      consultarDocumento();
+      }
+  }
