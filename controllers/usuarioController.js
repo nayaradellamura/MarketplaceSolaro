@@ -83,9 +83,9 @@ exports.loginUsuario = async (req, res) => {
             };
 
             // Redireciona conforme o tipo
-            if (usuario.tipo === 'Consumidor') {
+            if (usuario.tipo === 'C') {
                 return res.redirect('/home_consumidor');
-            } else if (usuario.tipo === 'Fornecedor de Energi') {
+            } else if (usuario.tipo === 'F') {
                 return res.redirect('/home_fornecedor');
             } else {
                 return res.redirect('/');

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Economia - SOLARO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <div class="container py-5">
+    <h2 class="mb-4 text-center">Simule sua Economia com Energia Solar</h2>
+
+    <!-- Seleção de Estado -->
+    <div class="mb-4">
+      <label for="estado" class="form-label">Selecione seu Estado</label>
+      <select id="estado" class="form-select" onchange="atualizarFornecedor()">
+        <option value="">Escolha seu estado</option>
+        <option value="SP">São Paulo</option>
+        <option value="MG">Minas Gerais</option>
+        <option value="RJ">Rio de Janeiro</option>
+        <!-- Adicione outros estados conforme necessário -->
+      </select>
+    </div>
+
+    <!-- Informações sobre os benefícios da energia solar -->
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card shadow-sm p-4 border-start border-info border-4">
+          <h5 class="text-muted">Vantagens ao se conectar com um fornecedor solar</h5>
+          <ul>
+            <li>Negociações com fornecedores locais e condições flexíveis</li>
+            <li>Acesso a fornecedores comprometidos com a sustentabilidade e qualidade</li>
+            <li>Possibilidade de reduzir custos com a distribuidora, conforme o consumo solar</li>
+          </ul>
+          <p>Descubra qual fornecedor pode oferecer a melhor condição para sua região!</p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card shadow-sm p-4 border-start border-success border-4">
+          <h5 class="text-muted">Fornecedores Solar</h5>
+          <h2 class="text-success" id="fornecedorInfo">Fornecedor Local Selecionado</h2>
+          <p>Descubra quais fornecedores estão disponíveis na sua região através do marketplace.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simulador de Economia -->
+    <div class="mt-5">
+      <h4>Informe seu consumo mensal (kWh)</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <input type="number" class="form-control" id="consumo" placeholder="Ex: 250">
+        </div>
+        <div class="col-md-6">
+          <button class="btn btn-success w-100" onclick="calcularEconomia()">Calcular Economia</button>
+        </div>
+      </div>
+
+      <!-- Resultado -->
+      <div class="mt-4" id="resultadoEconomia" style="display: none;">
+        <h5>💰 Economia estimada: <span id="valorEconomia" class="fw-bold text-primary"></span> por mês</h5>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Exemplo de fornecedores por estado
+    const fornecedores = {
+      "SP": "Fornecedor Solar SP - Condições Competitivas",
+      "MG": "Fornecedor Solar MG - Preços Flexíveis",
+      "RJ": "Fornecedor Solar RJ - Energia Sustentável"
+      // Adicione mais fornecedores conforme necessário
+    };
+
+    let fornecedorAtual = "Fornecedor Solar SP - Condições Competitivas"; // Valor padrão
+
+    function atualizarFornecedor() {
+      const estado = document.getElementById("estado").value;
+      fornecedorAtual = fornecedores[estado] || "Fornecedor Solar SP - Condições Competitivas";
+      document.getElementById("fornecedorInfo").textContent = fornecedorAtual;
+    }
+
+    function calcularEconomia() {
+      const consumo = parseFloat(document.getElementById("consumo").value);
+      
+      if (!isNaN(consumo) && consumo > 0) {
+        // Aqui, você pode calcular a economia estimada baseada no fornecedor escolhido e consumo
+        const desconto = 0.15; // Por exemplo, o fornecedor solar oferece 15% de desconto
+        const economia = consumo * desconto;
+        
+        document.getElementById("valorEconomia").textContent = "R$ " + economia.toFixed(2);
+        document.getElementById("resultadoEconomia").style.display = "block";
+      }
+    }
+  </script>
+
+</body>
+</html>

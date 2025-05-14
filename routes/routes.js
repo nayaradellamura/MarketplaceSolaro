@@ -9,6 +9,7 @@ router.get('/index', (req, res) => res.render('index'));
 router.get('/duvidas', (req, res) => res.render('duvidas'));
 router.get('/contato', (req, res) => res.render('contato'));
 router.get('/sustentabilidade', (req, res) => res.render('sustentabilidade'));
+router.get('/taxas', (req, res) => res.render('taxas'));
 router.get('/home', (req, res) => res.render('home'));
 router.get('/home_consumidor', (req, res) => res.render('home_consumidor'));
 router.get('/home_fornecedor', (req, res) => res.render('home_fornecedor'));
