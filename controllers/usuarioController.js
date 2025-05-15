@@ -103,8 +103,12 @@ exports.cadastrarContrato = (req, res) => {
         return res.status(403).send('Acesso negado');
     }
 
-    const { preco_kwh, geracao_kwh } = req.body;
-    const usuarioId = req.session.usuario.id;
+    const { preco_kwh, geracao_kwh, prazo_contrato } = req.body;
+    const usuarioId = req.session.usuario.id; 
+    let meses = parseInt(prazo_contrato);
+    if (![3, 6, 12].includes(meses)) {
+        return res.status(400).send('Prazo de contrato inválido');
+    }
 
     const sqlEndereco = 'SELECT estado FROM enderecos WHERE usuario_id = ? LIMIT 1';
 
@@ -121,12 +125,10 @@ exports.cadastrarContrato = (req, res) => {
                 UsuarioID, dataAssinatura, dataFinal, prazoContrato,
                 estado_fazenda, preco_kwh, geracao_kwh
             )
-            VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 3 MONTH), 
-                    PERIOD_DIFF(DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 3 MONTH), '%Y%m'), DATE_FORMAT(CURDATE(), '%Y%m')), 
-                    ?, ?, ?)
+            VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL ? MONTH), ?, ?, ?, ?)
         `;
 
-        db.query(sqlContrato, [usuarioId, estado_fazenda, preco_kwh, geracao_kwh], (err2) => {
+        db.query(sqlContrato, [usuarioId, meses, meses, estado_fazenda, preco_kwh, geracao_kwh], (err2) => {
             if (err2) {
                 console.error('Erro ao cadastrar contrato:', err2);
                 return res.status(500).send('Erro ao cadastrar contrato.');
