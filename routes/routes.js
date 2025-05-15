@@ -1,9 +1,8 @@
-
 const express = require('express');
 const router = express.Router();
 const usuarioController = require('../controllers/usuarioController');
 
-// Páginas
+// Páginas públicas
 router.get('/', (req, res) => res.render('index'));
 router.get('/index', (req, res) => res.render('index'));
 router.get('/duvidas', (req, res) => res.render('duvidas'));
@@ -11,36 +10,39 @@ router.get('/contato', (req, res) => res.render('contato'));
 router.get('/sustentabilidade', (req, res) => res.render('sustentabilidade'));
 router.get('/taxas', (req, res) => res.render('taxas'));
 router.get('/home', (req, res) => res.render('home'));
-router.get('/home_consumidor', (req, res) => res.render('home_consumidor'));
-router.get('/home_fornecedor', (req, res) => res.render('home_fornecedor'));
 
 // Partials
-router.get('/tawkto', (req, res) => res.render('tawkto'));
 router.get('/login', (req, res) => res.render('login'));
 router.get('/cadastro', (req, res) => res.render('form_cadastro'));
-router.get('/head', (req, res) => res.render('head'));
-router.get('/footer', (req, res) => res.render('footer'));
-router.get('/navbar_index', (req, res) => res.render('navbar_index'));
-router.get('/navbar_home', (req, res) => res.render('navbar_home'));
 router.get('/cadastro_usuario', (req, res) => res.render('cadastro_usuario'));
 
-// Processamento de formulários
+// Processamento - Usuário
 router.post('/cadastro', usuarioController.cadastrarUsuario);
 router.post('/login', usuarioController.loginUsuario);
+router.post('/cadastro_oferta', usuarioController.cadastrarContrato);
 
+
+// Páginas autenticadas
 router.get('/home_consumidor', (req, res) => {
-    if (req.session.usuario?.tipo === 'Consumidor') {
-        return res.render('home_consumidor', { NomeConsumidor: req.session.usuario });
+    if (req.session.usuario?.tipo === 'C') {
+        return res.render('home_consumidor', { NomeConsumidor: req.session.usuario.nome });
     }
     res.redirect('/');
 });
 
 router.get('/home_fornecedor', (req, res) => {
-    if (req.session.usuario?.tipo === 'Fornecedor de Energi') {
-        return res.render('home_fornecedor', { NomeFornecedor: req.session.usuario });
+    if (req.session.usuario?.tipo === 'F') {
+        return res.render('home_fornecedor', {
+            nomeFornecedor: req.session.usuario.nome,
+            rs_hora: req.session.usuario.rs_hora || 0,
+            kwh_total: req.session.usuario.kwh_total || 0,
+            repasse: req.session.usuario.repasse || 0
+        });
     }
     res.redirect('/');
 });
 
-module.exports = router;
 
+
+
+module.exports = router;
