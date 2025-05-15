@@ -556,7 +556,36 @@ h1 span {
   max-width: 100%;
   width: 100%;
 }
-/* div sustentabilidade */
+
+/* oferta fornecedor*/
+.oferta-card {
+  border-color: var(--primary-color) !important;
+}
+
+.oferta-titulo {
+  color: var(--primary-color);
+}
+
+.oferta-subtitulo {
+  color: #666666;
+}
+
+.oferta-btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.oferta-btn-outline-primary:hover,
+.oferta-btn-outline-primary:focus {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+.oferta-bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
 
 
 /* Animações */

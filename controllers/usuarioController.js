@@ -90,6 +90,7 @@ exports.loginUsuario = async (req, res) => {
             } else {
                 return res.redirect('/');
             }
+            
         });
     } catch (error) {
         console.error("Erro no login:", error);
