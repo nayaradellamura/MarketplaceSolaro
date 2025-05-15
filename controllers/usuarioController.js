@@ -69,27 +69,66 @@ exports.loginUsuario = async (req, res) => {
             }
 
             const usuario = results[0];
-
             const senhaCorreta = await bcrypt.compare(loginSenha, usuario.senha);
+
             if (!senhaCorreta) {
                 return res.render('login', { erro: 'Email ou senha inválidos!' });
             }
 
-            // Cria a sessão
+            // Cria a sessão inicial
             req.session.usuario = {
                 id: usuario.id,
                 nome: usuario.nome,
                 tipo: usuario.tipo
             };
 
-
             console.log('Sessão do usuário:', req.session.usuario);
 
-            // Redireciona conforme o tipo
             if (usuario.tipo === 'C') {
+                // Redireciona consumidores
                 return res.redirect('/home_consumidor');
+
             } else if (usuario.tipo === 'F') {
-                return res.redirect('/home_fornecedor');
+            
+                const contratoSQL = `
+                    SELECT IdOferta, UsuarioID, dataAssinatura, dataFinal, prazoContrato,
+                           estado_fazenda, preco_kwh, geracao_kwh
+                    FROM contrato
+                    WHERE UsuarioID = ?
+                    ORDER BY IdOferta DESC
+                `;
+            
+                db.query(contratoSQL, [usuario.id], (errContrato, resultadosContrato) => {
+                    if (errContrato) {
+                        console.error("Erro ao buscar contrato:", errContrato);
+                        return res.status(500).send('Erro ao buscar contrato.');
+                    }
+            
+                    if (resultadosContrato.length > 0) {
+                        const contrato = resultadosContrato[0];
+                        req.session.usuario.IdOferta = contrato.IdOferta;
+                        req.session.usuario.UsuarioID = contrato.UsuarioID;
+                        req.session.usuario.dataAssinatura = contrato.dataAssinatura;
+                        req.session.usuario.dataFinal = contrato.dataFinal;
+                        req.session.usuario.prazoContrato = contrato.prazoContrato;
+                        req.session.usuario.estado_fazenda = contrato.estado_fazenda;
+                        req.session.usuario.preco_kwh = contrato.preco_kwh;
+                        req.session.usuario.geracao_kwh = contrato.geracao_kwh;
+                    } else {
+                        // Caso não tenha contrato cadastrado
+                        req.session.usuario.IdOferta = null;
+                        req.session.usuario.UsuarioID = usuario.id;
+                        req.session.usuario.dataAssinatura = null;
+                        req.session.usuario.dataFinal = null;
+                        req.session.usuario.prazoContrato = null;
+                        req.session.usuario.estado_fazenda = null;
+                        req.session.usuario.preco_kwh = 0;
+                        req.session.usuario.geracao_kwh = 0;
+                    }
+            
+                    return res.redirect('/home_fornecedor');
+                });
+
             } else {
                 return res.redirect('/');
             }
