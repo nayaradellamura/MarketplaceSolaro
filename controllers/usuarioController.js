@@ -97,3 +97,42 @@ exports.loginUsuario = async (req, res) => {
         res.status(500).send('Erro interno.');
     }
 };
+
+exports.cadastrarContrato = (req, res) => {
+    if (!req.session.usuario || req.session.usuario.tipo !== 'F') {
+        return res.status(403).send('Acesso negado');
+    }
+
+    const { preco_kwh, geracao_kwh } = req.body;
+    const usuarioId = req.session.usuario.id;
+
+    const sqlEndereco = 'SELECT estado FROM enderecos WHERE usuario_id = ? LIMIT 1';
+
+    db.query(sqlEndereco, [usuarioId], (err, results) => {
+        if (err || results.length === 0) {
+            console.error('Erro ao buscar estado:', err);
+            return res.status(500).send('Erro ao buscar estado do usuário.');
+        }
+
+        const estado_fazenda = results[0].estado;
+
+        const sqlContrato = `
+            INSERT INTO contrato (
+                UsuarioID, dataAssinatura, dataFinal, prazoContrato,
+                estado_fazenda, preco_kwh, geracao_kwh
+            )
+            VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 3 MONTH), 
+                    PERIOD_DIFF(DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 3 MONTH), '%Y%m'), DATE_FORMAT(CURDATE(), '%Y%m')), 
+                    ?, ?, ?)
+        `;
+
+        db.query(sqlContrato, [usuarioId, estado_fazenda, preco_kwh, geracao_kwh], (err2) => {
+            if (err2) {
+                console.error('Erro ao cadastrar contrato:', err2);
+                return res.status(500).send('Erro ao cadastrar contrato.');
+            }
+
+            res.redirect('/home_fornecedor');
+        });
+    });
+};

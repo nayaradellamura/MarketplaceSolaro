@@ -20,6 +20,8 @@ router.get('/cadastro_usuario', (req, res) => res.render('cadastro_usuario'));
 // Processamento - Usuário
 router.post('/cadastro', usuarioController.cadastrarUsuario);
 router.post('/login', usuarioController.loginUsuario);
+router.post('/cadastro_oferta', usuarioController.cadastrarContrato);
+
 
 // Páginas autenticadas
 router.get('/home_consumidor', (req, res) => {
@@ -41,25 +43,7 @@ router.get('/home_fornecedor', (req, res) => {
     res.redirect('/');
 });
 
-// Cadastro de contrato (fornecedor logado)
-router.post('/cadastro-oferta', (req, res) => {
-    if (!req.session.usuario || req.session.usuario.tipo !== 'F') {
-        return res.status(403).send('Acesso não autorizado');
-    }
 
-    const dadosContrato = {
-        ...req.body,
-        UsuarioID: req.session.usuario.id // Fornecedor logado
-    };
-
-    contratoController.cadastrarContrato(dadosContrato, (erro) => {
-        if (erro) {
-            console.error('Erro ao cadastrar contrato:', erro);
-            return res.status(500).send('Erro ao cadastrar contrato');
-        }
-        res.redirect('/home_fornecedor');
-    });
-});
 
 
 module.exports = router;
