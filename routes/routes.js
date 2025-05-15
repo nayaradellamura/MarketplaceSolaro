@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const usuarioController = require('../controllers/usuarioController');
-const contratoController = require('../controllers/contratoController');
 
 // Páginas públicas
 router.get('/', (req, res) => res.render('index'));

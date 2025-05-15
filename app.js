@@ -11,7 +11,11 @@ app.use(express.json());
 app.use(session({
     secret: 'O-Rato-Roeu-A-Roupa-Do-Rei-De-Roma-Habemus-Papam',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true, 
+    cookie: {
+        secure: false, 
+        maxAge: 1000 * 60 * 60 * 2 
+    }
 }));
 
 app.use((req, res, next) => {

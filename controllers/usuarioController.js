@@ -82,6 +82,9 @@ exports.loginUsuario = async (req, res) => {
                 tipo: usuario.tipo
             };
 
+
+            console.log('Sessão do usuário:', req.session.usuario);
+
             // Redireciona conforme o tipo
             if (usuario.tipo === 'C') {
                 return res.redirect('/home_consumidor');
@@ -90,7 +93,6 @@ exports.loginUsuario = async (req, res) => {
             } else {
                 return res.redirect('/');
             }
-            
         });
     } catch (error) {
         console.error("Erro no login:", error);
@@ -99,42 +101,32 @@ exports.loginUsuario = async (req, res) => {
 };
 
 exports.cadastrarContrato = (req, res) => {
-    if (!req.session.usuario || req.session.usuario.tipo !== 'F') {
-        return res.status(403).send('Acesso negado');
+    if (!req.session.usuario) {
+        return res.status(401).send('Usuário não está autenticado.');
     }
 
-    const { preco_kwh, geracao_kwh, prazo_contrato } = req.body;
-    const usuarioId = req.session.usuario.id; 
+    const { preco_kwh, geracao_kwh, prazo_contrato, estado_fazenda } = req.body;
+    const usuarioId = req.session.usuario.id;
     let meses = parseInt(prazo_contrato);
+
     if (![3, 6, 12].includes(meses)) {
         return res.status(400).send('Prazo de contrato inválido');
     }
 
-    const sqlEndereco = 'SELECT estado FROM enderecos WHERE usuario_id = ? LIMIT 1';
+    const sqlContrato = `
+        INSERT INTO contrato (
+            UsuarioID, dataAssinatura, dataFinal, prazoContrato,
+            estado_fazenda, preco_kwh, geracao_kwh
+        )
+        VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL ? MONTH), ?, ?, ?, ?)
+    `;
 
-    db.query(sqlEndereco, [usuarioId], (err, results) => {
-        if (err || results.length === 0) {
-            console.error('Erro ao buscar estado:', err);
-            return res.status(500).send('Erro ao buscar estado do usuário.');
+    db.query(sqlContrato, [usuarioId, meses, meses, estado_fazenda, preco_kwh, geracao_kwh], (err2) => {
+        if (err2) {
+            console.error('Erro ao cadastrar contrato:', err2);
+            return res.status(500).send('Erro ao cadastrar contrato.');
         }
 
-        const estado_fazenda = results[0].estado;
-
-        const sqlContrato = `
-            INSERT INTO contrato (
-                UsuarioID, dataAssinatura, dataFinal, prazoContrato,
-                estado_fazenda, preco_kwh, geracao_kwh
-            )
-            VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL ? MONTH), ?, ?, ?, ?)
-        `;
-
-        db.query(sqlContrato, [usuarioId, meses, meses, estado_fazenda, preco_kwh, geracao_kwh], (err2) => {
-            if (err2) {
-                console.error('Erro ao cadastrar contrato:', err2);
-                return res.status(500).send('Erro ao cadastrar contrato.');
-            }
-
-            res.redirect('/home_fornecedor');
-        });
+        res.redirect('/home_fornecedor');
     });
 };
