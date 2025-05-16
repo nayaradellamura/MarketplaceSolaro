@@ -29,20 +29,19 @@ function openFormularioModal() {
     modal.hide();
   }
   
-const select = document.getElementById("tipo");
-
-    select.addEventListener("change", function () {
-        const selectedValue = select.value;
-
-        // Você pode usar condicionais para definir variáveis específicas
-        if (selectedValue === "F") {
-            const fornecedorSelecionado = true;
-            console.log("Fornecedor selecionado");
-        } else if (selectedValue === "C") {
-            const consumidorSelecionado = true;
-            console.log("Consumidor selecionado");
-        }
-    });
+  function validarLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const senha = document.getElementById('loginSenha').value;
+  
+    if (!email || !senha) {
+        alert('Por favor, preencha todos os campos.');
+        return;
+    }
+  
+    alert('Login enviado!');
+  }
+  
+  
   // Função para buscar o endereço pelo CEP
   function buscarEndereco() {
     var cep = document.getElementById('cep').value.replace('-', ''); 

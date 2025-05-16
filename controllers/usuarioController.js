@@ -1,6 +1,7 @@
 const db = require('../db/db');
 const bcrypt = require('bcrypt');
 
+
 exports.cadastrarUsuario = async (req, res) => {
     const {
         cpf_cnpj, nome, contato, tipo,
@@ -65,14 +66,18 @@ exports.loginUsuario = async (req, res) => {
             }
 
             if (results.length === 0) {
-                return res.render('login', { erro: 'Email ou senha inválidos!' });
+                return res.render('index', (err, html) => {
+                    res.redirect('/index?showLoginModal=true&LoginError=true');
+                });
             }
 
             const usuario = results[0];
             const senhaCorreta = await bcrypt.compare(loginSenha, usuario.senha);
 
             if (!senhaCorreta) {
-                return res.render('login', { erro: 'Email ou senha inválidos!' });
+                return res.render('index', (err, html) => {
+                    res.redirect('/index?showLoginModal=true&loginError=true');
+                });
             }
 
             // Cria a sessão inicial
@@ -181,6 +186,7 @@ exports.loginUsuario = async (req, res) => {
         });
     } catch (error) {
         console.error("Erro no login:", error);
+
         res.status(500).send('Erro interno.');
     }
 };
