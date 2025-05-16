@@ -17,34 +17,179 @@
           Gerencie suas ofertas e acompanhe seu desempenho na plataforma.
         </p>
 
+        {{#if preco_kwh}}
         <!-- Dashboard -->
         <div class="row g-4 justify-content-center text-center">
-          <div class="col-md-4">
+          <div class="col-md-6">
             <div class="card shadow-sm p-4 card-dashboard">
-              <h5 class="text-warning">Valor kWh</h5>
-              <p class="display-6 fw-bold">{{rs_hora}} R$</p>
+              <h5 class="text-warning">Preço do kWh</h5>
+              <p class="display-6 fw-bold">R$ {{preco_kwh}}</p>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <div class="card shadow-sm p-4 card-dashboard">
-              <h5 class="text-warning">Energia Total</h5>
+              <h5 class="text-warning">Geração por Hora</h5>
+              <p class="display-6 fw-bold">{{geracao_kwh}} KWh</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card shadow-sm p-4 card-dashboard">
+              <h5 class="text-success">Energia Total</h5>
               <p class="display-6 fw-bold">{{kwh_total}} kWh</p>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <div class="card shadow-sm p-4 card-dashboard border-danger">
               <h5 class="text-danger">A Receber</h5>
               <p class="display-6 fw-bold">R$ {{repasse}}</p>
             </div>
           </div>
         </div>
+        {{else}}
+        <!-- Simulador -->
+        <div class="mt-5">
+          <div class="card shadow p-4">
+            <h4 class="text-center mb-4 text-secondary">Simulador</h4>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="preco_kwh_sim" class="form-label">Preço do kWh (R$)</label>
+                <input type="number" step="0.01" class="form-control" id="preco_kwh_sim" placeholder="Ex: 0.72">
+              </div>
+
+              <div class="col-md-6">
+                <label for="geracao_kwh_sim" class="form-label">Geração por Hora (kWh)</label>
+                <input type="number" step="0.01" class="form-control" id="geracao_kwh_sim" placeholder="Ex: 3.5">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Prazo de Contrato</label>
+                  <select class="form-select" name="prazo_contrato_sim" required>
+                    <option value="" disabled selected>Selecione um prazo</option>
+                    <option value="3_meses">3 meses - Taxa SOLARO: 7,5%</option>
+                    <option value="6_meses">6 meses - Taxa SOLARO: 5%</option>
+                    <option value="12_meses">1 ano - Taxa SOLARO: 2,5%</option>
+                  </select>
+              </div>
+
+              <div class="col-md-6">
+                <label for="estado_fazenda_sim" class="form-label">Estado da Fazenda</label>
+                <select class="form-select" id="estado_fazenda_sim">
+                  <option value="" selected disabled>Selecione o estado (UF)</option>
+                  <option value="AC">Acre (AC)</option>
+                  <option value="AL">Alagoas (AL)</option>
+                  <option value="AP">Amapá (AP)</option>
+                  <option value="AM">Amazonas (AM)</option>
+                  <option value="BA">Bahia (BA)</option>
+                  <option value="CE">Ceará (CE)</option>
+                  <option value="DF">Distrito Federal (DF)</option>
+                  <option value="ES">Espírito Santo (ES)</option>
+                  <option value="GO">Goiás (GO)</option>
+                  <option value="MA">Maranhão (MA)</option>
+                  <option value="MT">Mato Grosso (MT)</option>
+                  <option value="MS">Mato Grosso do Sul (MS)</option>
+                  <option value="MG">Minas Gerais (MG)</option>
+                  <option value="PA">Pará (PA)</option>
+                  <option value="PB">Paraíba (PB)</option>
+                  <option value="PR">Paraná (PR)</option>
+                  <option value="PE">Pernambuco (PE)</option>
+                  <option value="PI">Piauí (PI)</option>
+                  <option value="RJ">Rio de Janeiro (RJ)</option>
+                  <option value="RN">Rio Grande do Norte (RN)</option>
+                  <option value="RS">Rio Grande do Sul (RS)</option>
+                  <option value="RO">Rondônia (RO)</option>
+                  <option value="RR">Roraima (RR)</option>
+                  <option value="SC">Santa Catarina (SC)</option>
+                  <option value="SP">São Paulo (SP)</option>
+                  <option value="SE">Sergipe (SE)</option>
+                  <option value="TO">Tocantins (TO)</option>
+                </select>
+              </div>
+
+              <div class="col-md-4 mx-auto">
+                <button class="btn btn-primary w-100 mt-3" onclick="calcularVenda()">
+                  <i class="bi bi-calculator-fill"></i>Calcular
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-4 text-center" id="resultado" style="display: none;">
+              <h5>Valor a receber estimado: <span id="valorReceber" class="fw-bold text-primary"></span> por mês</h5>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          function calcularVenda() {
+          const precoKwh = parseFloat(document.getElementById("preco_kwh_sim").value);
+          const geracao = parseFloat(document.getElementById("geracao_kwh_sim").value); // kWh/h
+          const prazoContrato = parseInt(document.getElementById("prazo_contrato_sim").value); // meses
+          const estado = document.getElementById("estado_fazenda_sim").value;
+
+          if (!precoKwh || !geracao || !prazoContrato || !estado) {
+            alert("Por favor, preencha todos os campos corretamente.");
+            return;
+          }
+
+          // Define taxa Solaro baseada no prazo selecionado
+          let taxaSolaro = 0;
+          switch (prazoContrato) {
+            case 3:
+              taxaSolaro = 0.075; // 7,5%
+              break;
+            case 6:
+              taxaSolaro = 0.05;  // 5%
+              break;
+            case 12:
+              taxaSolaro = 0.025; // 2,5%
+              break;
+            default:
+              taxaSolaro = 0.10; // padrão
+          }
+
+          const tarifaUF = 0.05;   // R$ 0,05 por kWh (fixa por enquanto)
+
+          // Energia gerada no mês: geração por hora * 24h * 30 dias
+          const energiaMensal = geracao * 24 * 30; // kWh por mês
+
+          // Valor bruto gerado por mês
+          const valorBrutoMensal = precoKwh * energiaMensal;
+
+          // Valor total bruto no prazo do contrato
+          const valorBrutoTotal = valorBrutoMensal * prazoContrato;
+
+          // Descontar taxa SOLARO
+          const valorComTaxaSolaro = valorBrutoTotal * (1 - taxaSolaro);
+
+          // Descontar tarifa da UF
+          const custoUF = tarifaUF * energiaMensal * prazoContrato;
+          const valorFinal = valorComTaxaSolaro - custoUF;
+
+          // Mostrar resultado formatado
+          document.getElementById("valorReceber").textContent = "R$ " + valorFinal.toFixed(2);
+          document.getElementById("resultado").style.display = "block";
+        }
+
+        </script>
+
+        <!-- Espaço -->
+        <div style="height: 100px;"></div>
 
         <!-- Botão abre Modal -->
-        <div class="text-center mt-5">
-          <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalOferta">
-            Cadastrar Oferta
-          </button>
-        </div>
+        <section class="d-flex justify-content-center align-items-center mt-5">
+          <div class="text-center">
+            <button class="btn btn-outline-primary btn-lg px-5 py-3 shadow-sm fw-bold animate__animated animate__pulse animate__infinite"
+              data-bs-toggle="modal" data-bs-target="#modalOferta">
+              <i class="bi bi-plus-circle me-2"></i> Cadastrar Nova Oferta
+            </button>
+            <p class="mt-2 text-muted small">Inicie uma nova parceria com a plataforma SOLARO</p>
+          </div>
+        </section>
+
+        {{/if}}
+
+        
+
       </div>
     </section>
 
@@ -57,10 +202,7 @@
               <h5 class="modal-title" id="modalOfertaLabel">Cadastrar Oferta de Energia</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
-
-            <!-- Scroll definido aqui -->
             <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-              <!-- Campos da Oferta -->
               <div class="mb-3">
                 <label for="preco_kwh" class="form-label">Preço do kWh (R$)</label>
                 <input type="number" step="0.01" class="form-control" id="preco_kwh" name="preco_kwh" required>
@@ -115,32 +257,17 @@
                 </select>
               </div>
 
-              <!-- Termos Contratuais -->
               <div class="border rounded p-3 bg-light mb-3">
                 <h6 class="text-center fw-bold">Contrato de Parceria com a SOLARO</h6>
-                <p class="small">
-                  Este contrato estabelece os termos de parceria entre o fornecedor {{nomeFornecedor}} e a plataforma SOLARO Marketplace.
-                </p>
                 <ul class="small">
                   <li>A energia gerada será ofertada a consumidores pela plataforma SOLARO.</li>
-                  <li>O fornecedor receberá os valores referentes à energia vendida, descontada a taxa administrativa conforme o prazo escolhido:
-                    <ul>
-                      <li>3 meses – 7,5%</li>
-                      <li>6 meses – 5%</li>
-                      <li>12 meses – 2,5%</li>
-                    </ul>
-                  </li>
+                  <li>O fornecedor receberá os valores referentes à energia vendida, descontada a taxa administrativa.</li>
                   <li>Contrato inicia na assinatura e termina automaticamente após o prazo.</li>
                   <li>Pagamentos são repassados mensalmente após o fechamento de consumo.</li>
                   <li>Fornecedor deve manter a geração conforme informado na oferta.</li>
-                  <li>Contrato tem validade jurídica mediante aceite digital abaixo.</li>
                 </ul>
-                <p class="small">
-                  Em caso de dúvidas ou cancelamento, entre em contato com o suporte SOLARO.
-                </p>
               </div>
 
-              <!-- Aceite -->
               <div class="form-check mt-3">
                 <input class="form-check-input" type="checkbox" id="aceiteContrato" name="aceite_contrato" required>
                 <label class="form-check-label" for="aceiteContrato">
@@ -149,7 +276,6 @@
               </div>
             </div>
 
-            <!-- Ações -->
             <div class="modal-footer">
               <button type="submit" class="btn btn-primary">Cadastrar Oferta e Assinar Contrato</button>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -159,84 +285,80 @@
       </div>
     </div>
 
-        <!-- Seção de Oferta -->
-      <section class="container my-5">
-        <div class="card border-start border-4 shadow-sm p-4 oferta-card">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <h4 class="oferta-titulo mb-1">Contrato Ativo</h4>
-              <small class="oferta-subtitulo">Parceria com a plataforma SOLARO</small>
-            </div>
-            <button class="btn oferta-btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalVisualizarContrato">
-              <i class="bi bi-file-earmark-text me-2"></i>Ver Detalhes
-            </button>
+    <!-- Seção de Contrato Ativo -->
+    {{#if preco_kwh}}
+    <section class="container my-5">
+      <div class="card border-start border-4 shadow-sm p-4 oferta-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h4 class="oferta-titulo mb-1">Contrato Ativo</h4>
+            <small class="oferta-subtitulo">Parceria com a plataforma SOLARO</small>
           </div>
-
-          <div class="row text-center text-md-start">
-            <div class="col-md-4 mb-3 mb-md-0">
-              <p class="mb-1"><strong><i class="bi bi-calendar-check me-2"></i>Assinatura:</strong></p>
-              <p>14/05/2025</p>
-            </div>
-            <div class="col-md-4 mb-3 mb-md-0">
-              <p class="mb-1"><strong><i class="bi bi-calendar-x me-2"></i>Validade:</strong></p>
-              <p>até 14/08/2025</p>
-            </div>
-            <div class="col-md-4">
-              <p class="mb-1"><strong><i class="bi bi-clock me-2"></i>Duração:</strong></p>
-              <p>3 meses</p>
-            </div>
-          </div>
+          <button class="btn oferta-btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalVisualizarContrato">
+            <i class="bi bi-file-earmark-text me-2"></i>Ver Detalhes
+          </button>
         </div>
-      </section>
 
-      <!-- Modal de Visualização de Contrato -->
-      <div class="modal fade" id="modalVisualizarContrato" tabindex="-1" aria-labelledby="visualizarContratoLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-lg">
-          <div class="modal-content">
-            <div class="modal-header oferta-bg-primary text-white">
-              <h5 class="modal-title" id="visualizarContratoLabel"><i class="bi bi-file-earmark-text me-2"></i>Contrato de Parceria com a SOLARO</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-            </div>
-            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-              <dl class="row">
-                <dt class="col-sm-4">Fornecedor</dt>
-                <dd class="col-sm-8">João Solar</dd>
-
-                <dt class="col-sm-4">Estado da Fazenda</dt>
-                <dd class="col-sm-8">SP</dd>
-
-                <dt class="col-sm-4">Preço kWh</dt>
-                <dd class="col-sm-8">R$ 0,65</dd>
-
-                <dt class="col-sm-4">Geração por Hora</dt>
-                <dd class="col-sm-8">500 kWh</dd>
-
-                <dt class="col-sm-4">Prazo</dt>
-                <dd class="col-sm-8">3 meses</dd>
-
-                <dt class="col-sm-4">Data de Início</dt>
-                <dd class="col-sm-8">14/05/2025</dd>
-
-                <dt class="col-sm-4">Data de Término</dt>
-                <dd class="col-sm-8">14/08/2025</dd>
-              </dl>
-
-              <hr>
-
-              <p class="small">
-                Este contrato estabelece os termos de parceria entre o fornecedor João Solar e a plataforma SOLARO Marketplace.
-                A energia será disponibilizada na plataforma com a taxa administrativa definida pelo prazo escolhido.
-                Repasses ocorrerão mensalmente após o fechamento dos consumos. A oferta e geração devem ser mantidas durante o prazo do contrato.
-                Em caso de dúvidas ou cancelamento antecipado, o fornecedor deve entrar em contato com o suporte da SOLARO.
-              </p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-            </div>
+        <div class="row text-center text-md-start">
+          <div class="col-md-4 mb-3 mb-md-0">
+            <p class="mb-1"><strong><i class="bi bi-calendar-check me-2"></i>Assinatura:</strong></p>
+            <p>{{dataAssinatura}}</p>
+          </div>
+          <div class="col-md-4 mb-3 mb-md-0">
+            <p class="mb-1"><strong><i class="bi bi-calendar-x me-2"></i>Validade:</strong></p>
+            <p>até {{dataFinal}}</p>
+          </div>
+          <div class="col-md-4">
+            <p class="mb-1"><strong><i class="bi bi-clock me-2"></i>Duração:</strong></p>
+            <p>{{prazoContrato}} meses</p>
           </div>
         </div>
       </div>
+    </section>
+    {{/if}}
 
+    <!-- Modal de Visualização -->
+    <div class="modal fade" id="modalVisualizarContrato" tabindex="-1" aria-labelledby="visualizarContratoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+          <div class="modal-header oferta-bg-primary text-white">
+            <h5 class="modal-title" id="visualizarContratoLabel"><i class="bi bi-file-earmark-text me-2"></i>Contrato de Parceria com a SOLARO</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+            <dl class="row">
+              <dt class="col-sm-4">Fornecedor</dt>
+              <dd class="col-sm-8">{{nomeFornecedor}}</dd>
+
+              <dt class="col-sm-4">Estado da Fazenda</dt>
+              <dd class="col-sm-8">{{estado_fazenda}}</dd>
+
+              <dt class="col-sm-4">Preço kWh</dt>
+              <dd class="col-sm-8">R$ {{preco_kwh}}</dd>
+
+              <dt class="col-sm-4">Geração por Hora</dt>
+              <dd class="col-sm-8">{{geracao_kwh}} kWh</dd>
+
+              <dt class="col-sm-4">Prazo</dt>
+              <dd class="col-sm-8">{{prazoContrato}} meses</dd>
+
+              <dt class="col-sm-4">Data de Início</dt>
+              <dd class="col-sm-8">{{dataAssinatura}}</dd>
+
+              <dt class="col-sm-4">Data de Término</dt>
+              <dd class="col-sm-8">{{dataFinal}}</dd>
+            </dl>
+            <hr>
+            <p class="small">
+              Este contrato estabelece os termos de parceria entre o fornecedor {{nomeFornecedor}} e a plataforma SOLARO Marketplace.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Dicas -->
     <section class="py-5 bg-white">
@@ -255,7 +377,38 @@
     <!-- Footer -->
     {{> footer }}
 
-    <!-- Bootstrap JS -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+      function calcularEconomia() {
+        const consumo = parseFloat(document.getElementById("consumo").value);
+        const tarifaAtual = 0.85;
+        const tarifaSolar = 0.72;
+
+        if (!isNaN(consumo) && consumo > 0) {
+          const economia = (tarifaAtual - tarifaSolar) * consumo;
+          document.getElementById("valorEconomia").textContent = "R$ " + economia.toFixed(2);
+          document.getElementById("resultadoEconomia").style.display = "block";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById('modalOferta');
+        const form = modal.querySelector("form");
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          Swal.fire({
+            title: "Contrato Realizado com Sucesso!",
+            icon: "success",
+            confirmButtonText: "OK"
+          }).then(() => {
+            form.submit();
+          });
+        });
+      });
+    </script>
   </body>
 </html>

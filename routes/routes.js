@@ -34,9 +34,12 @@ router.get('/home_fornecedor', (req, res) => {
     if (req.session.usuario?.tipo === 'F') {
         return res.render('home_fornecedor', {
             nomeFornecedor: req.session.usuario.nome,
-            rs_hora: req.session.usuario.rs_hora || 0,
-            kwh_total: req.session.usuario.kwh_total || 0,
-            repasse: req.session.usuario.repasse || 0
+            preco_kwh: req.session.usuario.preco_kwh  || 0,
+            geracao_kwh : req.session.usuario.geracao_kwh  || 0,
+            dataAssinatura: req.session.usuario.dataAssinatura,
+            dataFinal: req.session.usuario.dataFinal,
+            prazoContrato: req.session.usuario.prazoContrato,
+            estado_fazenda: req.session.usuario.estado_fazenda
         });
     }
     res.redirect('/');

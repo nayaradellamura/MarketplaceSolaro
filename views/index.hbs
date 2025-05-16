@@ -95,138 +95,6 @@
 <!-- Espaçamento -->
 <div style="height: 100px;"></div>
 
-<div class="container py-5">
-    <h2 class="mb-4 text-center">Simule sua Economia com Energia Solar</h2>
-
-    <!-- Seleção de Estado -->
-    <div class="mb-4">
-      <label for="estado" class="form-label">Selecione seu Estado</label>
-      <select id="estado" class="form-select" onchange="atualizarTarifa()">
-        <option value="">Escolha seu estado</option>
-        <option value="SP">São Paulo</option>
-        <option value="MG">Minas Gerais</option>
-        <option value="RJ">Rio de Janeiro</option>
-        <option value="BA">Bahia</option>
-        <option value="ES">Espírito Santo</option>
-        <option value="GO">Goiás</option>
-        <option value="MA">Maranhão</option>
-        <option value="MT">Mato Grosso</option>
-        <option value="MS">Mato Grosso do Sul</option>
-        <option value="PR">Paraná</option>
-        <option value="PE">Pernambuco</option>
-        <option value="PI">Piauí</option>
-        <option value="RJ">Rio de Janeiro</option>
-        <option value="RN">Rio Grande do Norte</option>
-        <option value="RS">Rio Grande do Sul</option>
-        <option value="SC">Santa Catarina</option>
-        <option value="SE">Sergipe</option>
-        <option value="TO">Tocantins</option>
-        <option value="AC">Acre</option>
-        <option value="AL">Alagoas</option>
-        <option value="AP">Amapá</option>
-        <option value="DF">Distrito Federal</option>
-        <option value="PA">Pará</option>
-        <option value="PB">Paraíba</option>
-        <option value="PR">Paraná</option>
-        <option value="PE">Pernambuco</option>
-        <option value="PI">Piauí</option>
-        <option value="RO">Rondônia</option>
-        <option value="RR">Roraima</option>
-        <option value="SP">São Paulo</option>
-        <option value="BA">Bahia</option>
-      </select>
-    </div>
-
-    <!-- Comparação de tarifas -->
-    <div class="row g-4">
-      <div class="col-md-6">
-        <div class="card shadow-sm p-4 border-start border-danger border-4">
-          <h5 class="text-muted">Tarifa da Distribuidora (ANEEL)</h5>
-          <h2 class="text-danger" id="tarifaEstado">R$ 0,85 / kWh</h2>
-          <p>Tarifa média praticada na sua região.</p>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card shadow-sm p-4 border-start border-success border-4">
-          <h5 class="text-muted">Tarifa do Fornecedor Solar</h5>
-          <h2 class="text-success">R$ 0,72 / kWh</h2>
-          <p>Oferta de energia limpa com desconto real.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Simulador -->
-    <div class="mt-5">
-      <h4>Informe seu consumo mensal (kWh)</h4>
-      <div class="row g-3">
-        <div class="col-md-6">
-          <input type="number" class="form-control" id="consumo" placeholder="Ex: 250">
-        </div>
-        <div class="col-md-6">
-          <button class="btn btn-success w-100" onclick="calcularEconomia()">Calcular Economia</button>
-        </div>
-      </div>
-
-      <!-- Resultado -->
-      <div class="mt-4" id="resultadoEconomia" style="display: none;">
-        <h5>💰 Economia estimada: <span id="valorEconomia" class="fw-bold text-primary"></span> por mês</h5>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Tarifa média da distribuidora por estado
-    const tarifas = {
-      "SP": 0.85,
-      "MG": 0.89,
-      "RJ": 0.95,
-      "BA": 0.80,
-      "ES": 0.83,
-      "GO": 0.87,
-      "MA": 0.91,
-      "MT": 0.86,
-      "MS": 0.88,
-      "PR": 0.82,
-      "PE": 0.90,
-      "PI": 0.84,
-      "RN": 0.93,
-      "RS": 0.92,
-      "SC": 0.89,
-      "SE": 0.85,
-      "TO": 0.77,
-      "AC": 0.79,
-      "AL": 0.82,
-      "AP": 0.91,
-      "DF": 0.83,
-      "PA": 0.88,
-      "PB": 0.86,
-      "RO": 0.95,
-      "RR": 0.94
-    };
-
-    let tarifaAtual = 0.85; // Valor padrão (caso nenhum estado seja escolhido)
-
-    function atualizarTarifa() {
-      const estado = document.getElementById("estado").value;
-      tarifaAtual = tarifas[estado] || 0.85;
-      document.getElementById("tarifaEstado").textContent = "R$ " + tarifaAtual.toFixed(2) + " / kWh";
-    }
-
-    function calcularEconomia() {
-      const consumo = parseFloat(document.getElementById("consumo").value);
-      const tarifaSolar = 0.72;
-
-      if (!isNaN(consumo) && consumo > 0) {
-        const economia = (tarifaAtual - tarifaSolar) * consumo;
-        document.getElementById("valorEconomia").textContent = "R$ " + economia.toFixed(2);
-        document.getElementById("resultadoEconomia").style.display = "block";
-      }
-    }
-  </script>
-
-<!-- Espaçamento -->
-<div style="height: 100px;"></div>
-
 <!-- Seção de FAQ -->
 <div class="faq-container" style="width: 90vw; max-width: 100%; margin: 0 auto;">
     <h1>Dúvidas Frequentes</h1>
@@ -303,6 +171,16 @@
       // Alterna a classe 'active' para mostrar ou ocultar a resposta
       item.classList.toggle('active');
     });
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('showLoginModal') === 'true') {
+      const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+      loginModal.show();
+    }
   });
 </script>
 
