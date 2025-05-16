@@ -28,3 +28,25 @@
 </div>
 
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const shouldShowLoginModal = urlParams.get('showLoginModal');
+        const loginError = urlParams.get('loginError');
+
+        if (shouldShowLoginModal === 'true') {
+            if (loginError === 'true') {
+                Swal.fire({
+                    icon: "error",
+                    title: "Algo deu errado!",
+                    text: "Usuário ou senha inválidas",
+                    confirmButtonText: 'Tentar novamente'
+                }).then(() => {
+                    const newUrl = window.location.pathname + '?showLoginModal=true';
+                    window.history.replaceState({}, document.title, newUrl);
+                });
+            }
+        }
+    });
+</script>
