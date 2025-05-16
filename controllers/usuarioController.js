@@ -67,7 +67,7 @@ exports.loginUsuario = async (req, res) => {
 
             if (results.length === 0) {
                 return res.render('index', (err, html) => {
-                    res.redirect('/index?showLoginModal=true&LoginError=true');
+                    res.redirect('/index?showLoginModal=true&loginError=true');
                 });
             }
 
