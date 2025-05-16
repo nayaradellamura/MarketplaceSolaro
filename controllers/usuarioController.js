@@ -9,7 +9,7 @@ exports.cadastrarUsuario = async (req, res) => {
     } = req.body;
 
     try {
-        const hashedSenha = await bcrypt.hash(cadastroSenha, 10); 
+        const hashedSenha = await bcrypt.hash(cadastroSenha, 10);
 
         const insertUsuarioSQL = `
             INSERT INTO usuarios (
@@ -89,23 +89,37 @@ exports.loginUsuario = async (req, res) => {
                 return res.redirect('/home_consumidor');
 
             } else if (usuario.tipo === 'F') {
-            
                 const contratoSQL = `
-                    SELECT IdOferta, UsuarioID, dataAssinatura, dataFinal, prazoContrato,
-                           estado_fazenda, preco_kwh, geracao_kwh
-                    FROM contrato
-                    WHERE UsuarioID = ?
-                    ORDER BY IdOferta DESC
+                    SELECT 
+                        c.IdOferta, 
+                        c.UsuarioID, 
+                        DATE_FORMAT(c.dataAssinatura, '%d/%m/%Y') AS dataAssinatura, 
+                        DATE_FORMAT(c.dataFinal, '%d/%m/%Y') AS dataFinal, 
+                        c.prazoContrato,
+                        c.estado_fazenda, 
+                        c.preco_kwh, 
+                        c.geracao_kwh,
+                        t.taxa
+                    FROM 
+                        contrato c
+                    JOIN 
+                        taxa_estaduais t ON c.estado_fazenda = t.estado
+                    WHERE 
+                        c.UsuarioID = ?
+                    ORDER BY 
+                        c.IdOferta DESC
+                    LIMIT 1;
                 `;
-            
+
                 db.query(contratoSQL, [usuario.id], (errContrato, resultadosContrato) => {
                     if (errContrato) {
                         console.error("Erro ao buscar contrato:", errContrato);
                         return res.status(500).send('Erro ao buscar contrato.');
                     }
-            
+
                     if (resultadosContrato.length > 0) {
                         const contrato = resultadosContrato[0];
+
                         req.session.usuario.IdOferta = contrato.IdOferta;
                         req.session.usuario.UsuarioID = contrato.UsuarioID;
                         req.session.usuario.dataAssinatura = contrato.dataAssinatura;
@@ -113,7 +127,35 @@ exports.loginUsuario = async (req, res) => {
                         req.session.usuario.prazoContrato = contrato.prazoContrato;
                         req.session.usuario.estado_fazenda = contrato.estado_fazenda;
                         req.session.usuario.preco_kwh = contrato.preco_kwh;
-                        req.session.usuario.geracao_kwh = contrato.geracao_kwh;
+                        req.session.usuario.geracao_kwh = contrato.geracao_kwh.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                        req.session.usuario.taxa = contrato.taxa;
+
+                        // --- Cálculo do valor base mensal corrigido ---
+            const taxaEstadual = contrato.taxa / 100; 
+            const precoComTaxa = contrato.preco_kwh * (1 + taxaEstadual);
+            const valorBase = precoComTaxa * contrato.geracao_kwh;
+
+            // --- Taxa mensal do Contrato Solaro ---
+            let taxaMensal = 0;
+            switch (contrato.prazoContrato) {
+                case 3:
+                    taxaMensal = 0.075;
+                    break;
+                case 6:
+                    taxaMensal = 0.05;
+                    break;
+                case 12:
+                    taxaMensal = 0.025;
+                    break;
+                default:
+                    taxaMensal = 0;
+            }
+
+            // Valor mensal com taxa aplicada
+            const valorMensalComTaxa = valorBase * (1 + taxaMensal);
+            req.session.usuario.valorMensalComTaxa = valorMensalComTaxa.toFixed(2);
+
+
                     } else {
                         // Caso não tenha contrato cadastrado
                         req.session.usuario.IdOferta = null;
@@ -124,12 +166,16 @@ exports.loginUsuario = async (req, res) => {
                         req.session.usuario.estado_fazenda = null;
                         req.session.usuario.preco_kwh = 0;
                         req.session.usuario.geracao_kwh = 0;
+                        req.session.usuario.valorMensalComTaxa = '0.00';
+                        req.session.usuario.taxaHora = 0;
                     }
-            
+
+                    // Após carregar dados do fornecedor, redireciona
                     return res.redirect('/home_fornecedor');
                 });
 
             } else {
+                // Tipo de usuário desconhecido ou não esperado
                 return res.redirect('/');
             }
         });

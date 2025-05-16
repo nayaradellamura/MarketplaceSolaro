@@ -31,19 +31,33 @@ router.get('/home_consumidor', (req, res) => {
 });
 
 router.get('/home_fornecedor', (req, res) => {
-    if (req.session.usuario?.tipo === 'F') {
-        return res.render('home_fornecedor', {
-            nomeFornecedor: req.session.usuario.nome,
-            preco_kwh: req.session.usuario.preco_kwh  || 0,
-            geracao_kwh : req.session.usuario.geracao_kwh  || 0,
-            dataAssinatura: req.session.usuario.dataAssinatura,
-            dataFinal: req.session.usuario.dataFinal,
-            prazoContrato: req.session.usuario.prazoContrato,
-            estado_fazenda: req.session.usuario.estado_fazenda
-        });
-    }
-    res.redirect('/');
+  if (req.session.usuario?.tipo === 'F') {
+    const preco_kwh = parseFloat(req.session.usuario.preco_kwh) || 0;
+    const geracao_kwh = parseFloat(req.session.usuario.geracao_kwh) || 0;
+    const valorMensalComTaxa = req.session.usuario.valorMensalComTaxa || '0.00';
+
+    const kwh_total = geracao_kwh * 720;
+
+    return res.render('home_fornecedor', {
+      nomeFornecedor: req.session.usuario.nome,
+      preco_kwh: preco_kwh.toFixed(2),
+      geracao_kwh: geracao_kwh.toFixed(2),
+      dataAssinatura: req.session.usuario.dataAssinatura,
+      dataFinal: req.session.usuario.dataFinal,
+      prazoContrato: req.session.usuario.prazoContrato,
+      estado_fazenda: req.session.usuario.estado_fazenda,
+      kwh_total: kwh_total.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }),
+      repasse: valorMensalComTaxa
+    });
+  }
+  res.redirect('/');
 });
+
+
+
 
 
 

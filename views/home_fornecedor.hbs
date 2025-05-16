@@ -19,32 +19,33 @@
 
         {{#if preco_kwh}}
         <!-- Dashboard -->
-        <div class="row g-4 justify-content-center text-center">
-          <div class="col-md-6">
-            <div class="card shadow-sm p-4 card-dashboard">
-              <h5 class="text-warning">Preço do kWh</h5>
-              <p class="display-6 fw-bold">R$ {{preco_kwh}}</p>
+          <div class="row g-4 justify-content-center text-center">
+            <div class="col-md-6">
+              <div class="card shadow-sm p-4 card-dashboard">
+                <h5 class="text-warning">Preço do kWh</h5>
+                <p class="display-6 fw-bold">R$ {{preco_kwh}}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card shadow-sm p-4 card-dashboard">
+                <h5 class="text-warning">Geração por Hora</h5>
+                <p class="display-6 fw-bold">{{geracao_kwh}} KWh</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card shadow-sm p-4 card-dashboard">
+                <h5 class="text-success">Energia Total</h5>
+                <p class="display-6 fw-bold">{{kwh_total}} kWh</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card shadow-sm p-4 card-dashboard border-danger">
+                <h5 class="text-danger">A Receber</h5>
+                <p class="display-6 fw-bold">R$ {{repasse}}</p>
+              </div>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="card shadow-sm p-4 card-dashboard">
-              <h5 class="text-warning">Geração por Hora</h5>
-              <p class="display-6 fw-bold">{{geracao_kwh}} KWh</p>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="card shadow-sm p-4 card-dashboard">
-              <h5 class="text-success">Energia Total</h5>
-              <p class="display-6 fw-bold">{{kwh_total}} kWh</p>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="card shadow-sm p-4 card-dashboard border-danger">
-              <h5 class="text-danger">A Receber</h5>
-              <p class="display-6 fw-bold">R$ {{repasse}}</p>
-            </div>
-          </div>
-        </div>
+
         {{else}}
         <!-- Simulador -->
         <div class="mt-5">
