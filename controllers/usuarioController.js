@@ -218,6 +218,67 @@ exports.cadastrarContrato = (req, res) => {
             return res.status(500).send('Erro ao cadastrar contrato.');
         }
 
-        res.redirect('/home_fornecedor');
+        // Agora que cadastrou, vamos buscar o contrato mais recente e atualizar a sessão
+        const contratoSQL = `
+            SELECT 
+                c.IdOferta, 
+                c.UsuarioID, 
+                DATE_FORMAT(c.dataAssinatura, '%d/%m/%Y') AS dataAssinatura, 
+                DATE_FORMAT(c.dataFinal, '%d/%m/%Y') AS dataFinal, 
+                c.prazoContrato,
+                c.estado_fazenda, 
+                c.preco_kwh, 
+                c.geracao_kwh,
+                t.taxa
+            FROM 
+                contrato c
+            JOIN 
+                taxa_estaduais t ON c.estado_fazenda = t.estado
+            WHERE 
+                c.UsuarioID = ?
+            ORDER BY 
+                c.IdOferta DESC
+            LIMIT 1;
+        `;
+
+        db.query(contratoSQL, [usuarioId], (errContrato, resultadosContrato) => {
+            if (errContrato) {
+                console.error("Erro ao buscar contrato:", errContrato);
+                return res.status(500).send('Erro ao buscar contrato.');
+            }
+
+            if (resultadosContrato.length > 0) {
+                const contrato = resultadosContrato[0];
+
+                req.session.usuario.IdOferta = contrato.IdOferta;
+                req.session.usuario.UsuarioID = contrato.UsuarioID;
+                req.session.usuario.dataAssinatura = contrato.dataAssinatura;
+                req.session.usuario.dataFinal = contrato.dataFinal;
+                req.session.usuario.prazoContrato = contrato.prazoContrato;
+                req.session.usuario.estado_fazenda = contrato.estado_fazenda;
+                req.session.usuario.preco_kwh = contrato.preco_kwh;
+                req.session.usuario.geracao_kwh = contrato.geracao_kwh.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                req.session.usuario.taxa = contrato.taxa;
+
+                // Calcular valor mensal
+                const taxaEstadual = contrato.taxa / 100;
+                const precoComTaxa = contrato.preco_kwh * (1 + taxaEstadual);
+                const valorBase = precoComTaxa * contrato.geracao_kwh;
+
+                let taxaMensal = 0;
+                switch (contrato.prazoContrato) {
+                    case 3: taxaMensal = 0.075; break;
+                    case 6: taxaMensal = 0.05; break;
+                    case 12: taxaMensal = 0.025; break;
+                    default: taxaMensal = 0;
+                }
+
+                const valorMensalComTaxa = valorBase * (1 + taxaMensal);
+                req.session.usuario.valorMensalComTaxa = valorMensalComTaxa.toFixed(2);
+            }
+
+            // Agora redireciona com sessão atualizada
+            return res.redirect('/home_fornecedor');
+        });
     });
 };
