@@ -299,7 +299,6 @@
         <div class="modal-content">
           <div class="modal-header oferta-bg-primary text-white">
             <h5 class="modal-title" id="visualizarContratoLabel"><i class="bi bi-file-earmark-text me-2"></i>Contrato de Parceria com a SOLARO</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
           </div>
           <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
             <dl class="row">
@@ -327,14 +326,39 @@
             <hr>
             <p class="small">
               Este contrato estabelece os termos de parceria entre o fornecedor {{nomeFornecedor}} e a plataforma SOLARO Marketplace.
+                
             </p>
           </div>
           <div class="modal-footer">
+            <button type="button" class="btn btn-danger me-auto" data-bs-toggle="modal" data-bs-target="#modalAvisoMulta">
+              Rescindir Contrato
+            </button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
           </div>
         </div>
       </div>
     </div>
+
+  <!-- Modal Rescindir Contrato -->
+    <div class="modal fade" id="modalAvisoMulta" tabindex="-1" aria-labelledby="modalAvisoMultaLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-warning">
+            <h5 class="modal-title" id="modalAvisoMultaLabel">Aviso de Multa</h5>
+          </div>
+          <div class="modal-body">
+            Ao rescindir o contrato, será aplicada uma multa proporcional ao prazo restante. Deseja continuar?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <form action="/rescindir_contrato" method="POST">
+              <button type="submit" class="btn btn-danger">Confirmar Rescisão</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <!-- Dicas -->
     <section class="py-5 bg-white">
