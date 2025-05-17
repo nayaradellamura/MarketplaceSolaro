@@ -141,6 +141,7 @@ function openFormularioModal() {
       const cidadeCampo = document.getElementById('cidade');
       const estadoCampo = document.getElementById('estado');
       const paisCampo = document.getElementById('pais');
+      const tipoCampo = document.getElementById('tipo');
       const valor = campo.value.replace(/\D/g, '');
     
       campo.classList.remove('is-invalid', 'is-valid');
@@ -156,6 +157,9 @@ function openFormularioModal() {
       if (valor.length === 11) {
         // Validação CPF
         if (validarCPF(valor)) {
+              tipoCampo.value = "C" || '';
+              tipoCampo.options[0].disabled = true;
+              tipoCampo.options[1].disabled = true;
           campo.classList.add('is-valid');
         } else {
           campo.classList.add('is-invalid');
@@ -174,7 +178,7 @@ function openFormularioModal() {
               bairroCampo.value = data.bairro || '';
               cidadeCampo.value = data.municipio || '';
               estadoCampo.value = data.uf || '';
-              paisCampo.value = 'Brasil';  
+              paisCampo.value = 'Brasil';
             })
             .catch(() => {
               alert('Erro ao buscar as informações do CNPJ. Verifique a conexão.');

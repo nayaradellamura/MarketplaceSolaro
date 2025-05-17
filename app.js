@@ -31,6 +31,6 @@ hbs.registerPartials(path.join(__dirname, '/views/partials'));
 const routes = require('./routes/routes');
 app.use('/', routes);
 
-app.listen(4000, () => {
-    console.log("Servidor rodando na porta 4000");
+app.listen(5002, () => {
+    console.log("Servidor rodando na porta 5002");
 });
