@@ -136,29 +136,29 @@ exports.loginUsuario = async (req, res) => {
                         req.session.usuario.taxa = contrato.taxa;
 
                         // --- Cálculo do valor base mensal corrigido ---
-            const taxaEstadual = contrato.taxa / 100; 
-            const precoComTaxa = contrato.preco_kwh * (1 + taxaEstadual);
-            const valorBase = precoComTaxa * contrato.geracao_kwh;
+                        const taxaEstadual = contrato.taxa / 100;
+                        const precoComTaxa = contrato.preco_kwh * (1 + taxaEstadual);
+                        const valorBase = precoComTaxa * contrato.geracao_kwh;
 
-            // --- Taxa mensal do Contrato Solaro ---
-            let taxaMensal = 0;
-            switch (contrato.prazoContrato) {
-                case 3:
-                    taxaMensal = 0.075;
-                    break;
-                case 6:
-                    taxaMensal = 0.05;
-                    break;
-                case 12:
-                    taxaMensal = 0.025;
-                    break;
-                default:
-                    taxaMensal = 0;
-            }
+                        // --- Taxa mensal do Contrato Solaro ---
+                        let taxaMensal = 0;
+                        switch (contrato.prazoContrato) {
+                            case 3:
+                                taxaMensal = 0.075;
+                                break;
+                            case 6:
+                                taxaMensal = 0.05;
+                                break;
+                            case 12:
+                                taxaMensal = 0.025;
+                                break;
+                            default:
+                                taxaMensal = 0;
+                        }
 
-            // Valor mensal com taxa aplicada
-            const valorMensalComTaxa = valorBase * (1 + taxaMensal);
-            req.session.usuario.valorMensalComTaxa = valorMensalComTaxa.toFixed(2);
+                        // Valor mensal com taxa aplicada
+                        const valorMensalComTaxa = valorBase * (1 + taxaMensal);
+                        req.session.usuario.valorMensalComTaxa = valorMensalComTaxa.toFixed(2);
 
 
                     } else {
@@ -285,33 +285,85 @@ exports.cadastrarContrato = (req, res) => {
     });
 };
 
-exports.simularContrato = (req, res) => {
-  const { preco_kwh_sim, geracao_kwh_sim, prazo_contrato_sim, estado_fazenda_sim } = req.body;
+exports.renderHomeFornecedor = (req, res) => {
+    res.render('home_fornecedor', { resultado_calculado: null });
+};
 
-  // Validação simples
-  if (!preco_kwh_sim || !geracao_kwh_sim || !prazo_contrato_sim || !estado_fazenda_sim) {
-    return res.status(400).json({ success: false, message: 'Todos os campos são obrigatórios.' });
-  }
+exports.processaSimulacao = (req, res) => {
+    const { preco_kwh_sim, geracao_kwh_sim, prazo_contrato_sim, estado_fazenda_sim } = req.body;
 
-  // Converta strings em número para cálculo
-  const precoKwh = parseFloat(preco_kwh_sim);
-  const geracaoKwh = parseFloat(geracao_kwh_sim);
+    const taxaSQL = `
+    SELECT taxa
+    FROM taxa_estaduais
+    WHERE estado = ?
+    LIMIT 1;
+  `;
 
-  const diasPorMes = 30;
-  const meses = {
-    '3_meses': { prazo: 3, taxa: 0.075 },
-    '6_meses': { prazo: 6, taxa: 0.05 },
-    '12_meses': { prazo: 12, taxa: 0.025 }
-  };
+    db.query(taxaSQL, [estado_fazenda_sim], (err, resultadosTaxa) => {
+        if (err) {
+            console.error("Erro ao buscar taxa estadual:", err);
+            return res.status(500).send('Erro interno no servidor.');
+        }
 
-  const config = meses[prazo_contrato_sim];
-  const energiaGerada = geracaoKwh * 24 * diasPorMes * config.prazo;
-  const valorTotal = energiaGerada * precoKwh;
-  const valorFinal = valorTotal * (1 - config.taxa);
+        if (resultadosTaxa.length === 0) {
+            return res.status(400).send('Estado não encontrado.');
+        }
 
-  return res.json({
-    success: true,
-    message: `Contrato simulado com sucesso! Valor estimado: R$ ${valorFinal.toFixed(2)}`
-  });
+        const taxaEstadual = resultadosTaxa[0].taxa / 100;
+        const precoComTaxa = preco_kwh_sim * (1 + taxaEstadual);
+        const valorBase = precoComTaxa * geracao_kwh_sim;
+
+        let taxaMensal = 0;
+        switch (parseInt(prazo_contrato_sim)) {
+            case 3:
+                taxaMensal = 0.075;
+                break;
+            case 6:
+                taxaMensal = 0.05;
+                break;
+            case 12:
+                taxaMensal = 0.025;
+                break;
+            default:
+                taxaMensal = 0;
+        }
+
+        const valorMensalComTaxa = valorBase * (1 + taxaMensal);
+        const resultado_calculado = valorMensalComTaxa.toFixed(2);
+
+        if (req.session.usuario) {
+            req.session.usuario.resultado_calculado = resultado_calculado;
+            console.log('Resultado do Simulador: ', resultado_calculado);
+        }
+
+        res.render('home_fornecedor', { resultado_calculado });
+    });
+};
+
+exports.rescindirContrato = (req, res) => {
+
+    if (!req.session.usuario) {
+        return res.status(401).send('Usuário não autenticado.');
+    }
+
+    const usuarioId = req.session.usuario.id;
+
+    const sqlDelete = `
+    DELETE FROM contrato
+    WHERE UsuarioID = ?
+  `;
+
+    db.query(sqlDelete, [usuarioId], (err, result) => {
+        if (err) {
+            console.error('Erro ao rescindir contrato:', err);
+            return res.status(500).send('Erro ao rescindir contrato.');
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Nenhum contrato encontrado para rescindir.');
+        }
+
+        res.redirect('/index');
+    });
 };
 

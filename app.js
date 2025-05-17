@@ -11,10 +11,10 @@ app.use(express.json());
 app.use(session({
     secret: 'O-Rato-Roeu-A-Roupa-Do-Rei-De-Roma-Habemus-Papam',
     resave: false,
-    saveUninitialized: true, 
+    saveUninitialized: true,
     cookie: {
-        secure: false, 
-        maxAge: 1000 * 60 * 60 * 2 
+        secure: false,
+        maxAge: 1000 * 60 * 60 * 2
     }
 }));
 
@@ -31,6 +31,6 @@ hbs.registerPartials(path.join(__dirname, '/views/partials'));
 const routes = require('./routes/routes');
 app.use('/', routes);
 
-app.listen(5002, () => {
-    console.log("Servidor rodando na porta 5002");
+app.listen(5000, () => {
+    console.log("Servidor rodando na porta 5000");
 });

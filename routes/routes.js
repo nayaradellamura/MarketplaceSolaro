@@ -16,19 +16,23 @@ router.get('/login', (req, res) => res.render('login'));
 router.get('/cadastro', (req, res) => res.render('form_cadastro'));
 router.get('/cadastro_usuario', (req, res) => res.render('cadastro_usuario'));
 
+
 // Processamento - Usuário
 router.post('/cadastro', usuarioController.cadastrarUsuario);
 router.post('/login', usuarioController.loginUsuario);
 router.post('/cadastro_oferta', usuarioController.cadastrarContrato);
-router.post('/Simular-Contrato', usuarioController.simularContrato);
+router.post('/Simular-Contrato', usuarioController.processaSimulacao);
+router.post('/rescindir_contrato', usuarioController.rescindirContrato);
+
+
 
 
 // Páginas autenticadas
 router.get('/home_consumidor', (req, res) => {
-    if (req.session.usuario?.tipo === 'C') {
-        return res.render('home_consumidor', { NomeConsumidor: req.session.usuario.nome });
-    }
-    res.redirect('/');
+  if (req.session.usuario?.tipo === 'C') {
+    return res.render('home_consumidor', { NomeConsumidor: req.session.usuario.nome });
+  }
+  res.redirect('/');
 });
 
 router.get('/home_fornecedor', (req, res) => {
@@ -53,7 +57,7 @@ router.get('/home_fornecedor', (req, res) => {
       }),
       repasse: valorMensalComTaxa
     });
-    
+
   }
   res.redirect('/');
 });

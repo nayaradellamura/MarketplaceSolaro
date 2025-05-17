@@ -3,32 +3,33 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-        <h5 class="modal-title" id="modalLabel">Cadastro de Oferta de Energia</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar" id="btnFechar"></button>
-      </div>
-
-        <form class="bg-white p-4" method="POST" action="/cadastro-oferta">
-
-            <div class="tab-content" id="pills-tabContent">
-                
-                <div class="tab-pane fade" id="pills-tab3" role="tabpanel" aria-labelledby="pills-tab3-tab">
-                <div class="mb-3">
-                    <label for="preco_kwh" class="form-label">Preço do kWh (R$)</label>
-                    <input type="number" step="0.01" class="form-control" id="preco_kwh" name="preco_kwh" required>
-                </div>
-                <div class="mb-3">
-                    <label for="geracao_kwh" class="form-label">Geração de Energia (kWh por hora)</label>
-                    <input type="number" step="0.01" class="form-control" id="geracao_kwh" name="geracao_kwh" required>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <button style="background-color: #003366;" type="submit" class="btn btn-secondary">Cadastrar Oferta</button>
-                </div>
-                </div>
+                <h5 class="modal-title" id="modalLabel">Cadastro de Oferta de Energia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"
+                    id="btnFechar"></button>
             </div>
-        </form> 
-      </div>
-    </div> 
-</div> 
 
+            <form class="bg-white p-4" method="POST" action="/cadastro-oferta">
 
+                <div class="tab-content" id="pills-tabContent">
 
+                    <div class="tab-pane fade" id="pills-tab3" role="tabpanel" aria-labelledby="pills-tab3-tab">
+                        <div class="mb-3">
+                            <label for="preco_kwh" class="form-label">Preço do kWh (R$)</label>
+                            <input type="number" step="0.01" class="form-control" id="preco_kwh" name="preco_kwh"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="geracao_kwh" class="form-label">Geração de Energia (kWh por hora)</label>
+                            <input type="number" step="0.01" class="form-control" id="geracao_kwh" name="geracao_kwh"
+                                required>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button style="background-color: #003366;" type="submit" class="btn btn-secondary">Cadastrar
+                                Oferta</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

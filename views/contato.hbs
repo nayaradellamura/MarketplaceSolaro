@@ -4,61 +4,64 @@
 {{> head }}
 
 <body>
-<header class="custom-header">
-  {{> navbar_index }}
-</header>
-<br>
+  <header class="custom-header">
+    {{> navbar_index }}
+  </header>
+  <br>
 
-<section id="contato" class="py-5 bg-light">
-  <div class="container">
-    <h2 class="text-center mb-4">Fale Conosco</h2>
-    <p class="text-center mb-5">Tem alguma dúvida ou sugestão? Entre em contato conosco preenchendo o formulário abaixo.</p>
+  <section id="contato" class="py-5 bg-light">
+    <div class="container">
+      <h2 class="text-center mb-4">Fale Conosco</h2>
+      <p class="text-center mb-5">Tem alguma dúvida ou sugestão? Entre em contato conosco preenchendo o formulário
+        abaixo.</p>
 
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <form>
-          <div class="mb-3">
-            <label for="nome" class="form-label">Nome</label>
-            <input type="text" class="form-control" id="nome" placeholder="Seu nome" required>
-          </div>
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <form>
+            <div class="mb-3">
+              <label for="nome" class="form-label">Nome</label>
+              <input type="text" class="form-control" id="nome" placeholder="Seu nome" required>
+            </div>
 
-          <div class="mb-3">
-            <label for="email" class="form-label">E-mail</label>
-            <input type="email" class="form-control" id="email" placeholder="seuemail@exemplo.com" required>
-          </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">E-mail</label>
+              <input type="email" class="form-control" id="email" placeholder="seuemail@exemplo.com" required>
+            </div>
 
-          <div class="mb-3">
-            <label for="mensagem" class="form-label">Mensagem</label>
-            <textarea class="form-control" id="mensagem" rows="5" placeholder="Digite sua mensagem aqui..." required></textarea>
-          </div>
+            <div class="mb-3">
+              <label for="mensagem" class="form-label">Mensagem</label>
+              <textarea class="form-control" id="mensagem" rows="5" placeholder="Digite sua mensagem aqui..."
+                required></textarea>
+            </div>
 
-          <div class="text-center">
-            <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
-          </div>
-        </form>
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Código do Tawk.to -->
-<script type="text/javascript">
+  <!-- Código do Tawk.to -->
+  <script type="text/javascript">
     var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
-    (function(){
-        var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
-        s1.async = true;
-        s1.src = 'https://embed.tawk.to/681ec7309c7ecf190fb1b8d1/1iqs3k5bm';
-        s1.charset = 'UTF-8';
-        s1.setAttribute('crossorigin', '*');
-        s0.parentNode.insertBefore(s1, s0);
+    (function () {
+      var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+      s1.async = true;
+      s1.src = 'https://embed.tawk.to/681ec7309c7ecf190fb1b8d1/1iqs3k5bm';
+      s1.charset = 'UTF-8';
+      s1.setAttribute('crossorigin', '*');
+      s0.parentNode.insertBefore(s1, s0);
     })();
-</script>
+  </script>
 
 
-<!-- Espaçamento -->
-<div style="height: 100px;"></div>
+  <!-- Espaçamento -->
+  <div style="height: 100px;"></div>
 
-<!-- Footer e JS -->
-{{> footer }}
+  <!-- Footer e JS -->
+  {{> footer }}
 </body>
+
 </html>

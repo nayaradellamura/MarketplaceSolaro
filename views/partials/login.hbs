@@ -5,15 +5,17 @@
       <button type="button" class="btn-close ms-auto" onclick="closeLoginModal()" aria-label="Fechar"></button>
       <img src="img/solaro_logo.png" alt="Logo Marketplace" style="max-width: 150px; margin: 10px auto 20px;" />
       <h5 class="fw-bold text-black-50 mb-3">Login</h5>
-      
+
       <form id="loginForm" action="/login" method="POST" style="font-family: 'Poppins', sans-serif;">
         <div class="mb-3 text-start">
           <label for="loginEmail" class="form-label">Email</label>
-          <input type="email" class="form-control" id="loginEmail" name="loginEmail" placeholder="Digite seu email" required>
+          <input type="email" class="form-control" id="loginEmail" name="loginEmail" placeholder="Digite seu email"
+            required>
         </div>
         <div class="mb-3 text-start">
           <label for="loginSenha" class="form-label">Senha</label>
-          <input type="password" class="form-control" id="loginSenha" name="loginSenha" placeholder="Digite sua senha" required>
+          <input type="password" class="form-control" id="loginSenha" name="loginSenha" placeholder="Digite sua senha"
+            required>
         </div>
         <br>
         <button type="submit" class="btn btn-primary w-100 py-2">Entrar</button>
@@ -30,23 +32,23 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const shouldShowLoginModal = urlParams.get('showLoginModal');
-        const loginError = urlParams.get('loginError');
+  document.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const shouldShowLoginModal = urlParams.get('showLoginModal');
+    const loginError = urlParams.get('loginError');
 
-        if (shouldShowLoginModal === 'true') {
-            if (loginError === 'true') {
-                Swal.fire({
-                    icon: "error",
-                    title: "Algo deu errado!",
-                    text: "Usuário ou senha inválidas",
-                    confirmButtonText: 'Tentar novamente'
-                }).then(() => {
-                    const newUrl = window.location.pathname + '?showLoginModal=true';
-                    window.history.replaceState({}, document.title, newUrl);
-                });
-            }
-        }
-    });
+    if (shouldShowLoginModal === 'true') {
+      if (loginError === 'true') {
+        Swal.fire({
+          icon: "error",
+          title: "Algo deu errado!",
+          text: "Usuário ou senha inválidas",
+          confirmButtonText: 'Tentar novamente'
+        }).then(() => {
+          const newUrl = window.location.pathname + '?showLoginModal=true';
+          window.history.replaceState({}, document.title, newUrl);
+        });
+      }
+    }
+  });
 </script>
