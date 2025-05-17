@@ -49,9 +49,10 @@
         {{else}}
         <!-- Simulador -->
         <div class="mt-5">
-          <div class="card shadow p-4">
-            <h4 class="text-center mb-4 text-secondary">Simulador</h4>
+        <div class="card shadow p-4">
+          <h4 class="text-center mb-4 text-secondary">Simulador</h4>
 
+          <form method="POST" action="/Simular-Contrato">
             <div class="row g-3">
               <div class="col-md-6">
                 <label for="preco_kwh_sim" class="form-label">Preço do kWh (R$)</label>
@@ -65,12 +66,12 @@
 
               <div class="col-md-6">
                 <label class="form-label">Prazo de Contrato</label>
-                  <select class="form-select" name="prazo_contrato_sim" required>
-                    <option value="" disabled selected>Selecione um prazo</option>
-                    <option value="3_meses">3 meses - Taxa SOLARO: 7,5%</option>
-                    <option value="6_meses">6 meses - Taxa SOLARO: 5%</option>
-                    <option value="12_meses">1 ano - Taxa SOLARO: 2,5%</option>
-                  </select>
+                <select class="form-select" name="prazo_contrato_sim" required>
+                  <option value="" disabled selected>Selecione um prazo</option>
+                  <option value="3_meses">3 meses - Taxa SOLARO: 7,5%</option>
+                  <option value="6_meses">6 meses - Taxa SOLARO: 5%</option>
+                  <option value="12_meses">1 ano - Taxa SOLARO: 2,5%</option>
+                </select>
               </div>
 
               <div class="col-md-6">
@@ -106,72 +107,46 @@
                   <option value="TO">Tocantins (TO)</option>
                 </select>
               </div>
-
-              <div class="col-md-4 mx-auto">
-                <button class="btn btn-primary w-100 mt-3" onclick="calcularVenda()">
-                  <i class="bi bi-calculator-fill"></i>Calcular
-                </button>
-              </div>
             </div>
 
-            <div class="mt-4 text-center" id="resultado" style="display: none;">
-              <h5>Valor a receber estimado: <span id="valorReceber" class="fw-bold text-primary"></span> por mês</h5>
-            </div>
-          </div>
+            <button style="background-color: #003366;" type="submit" class="btn btn-secondary">Simular Oferta</button>
+          </form>
+        </div>
+</div>
+
         </div>
 
-        <script>
+         <script>    
           function calcularVenda() {
-          const precoKwh = parseFloat(document.getElementById("preco_kwh_sim").value);
-          const geracao = parseFloat(document.getElementById("geracao_kwh_sim").value); // kWh/h
-          const prazoContrato = parseInt(document.getElementById("prazo_contrato_sim").value); // meses
-          const estado = document.getElementById("estado_fazenda_sim").value;
+          const precoKwh = parseFloat(document.getElementById('preco_kwh_sim').value);
+          const geracaoKwh = parseFloat(document.getElementById('geracao_kwh_sim').value);
+          
+          const prazoContrato = document.querySelector('select[name="prazo_contrato_sim"]').value;
+          const estadoFazenda = document.getElementById('estado_fazenda_sim').value;
 
-          if (!precoKwh || !geracao || !prazoContrato || !estado) {
-            alert("Por favor, preencha todos os campos corretamente.");
+          if (
+            isNaN(precoKwh) ||
+            isNaN(geracaoKwh) ||
+            !prazoContrato ||
+            !estadoFazenda
+          ) {
+            Swal.fire({
+                  title: "Preencha os campos faltantes",
+                  icon: "error",
+                  draggable: true
+                });
             return;
           }
 
-          // Define taxa Solaro baseada no prazo selecionado
-          let taxaSolaro = 0;
-          switch (prazoContrato) {
-            case 3:
-              taxaSolaro = 0.075; // 7,5%
-              break;
-            case 6:
-              taxaSolaro = 0.05;  // 5%
-              break;
-            case 12:
-              taxaSolaro = 0.025; // 2,5%
-              break;
-            default:
-              taxaSolaro = 0.10; // padrão
-          }
+          console.log("Preço do kWh:", precoKwh);
+          console.log("Geração por Hora:", geracaoKwh);
+          console.log("Prazo de Contrato:", prazoContrato);
+          console.log("Estado da Fazenda:", estadoFazenda);
 
-          const tarifaUF = 0.05;   // R$ 0,05 por kWh (fixa por enquanto)
 
-          // Energia gerada no mês: geração por hora * 24h * 30 dias
-          const energiaMensal = geracao * 24 * 30; // kWh por mês
-
-          // Valor bruto gerado por mês
-          const valorBrutoMensal = precoKwh * energiaMensal;
-
-          // Valor total bruto no prazo do contrato
-          const valorBrutoTotal = valorBrutoMensal * prazoContrato;
-
-          // Descontar taxa SOLARO
-          const valorComTaxaSolaro = valorBrutoTotal * (1 - taxaSolaro);
-
-          // Descontar tarifa da UF
-          const custoUF = tarifaUF * energiaMensal * prazoContrato;
-          const valorFinal = valorComTaxaSolaro - custoUF;
-
-          // Mostrar resultado formatado
-          document.getElementById("valorReceber").textContent = "R$ " + valorFinal.toFixed(2);
-          document.getElementById("resultado").style.display = "block";
+          
         }
-
-        </script>
+</script>
 
         <!-- Espaço -->
         <div style="height: 100px;"></div>

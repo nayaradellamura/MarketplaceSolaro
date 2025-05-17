@@ -173,6 +173,8 @@ exports.loginUsuario = async (req, res) => {
                         req.session.usuario.geracao_kwh = 0;
                         req.session.usuario.valorMensalComTaxa = '0.00';
                         req.session.usuario.taxaHora = 0;
+
+
                     }
 
                     // Após carregar dados do fornecedor, redireciona
@@ -282,3 +284,34 @@ exports.cadastrarContrato = (req, res) => {
         });
     });
 };
+
+exports.simularContrato = (req, res) => {
+  const { preco_kwh_sim, geracao_kwh_sim, prazo_contrato_sim, estado_fazenda_sim } = req.body;
+
+  // Validação simples
+  if (!preco_kwh_sim || !geracao_kwh_sim || !prazo_contrato_sim || !estado_fazenda_sim) {
+    return res.status(400).json({ success: false, message: 'Todos os campos são obrigatórios.' });
+  }
+
+  // Converta strings em número para cálculo
+  const precoKwh = parseFloat(preco_kwh_sim);
+  const geracaoKwh = parseFloat(geracao_kwh_sim);
+
+  const diasPorMes = 30;
+  const meses = {
+    '3_meses': { prazo: 3, taxa: 0.075 },
+    '6_meses': { prazo: 6, taxa: 0.05 },
+    '12_meses': { prazo: 12, taxa: 0.025 }
+  };
+
+  const config = meses[prazo_contrato_sim];
+  const energiaGerada = geracaoKwh * 24 * diasPorMes * config.prazo;
+  const valorTotal = energiaGerada * precoKwh;
+  const valorFinal = valorTotal * (1 - config.taxa);
+
+  return res.json({
+    success: true,
+    message: `Contrato simulado com sucesso! Valor estimado: R$ ${valorFinal.toFixed(2)}`
+  });
+};
+

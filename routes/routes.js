@@ -20,6 +20,7 @@ router.get('/cadastro_usuario', (req, res) => res.render('cadastro_usuario'));
 router.post('/cadastro', usuarioController.cadastrarUsuario);
 router.post('/login', usuarioController.loginUsuario);
 router.post('/cadastro_oferta', usuarioController.cadastrarContrato);
+router.post('/Simular-Contrato', usuarioController.simularContrato);
 
 
 // Páginas autenticadas
@@ -52,6 +53,7 @@ router.get('/home_fornecedor', (req, res) => {
       }),
       repasse: valorMensalComTaxa
     });
+    
   }
   res.redirect('/');
 });
