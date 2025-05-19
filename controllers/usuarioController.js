@@ -341,29 +341,36 @@ exports.processaSimulacao = (req, res) => {
 };
 
 exports.rescindirContrato = (req, res) => {
-
     if (!req.session.usuario) {
         return res.status(401).send('Usuário não autenticado.');
     }
 
     const usuarioId = req.session.usuario.id;
 
-    const sqlDelete = `
-    DELETE FROM contrato
-    WHERE UsuarioID = ?
-  `;
+    const receitaEstimativa = 1 // Vou chamar uma função aqui
+    const dataRescisao = new Date();
 
-    db.query(sqlDelete, [usuarioId], (err, result) => {
+    const sqlUpdate = `
+        UPDATE contrato
+        SET 
+            dataRescisao = ?, 
+            status = 'RE',
+            receitaGerada = ?
+        WHERE UsuarioID = ? AND status = 'AT'
+    `;
+
+    db.query(sqlUpdate, [dataRescisao, receitaEstimativa, usuarioId], (err, result) => {
         if (err) {
             console.error('Erro ao rescindir contrato:', err);
             return res.status(500).send('Erro ao rescindir contrato.');
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).send('Nenhum contrato encontrado para rescindir.');
+            return res.status(404).send('Nenhum contrato ativo encontrado para rescindir.');
         }
 
         res.redirect('/index');
     });
 };
+
 
