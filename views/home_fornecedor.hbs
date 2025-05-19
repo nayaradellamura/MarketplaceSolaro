@@ -51,7 +51,6 @@
 
       <form id="simuladorForm" method="POST" action="/Simular-Contrato">
         <div class="row g-3">
-
           <div class="col-md-6">
             <label for="preco_kwh_sim" class="form-label">Preço do kWh (R$)</label>
             <input type="number" step="0.01" class="form-control" id="preco_kwh_sim" name="preco_kwh_sim" required>
@@ -75,7 +74,7 @@
           <div class="col-md-6">
             <label for="estado_fazenda_sim" class="form-label">Estado da Fazenda</label>
             <select class="form-select" id="estado_fazenda_sim" name="estado_fazenda_sim" required>
-              <option value="" selected disabled>Selecione o estado (UF)</option>
+              <option value="" disabled selected>Selecione o estado (UF)</option>
               <option value="AC">Acre (AC)</option>
               <option value="AL">Alagoas (AL)</option>
               <option value="AP">Amapá (AP)</option>
@@ -103,19 +102,24 @@
               <option value="SP">São Paulo (SP)</option>
               <option value="SE">Sergipe (SE)</option>
               <option value="TO">Tocantins (TO)</option>
+              {{#each estados}}
+              <option value="{{this.sigla}}">{{this.nome}} ({{this.sigla}})</option>
+              {{/each}}
             </select>
           </div>
 
-          <div class="col-md-6">
+          <div class="col-md-12">
             <label for="resultado_calculado" class="form-label">Valor Mensal com Taxa</label>
-            <input type="text" class="form-control" id="resultado_calculado" name="resultado_calculado"
+            <input type="text" class="form-control bg-light" id="resultado_calculado" name="resultado_calculado"
               value="{{resultado_calculado}}" readonly>
           </div>
-
         </div>
 
-        <button style="background-color: #003366; margin-top: 20px;" type="submit" class="btn btn-secondary">Simular
-          Oferta</button>
+        <div class="d-flex justify-content-center mt-4">
+          <button type="submit" class="btn btn-primary px-4 py-2">
+            <i class="bi bi-calculator-fill me-2"></i>Simular Oferta
+          </button>
+        </div>
       </form>
 
     </div>
@@ -244,7 +248,8 @@
               <h6 class="text-center fw-bold">Contrato de Parceria com a SOLARO</h6>
               <ul class="small">
                 <li>A energia gerada será ofertada a consumidores pela plataforma SOLARO.</li>
-                <li>O fornecedor receberá os valores referentes à energia vendida, descontada a taxa administrativa.
+                <li>O fornecedor receberá os valores referentes à energia vendida, descontada a taxa
+                  administrativa.
                 </li>
                 <li>Contrato inicia na assinatura e termina automaticamente após o prazo.</li>
                 <li>Pagamentos são repassados mensalmente após o fechamento de consumo.</li>
@@ -335,7 +340,8 @@
           </dl>
           <hr>
           <p class="small">
-            Este contrato estabelece os termos de parceria entre o fornecedor {{nomeFornecedor}} e a plataforma SOLARO
+            Este contrato estabelece os termos de parceria entre o fornecedor {{nomeFornecedor}} e a
+            plataforma SOLARO
             Marketplace.
 
           </p>
