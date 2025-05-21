@@ -96,23 +96,23 @@ exports.loginUsuario = async (req, res) => {
             } else if (usuario.tipo === 'F') {
                 const contratoSQL = `
                     SELECT 
-                        c.IdOferta, 
-                        c.UsuarioID, 
-                        DATE_FORMAT(c.dataAssinatura, '%d/%m/%Y') AS dataAssinatura, 
-                        DATE_FORMAT(c.dataFinal, '%d/%m/%Y') AS dataFinal, 
-                        c.prazoContrato,
+                        c.id, 
+                        c.usuario_id, 
+                        DATE_FORMAT(c.data_assinatura, '%d/%m/%Y') AS dataAssinatura, 
+                        DATE_FORMAT(c.data_final, '%d/%m/%Y') AS dataFinal, 
+                        c.prazo_contrato,
                         c.estado_fazenda, 
                         c.preco_kwh, 
                         c.geracao_kwh,
                         t.taxa
                     FROM 
-                        contrato c
+                        contratos_fornecedores c
                     JOIN 
                         taxa_estaduais t ON c.estado_fazenda = t.estado
                     WHERE 
-                        c.UsuarioID = ?
+                        c.usuario_id = ?
                     ORDER BY 
-                        c.IdOferta DESC
+                        c.id DESC
                     LIMIT 1;
                 `;
 
@@ -207,8 +207,8 @@ exports.cadastrarContrato = (req, res) => {
     }
 
     const sqlContrato = `
-        INSERT INTO contrato (
-            UsuarioID, dataAssinatura, dataFinal, prazoContrato,
+        INSERT INTO contratos_fornecedores (
+            usuario_id, data_assinatura, data_final, prazo_contrato,
             estado_fazenda, preco_kwh, geracao_kwh
         )
         VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL ? MONTH), ?, ?, ?, ?)
@@ -220,26 +220,26 @@ exports.cadastrarContrato = (req, res) => {
             return res.status(500).send('Erro ao cadastrar contrato.');
         }
 
-        // Agora que cadastrou, vamos buscar o contrato mais recente e atualizar a sessão
         const contratoSQL = `
             SELECT 
-                c.IdOferta, 
-                c.UsuarioID, 
-                DATE_FORMAT(c.dataAssinatura, '%d/%m/%Y') AS dataAssinatura, 
-                DATE_FORMAT(c.dataFinal, '%d/%m/%Y') AS dataFinal, 
-                c.prazoContrato,
+                c.id, 
+                c.usuario_id, 
+                DATE_FORMAT(c.data_assinatura, '%d/%m/%Y') AS dataAssinatura, 
+                DATE_FORMAT(c.data_final, '%d/%m/%Y') AS dataFinal, 
+                c.prazo_contrato,
                 c.estado_fazenda, 
                 c.preco_kwh, 
                 c.geracao_kwh,
+                c.status,
                 t.taxa
             FROM 
-                contrato c
+                contratos_fornecedores c
             JOIN 
                 taxa_estaduais t ON c.estado_fazenda = t.estado
             WHERE 
-                c.UsuarioID = ?
+                c.usuarioID = ?
             ORDER BY 
-                c.IdOferta DESC
+                c.id DESC
             LIMIT 1;
         `;
 
@@ -261,6 +261,7 @@ exports.cadastrarContrato = (req, res) => {
                 req.session.usuario.preco_kwh = contrato.preco_kwh;
                 req.session.usuario.geracao_kwh = contrato.geracao_kwh.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 req.session.usuario.taxa = contrato.taxa;
+                req.session.usuario.status = contrato.status;
 
                 // Calcular valor mensal
                 const taxaEstadual = contrato.taxa / 100;
@@ -351,12 +352,12 @@ exports.rescindirContrato = (req, res) => {
     const dataRescisao = new Date();
 
     const sqlUpdate = `
-        UPDATE contrato
+        UPDATE contratos_fornecedores
         SET 
-            dataRescisao = ?, 
+            data_rescisao = ?, 
             status = 'RE',
-            receitaGerada = ?
-        WHERE UsuarioID = ? AND status = 'AT'
+            receita_prevista = ?
+        WHERE usuario_id = ? AND status = 'AT'
     `;
 
     db.query(sqlUpdate, [dataRescisao, receitaEstimativa, usuarioId], (err, result) => {
