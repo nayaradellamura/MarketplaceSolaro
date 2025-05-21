@@ -58,7 +58,7 @@ router.get('/home_fornecedor', (req, res) => {
       nomeFornecedor: req.session.usuario.nome,
       preco_kwh: preco_kwh.toFixed(2),
       geracao_kwh: geracao_kwh.toFixed(2),
-      dataAssinatura: req.session.usuario.dataAssinatura,
+      data_assinatura: req.session.usuario.data_assinatura,
       dataFinal: req.session.usuario.dataFinal,
       prazoContrato: req.session.usuario.prazoContrato,
       estado_fazenda: req.session.usuario.estado_fazenda,
