@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const usuarioController = require('../controllers/usuarioController');
-
+const db = require('../db/db');
 
 // Páginas públicas
 router.get('/', (req, res) => res.render('index'));
@@ -45,34 +45,64 @@ router.get('/home_consumidor', (req, res) => {
 
 
 router.get('/home_fornecedor', (req, res) => {
-  if (req.session.usuario?.tipo === 'F') {
-    const preco_kwh = parseFloat(req.session.usuario.preco_kwh) || 0;
-    const geracao_kwh = parseFloat(req.session.usuario.geracao_kwh) || 0;
-    const valorMensalComTaxa = req.session.usuario.valorMensalComTaxa || '0.00';
+  if (req.session.usuario?.tipo !== 'F') {
+    return res.redirect('/login');
+  }
 
+  const usuario_id = req.session.usuario.id;
 
+  const sql = `
+    SELECT * FROM contratos_fornecedores
+    WHERE usuario_id = ?
+    ORDER BY data_assinatura DESC
+    LIMIT 1
+  `;
+
+  db.query(sql, [usuario_id], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar contrato do fornecedor:', err);
+      return res.status(500).send('Erro ao carregar página do fornecedor.');
+    }
+
+    if (results.length === 0) {
+      // Nenhum contrato ainda
+      return res.render('home_fornecedor', {
+        nomeFornecedor: req.session.usuario.nome,
+        preco_kwh: '0.00',
+        geracao_kwh: '0.00',
+        data_assinatura: null,
+        dataFinal: null,
+        prazoContrato: null,
+        flagRescisao: null,
+        estado_fazenda: null,
+        kwh_total: '0,00',
+        repasse: '0.00'
+      });
+    }
+
+    const contrato = results[0];
+    const preco_kwh = parseFloat(contrato.preco_kwh);
+    const geracao_kwh = parseFloat(contrato.geracao_kwh);
     const kwh_total = geracao_kwh * 720;
 
-
-    return res.render('home_fornecedor', {
+    res.render('home_fornecedor', {
       nomeFornecedor: req.session.usuario.nome,
       preco_kwh: preco_kwh.toFixed(2),
       geracao_kwh: geracao_kwh.toFixed(2),
-      data_assinatura: req.session.usuario.data_assinatura,
-      dataFinal: req.session.usuario.dataFinal,
-      prazoContrato: req.session.usuario.prazoContrato,
-      estado_fazenda: req.session.usuario.estado_fazenda,
+      data_assinatura: contrato.data_assinatura,
+      dataFinal: contrato.data_final,
+      prazoContrato: contrato.prazo_contrato,
+      flagRescisao: contrato.flag_rescisao,
+      estado_fazenda: contrato.estado_fazenda,
       kwh_total: kwh_total.toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       }),
-      repasse: valorMensalComTaxa
+      repasse: contrato.valor_mensal_com_taxa || '0.00'
     });
-
-
-  }
-  res.redirect('/');
+  });
 });
+
 
 
 

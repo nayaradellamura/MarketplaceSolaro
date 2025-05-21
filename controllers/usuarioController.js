@@ -87,7 +87,7 @@ exports.loginUsuario = async (req, res) => {
             } else if (usuario.tipo === 'F') {
                 const contratoSQL = `
                     SELECT 
-                        c.id AS contrato_id,
+                        c.id AS id,
                         c.usuario_id,
                         DATE_FORMAT(c.data_assinatura, '%d/%m/%Y') AS data_assinatura, 
                         DATE_FORMAT(c.data_final, '%d/%m/%Y') AS dataFinal, 
@@ -115,7 +115,7 @@ exports.loginUsuario = async (req, res) => {
 
                         req.session.usuario = {
                             ...req.session.usuario,
-                            contrato_id: contrato.contrato_id,
+                            id: contrato.id,
                             usuario_id: contrato.usuario_id,
                             data_assinatura: contrato.data_assinatura,
                             dataFinal: contrato.dataFinal,
@@ -236,6 +236,7 @@ exports.rescindirContrato = (req, res) => {
     const usuario_id = req.session.usuario.id;
     const receitaEstimativa = 1; 
     const dataRescisao = new Date();
+    const flagRescisao = 0;
 
     const sqlUpdate = `
         UPDATE contratos_fornecedores
@@ -249,7 +250,7 @@ exports.rescindirContrato = (req, res) => {
     db.query(sqlUpdate, [dataRescisao, receitaEstimativa, usuario_id], (err, result) => {
         if (err) return res.status(500).send('Erro ao rescindir contrato.');
         if (result.affectedRows === 0) return res.status(404).send('Nenhum contrato ativo encontrado para rescindir.');
-
+        flagRescisao = 1;
         res.redirect('/index');
     });
 };
