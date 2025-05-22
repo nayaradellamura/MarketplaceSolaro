@@ -95,13 +95,15 @@ exports.loginUsuario = async (req, res) => {
                         c.estado_fazenda, 
                         c.preco_kwh, 
                         c.geracao_kwh,
-                        t.taxa
+                        t.taxa,
+                        c.status,
+                        c.flag_fornecedor
                     FROM 
                         contratos_fornecedores c
                     JOIN 
                         taxa_estaduais t ON c.estado_fazenda = t.estado
                     WHERE 
-                        c.usuario_id = ?
+                        c.usuario_id = ? AND c.status = 'AT' AND c.flag_fornecedor = 1
                     ORDER BY 
                         c.id DESC
                     LIMIT 1;
@@ -125,6 +127,8 @@ exports.loginUsuario = async (req, res) => {
                             geracao_kwh: contrato.geracao_kwh.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
                             taxa: contrato.taxa
                         };
+
+                        console.log('Contrato carregado do fornecedor:', contrato);
 
                         const taxaEstadual = contrato.taxa / 100;
                         const precoComTaxa = contrato.preco_kwh * (1 + taxaEstadual);
