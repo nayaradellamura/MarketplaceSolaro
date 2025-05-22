@@ -17,8 +17,8 @@ router.get('/home', (req, res) => res.render('home'));
 router.get('/login', (req, res) => res.render('login'));
 router.get('/cadastro', (req, res) => res.render('form_cadastro'));
 router.get('/cadastro_usuario', (req, res) => res.render('cadastro_usuario'));
-
-
+router.get('/termos', (req, res) => res.render('termos'));
+router.get('/cookies', (req, res) => res.render('cookies'));
 
 
 // Processamento - Usuário

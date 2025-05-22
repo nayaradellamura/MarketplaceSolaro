@@ -593,7 +593,7 @@ h1 span {
   box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
 }
 
-/* Estilo para o conteúdo da tooltip */
+/* Estilo para o conteúdo da tooltip para aba contrato*/
 .tooltip-inner {
   max-width: 50vw;     
   max-height: 60vh;    
@@ -621,6 +621,74 @@ h1 span {
   margin: 0 auto;
 }
 
+/* Aba termos */
+.custom-content {
+  max-width: 900px;
+  margin: 40px auto;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  font-size: 1rem;
+}
+
+.custom-header-section {
+  background-color: var(--primary-color);
+  color: #fff !important;
+  padding: 25px 20px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  margin-bottom: 30px;
+}
+
+.custom-header-section h1 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: 1px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.custom-content h2 {
+  color: var(--primary-color);
+  border-bottom: 3px solid #dee2e6;
+  padding-bottom: 8px;
+  margin-top: 0;
+  font-size: 1.5rem;
+}
+
+.custom-content h3 {
+  color: var(--secondary-color);
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: 1.25rem;
+}
+
+.custom-content p {
+  margin-bottom: 15px;
+  text-align: justify;
+  line-height: 1.7;
+}
+
+.custom-content ul {
+  padding-left: 20px;
+  margin-bottom: 15px;
+}
+
+.custom-content ul li {
+  margin-bottom: 8px;
+}
+
+.custom-footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-top: 10px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  border-top: 1px solid #ddd;
+  font-family: 'Poppins', sans-serif;
+}
 
 /* Animações */
 @keyframes fadeIn {
