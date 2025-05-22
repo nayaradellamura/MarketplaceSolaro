@@ -125,7 +125,8 @@ exports.loginUsuario = async (req, res) => {
                             estado_fazenda: contrato.estado_fazenda,
                             preco_kwh: contrato.preco_kwh,
                             geracao_kwh: contrato.geracao_kwh.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                            taxa: contrato.taxa
+                            taxa: contrato.taxa,
+                            flag_fornecedor: contrato.flag_fornecedor
                         };
 
                         console.log('Contrato carregado do fornecedor:', contrato);
@@ -179,9 +180,9 @@ exports.cadastrarContrato = (req, res) => {
     const sqlContrato = `
         INSERT INTO contratos_fornecedores (
             usuario_id, data_assinatura, data_final, prazo_contrato,
-            estado_fazenda, preco_kwh, geracao_kwh
+            estado_fazenda, preco_kwh, geracao_kwh, flag_fornecedor
         )
-        VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL ? MONTH), ?, ?, ?, ?)
+        VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL ? MONTH), ?, ?, ?, ?, 1)
     `;
 
     db.query(sqlContrato, [usuario_id, meses, meses, estado_fazenda, preco_kwh, geracao_kwh], (err2) => {
@@ -240,7 +241,6 @@ exports.rescindirContrato = (req, res) => {
     const usuario_id = req.session.usuario.id;
     const receitaEstimativa = 1; 
     const dataRescisao = new Date();
-    const flagRescisao = 0;
 
     const sqlUpdate = `
         UPDATE contratos_fornecedores
@@ -248,6 +248,7 @@ exports.rescindirContrato = (req, res) => {
             data_rescisao = ?, 
             status = 'RE',
             receita_prevista = ?
+            flag_fornecedor = NULL
         WHERE usuario_id = ? AND status = 'AT'
     `;
 
