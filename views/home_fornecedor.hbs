@@ -48,7 +48,7 @@
 
       {{else}}
       <!-- Simulador -->
-      <section class="my-5">
+      <section class="my-5 border-simulador">
                 <h4 class="mb-4 text-center">Simule sua Oferta</h4>
 
       <form id="simuladorForm" method="POST" action="/Simular-Contrato">
@@ -127,7 +127,6 @@
 
     </div>
 
-    </div>
 
     <script>
       function calcularVenda() {
@@ -336,7 +335,7 @@
             <dd class="col-sm-8">{{prazoContrato}} meses</dd>
 
             <dt class="col-sm-4">Data de Início</dt>
-            <dd class="col-sm-8">{{dataAssinatura}}</dd>
+            <dd class="col-sm-8">{{data_assinatura}}</dd>
 
             <dt class="col-sm-4">Data de Término</dt>
             <dd class="col-sm-8">{{dataFinal}}</dd>
@@ -350,11 +349,19 @@
           </p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger me-auto" data-bs-toggle="modal" data-bs-target="#modalAvisoMulta">
+          <button type="button" class="btn btn-primary me-auto" data-bs-toggle="modal" data-bs-target="#modalTodosContratos" data-bs-dismiss="modal">
+            Ver Todos os Contratos
+          </button>
+
+          <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#modalAvisoMulta">
             Rescindir Contrato
           </button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Fechar
+          </button>
         </div>
+
       </div>
     </div>
   </div>
@@ -379,6 +386,54 @@
     </div>
   </div>
 
+<!-- Modal para todos os contratos -->
+<div class="modal fade" id="modalTodosContratos" tabindex="-1" aria-labelledby="todosContratosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl">
+    <div class="modal-content">
+      <div class="modal-header oferta-bg-primary text-white">
+        <h5 class="modal-title" id="todosContratosLabel"><i class="bi bi-list-ul me-2"></i>Todos os Contratos (Ativos e Inativos)</h5>
+      </div>
+      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Data de Início</th>
+              <th>Data de Término</th>
+              <th>Prazo (meses)</th>
+              <th>Estado</th>
+              <th>Preço kWh</th>
+              <th>Geração por Hora</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>01/01/2025</td>
+              <td>31/12/2025</td>
+              <td>12</td>
+              <td>SP</td>
+              <td>0,45</td>
+              <td>5 kWh</td>
+              <td><span class="badge bg-success">Ativo</span></td>
+            </tr>
+            <tr>
+              <td>01/07/2023</td>
+              <td>31/12/2023</td>
+              <td>6</td>
+              <td>MG</td>
+              <td>0,50</td>
+              <td>6 kWh</td>
+              <td><span class="badge bg-secondary">Inativo</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Dicas -->
   <section class="py-5 bg-white">

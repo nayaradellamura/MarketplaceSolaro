@@ -586,7 +586,12 @@ h1 span {
   background-color: var(--primary-color) !important;
 }
 
-
+.border-simulador {
+  border: 1px solid #ccc; 
+  border-radius: 8px;      
+  padding: 60px;           
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+}
 
 /* Animações */
 @keyframes fadeIn {

@@ -42,16 +42,31 @@
 
             {{else}}
             <!-- Simulador -->
-            <section class="my-5">
+            <section class="my-5 border-simulador">
                 <h4 class="mb-4 text-center">Simule sua Economia</h4>
                 <form id="simuladorForm" method="POST" action="/Simular-Contrato">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Consumo de kWh nos 3 últimos meses:</label>
+                            <label class="form-label">
+                                Consumo de kWh nos 3 últimos meses:
+
+                                <!-- Ícone com tooltip -->
+                                <!-- Ícone com Tooltip -->
+                                <i class="bi bi-info-circle-fill text-primary"
+                                    id="tooltipIcon"
+                                    style="cursor: pointer;"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-html="true"
+                                    title="">
+                                </i>
+
+                            </label>
+
                             <input type="number" class="form-control mb-2" id="kwh1" placeholder="Mês 1 (kWh)" required>
                             <input type="number" class="form-control mb-2" id="kwh2" placeholder="Mês 2 (kWh)" required>
                             <input type="number" class="form-control" id="kwh3" placeholder="Mês 3 (kWh)" required>
                         </div>
+
 
                         <div class="col-md-6">
                             <label class="form-label">Valor das 3 últimas contas (R$):</label>
