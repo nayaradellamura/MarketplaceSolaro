@@ -230,7 +230,7 @@ function openFormularioModal() {
       if (campo.value.length === 14 || campo.value.length === 18) {
       consultarDocumento();
       }
-      if(campo.value.length === 0) {
+      if(campo.value.length < 14) {
         document.getElementById("tipo").options[1].disabled = false;
         document.getElementById("tipo").options[0].disabled = false;
         document.getElementById("tipo").value = '';
