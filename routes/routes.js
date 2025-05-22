@@ -53,7 +53,7 @@ router.get('/home_fornecedor', (req, res) => {
 
   const sql = `
     SELECT * FROM contratos_fornecedores
-    WHERE usuario_id = ?
+    WHERE usuario_id = ? AND status = 'AT'
     ORDER BY data_assinatura DESC
     LIMIT 1
   `;
@@ -73,7 +73,6 @@ router.get('/home_fornecedor', (req, res) => {
         data_assinatura: null,
         dataFinal: null,
         prazoContrato: null,
-        flagRescisao: null,
         estado_fazenda: null,
         kwh_total: '0,00',
         repasse: '0.00'
@@ -92,13 +91,13 @@ router.get('/home_fornecedor', (req, res) => {
       data_assinatura: contrato.data_assinatura,
       dataFinal: contrato.data_final,
       prazoContrato: contrato.prazo_contrato,
-      flagRescisao: contrato.flag_rescisao,
       estado_fazenda: contrato.estado_fazenda,
       kwh_total: kwh_total.toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       }),
-      repasse: contrato.valor_mensal_com_taxa || '0.00'
+      repasse: contrato.valor_mensal_com_taxa || '0.00',
+      flag: contrato.flag_fornecedor
     });
   });
 });
