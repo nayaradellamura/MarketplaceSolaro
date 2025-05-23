@@ -49,82 +49,82 @@
       {{else}}
       <!-- Simulador -->
       <section class="my-5 border-simulador">
-                <h4 class="mb-4 text-center">Simule sua Oferta</h4>
+        <h4 class="mb-4 text-center">Simule sua Oferta</h4>
 
-      <form id="simuladorForm" method="POST" action="/Simular-Contrato">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label for="preco_kwh_sim" class="form-label">Preço do kWh (R$)</label>
-            <input type="number" step="0.01" class="form-control" id="preco_kwh_sim" name="preco_kwh_sim" required>
+        <form id="simuladorForm" method="POST" action="/Simular-Contrato">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="preco_kwh_sim" class="form-label">Preço do kWh (R$)</label>
+              <input type="number" step="0.01" class="form-control" id="preco_kwh_sim" name="preco_kwh_sim" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="geracao_kwh_sim" class="form-label">Geração por Hora (kWh)</label>
+              <input type="number" step="0.01" class="form-control" id="geracao_kwh_sim" name="geracao_kwh_sim"
+                required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Prazo de Contrato</label>
+              <select class="form-select" name="prazo_contrato_sim" required>
+                <option value="" disabled selected>Selecione um prazo</option>
+                <option value="3">3 meses - Taxa SOLARO: 7,5%</option>
+                <option value="6">6 meses - Taxa SOLARO: 5%</option>
+                <option value="12">1 ano - Taxa SOLARO: 2,5%</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label for="estado_fazenda_sim" class="form-label">Estado da Fazenda</label>
+              <select class="form-select" id="estado_fazenda_sim" name="estado_fazenda_sim" required>
+                <option value="" disabled selected>Selecione o estado (UF)</option>
+                <option value="AC">Acre (AC)</option>
+                <option value="AL">Alagoas (AL)</option>
+                <option value="AP">Amapá (AP)</option>
+                <option value="AM">Amazonas (AM)</option>
+                <option value="BA">Bahia (BA)</option>
+                <option value="CE">Ceará (CE)</option>
+                <option value="DF">Distrito Federal (DF)</option>
+                <option value="ES">Espírito Santo (ES)</option>
+                <option value="GO">Goiás (GO)</option>
+                <option value="MA">Maranhão (MA)</option>
+                <option value="MT">Mato Grosso (MT)</option>
+                <option value="MS">Mato Grosso do Sul (MS)</option>
+                <option value="MG">Minas Gerais (MG)</option>
+                <option value="PA">Pará (PA)</option>
+                <option value="PB">Paraíba (PB)</option>
+                <option value="PR">Paraná (PR)</option>
+                <option value="PE">Pernambuco (PE)</option>
+                <option value="PI">Piauí (PI)</option>
+                <option value="RJ">Rio de Janeiro (RJ)</option>
+                <option value="RN">Rio Grande do Norte (RN)</option>
+                <option value="RS">Rio Grande do Sul (RS)</option>
+                <option value="RO">Rondônia (RO)</option>
+                <option value="RR">Roraima (RR)</option>
+                <option value="SC">Santa Catarina (SC)</option>
+                <option value="SP">São Paulo (SP)</option>
+                <option value="SE">Sergipe (SE)</option>
+                <option value="TO">Tocantins (TO)</option>
+                {{#each estados}}
+                <option value="{{this.sigla}}">{{this.nome}} ({{this.sigla}})</option>
+                {{/each}}
+              </select>
+            </div>
+
+            <div class="col-md-12">
+              <label for="resultado_calculado" class="form-label">Valor Mensal com Taxa</label>
+              <input type="text" class="form-control bg-light" id="resultado_calculado" name="resultado_calculado"
+                value="{{resultado_calculado}}" readonly>
+            </div>
           </div>
 
-          <div class="col-md-6">
-            <label for="geracao_kwh_sim" class="form-label">Geração por Hora (kWh)</label>
-            <input type="number" step="0.01" class="form-control" id="geracao_kwh_sim" name="geracao_kwh_sim" required>
+          <div class="d-flex justify-content-center mt-4">
+            <button type="submit" class="btn btn-primary px-4 py-2">
+              <i class="bi bi-calculator-fill me-2"></i>Simular Oferta
+            </button>
           </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Prazo de Contrato</label>
-            <select class="form-select" name="prazo_contrato_sim" required>
-              <option value="" disabled selected>Selecione um prazo</option>
-              <option value="3">3 meses - Taxa SOLARO: 7,5%</option>
-              <option value="6">6 meses - Taxa SOLARO: 5%</option>
-              <option value="12">1 ano - Taxa SOLARO: 2,5%</option>
-            </select>
-          </div>
-
-          <div class="col-md-6">
-            <label for="estado_fazenda_sim" class="form-label">Estado da Fazenda</label>
-            <select class="form-select" id="estado_fazenda_sim" name="estado_fazenda_sim" required>
-              <option value="" disabled selected>Selecione o estado (UF)</option>
-              <option value="AC">Acre (AC)</option>
-              <option value="AL">Alagoas (AL)</option>
-              <option value="AP">Amapá (AP)</option>
-              <option value="AM">Amazonas (AM)</option>
-              <option value="BA">Bahia (BA)</option>
-              <option value="CE">Ceará (CE)</option>
-              <option value="DF">Distrito Federal (DF)</option>
-              <option value="ES">Espírito Santo (ES)</option>
-              <option value="GO">Goiás (GO)</option>
-              <option value="MA">Maranhão (MA)</option>
-              <option value="MT">Mato Grosso (MT)</option>
-              <option value="MS">Mato Grosso do Sul (MS)</option>
-              <option value="MG">Minas Gerais (MG)</option>
-              <option value="PA">Pará (PA)</option>
-              <option value="PB">Paraíba (PB)</option>
-              <option value="PR">Paraná (PR)</option>
-              <option value="PE">Pernambuco (PE)</option>
-              <option value="PI">Piauí (PI)</option>
-              <option value="RJ">Rio de Janeiro (RJ)</option>
-              <option value="RN">Rio Grande do Norte (RN)</option>
-              <option value="RS">Rio Grande do Sul (RS)</option>
-              <option value="RO">Rondônia (RO)</option>
-              <option value="RR">Roraima (RR)</option>
-              <option value="SC">Santa Catarina (SC)</option>
-              <option value="SP">São Paulo (SP)</option>
-              <option value="SE">Sergipe (SE)</option>
-              <option value="TO">Tocantins (TO)</option>
-              {{#each estados}}
-              <option value="{{this.sigla}}">{{this.nome}} ({{this.sigla}})</option>
-              {{/each}}
-            </select>
-          </div>
-
-          <div class="col-md-12">
-            <label for="resultado_calculado" class="form-label">Valor Mensal com Taxa</label>
-            <input type="text" class="form-control bg-light" id="resultado_calculado" name="resultado_calculado"
-              value="{{resultado_calculado}}" readonly>
-          </div>
-        </div>
-
-        <div class="d-flex justify-content-center mt-4">
-          <button type="submit" class="btn btn-primary px-4 py-2">
-            <i class="bi bi-calculator-fill me-2"></i>Simular Oferta
-          </button>
-        </div>
-      </form>
+        </form>
       </section>
-
     </div>
 
 
@@ -149,35 +149,33 @@
           });
           return;
         }
-
         console.log("Preço do kWh:", precoKwh);
         console.log("Geração por Hora:", geracaoKwh);
         console.log("Prazo de Contrato:", prazoContrato);
         console.log("Estado da Fazenda:", estadoFazenda);
-
-
-
       }
     </script>
 
     <!-- Espaço -->
-    <div style="height: 100px;"></div>
+    <div style="height: 50px;"></div>
 
     <!-- Botão abre Modal -->
-    <section class="d-flex justify-content-center align-items-center mt-5">
-      <div class="text-center">
-        <button
-          class="btn btn-outline-primary btn-lg px-5 py-3 shadow-sm fw-bold animate__animated animate__pulse animate__infinite"
-          data-bs-toggle="modal" data-bs-target="#modalOferta">
-          <i class="bi bi-plus-circle me-2"></i> Cadastrar Nova Oferta
-        </button>
-        <p class="mt-2 text-muted small">Inicie uma nova parceria com a plataforma SOLARO</p>
+    <section class="container my-5">
+      <div class="card border-start border-4 shadow-sm p-4 oferta-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h4 class="oferta-titulo mb-1">Cadastrar Nova Oferta</h4>
+            <small class="oferta-subtitulo">Inicie agora uma parceria com o SOLARO.</small>
+          </div>
+          <button
+            class="btn btn-outline-primary btn-lg px-5 py-3 shadow-sm fw-bold animate__animated animate__pulse animate__infinite"
+            data-bs-toggle="modal" data-bs-target="#modalOferta">
+            <i class="bi bi-plus-circle me-2"></i> Cadastrar Nova Oferta
+          </button>
+        </div>
       </div>
     </section>
-
     {{/if}}
-
-
 
     </div>
   </section>
@@ -278,6 +276,52 @@
 
   <!-- Seção de Contrato Ativo -->
   {{#if flag}}
+
+  <!-- Modal de Receber Pagamento -->
+<section class="container my-5">
+  <div class="card border-start border-4 shadow-sm p-4 oferta-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h4 class="oferta-titulo mb-1">Pagamentos</h4>
+        <small class="oferta-subtitulo">Receba seu pagamentos</small>
+      </div>
+      <button class="btn oferta-btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalReceberPagamento">
+        <i class="bi bi-cash-coin me-2"></i>Receber Pagamento
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<div class="modal fade" id="modalReceberPagamento" tabindex="-1" aria-labelledby="modalReceberPagamentoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content border-start border-4 shadow-sm" style="border-left-color: var(--primary-color);">
+      <div class="modal-header text-white" style="background-color: var(--primary-color);">
+        <h5 class="modal-title" id="modalReceberPagamentoLabel">Receber Pagamento</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="fornecedor" class="form-label">Fornecedor</label>
+          <input type="text" class="form-control" id="fornecedor" placeholder="Nome do fornecedor">
+        </div>
+        <div class="mb-3">
+          <label for="valor" class="form-label">Valor</label>
+          <input type="text" class="form-control" id="valor" placeholder="R$ 0,00">
+        </div>
+        <div class="mb-3">
+          <label for="data" class="form-label">Data</label>
+          <input type="date" class="form-control" id="data">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn text-white" style="background-color: var(--primary-color);" onclick="gerarRecibo()">Receber e Gerar Recibo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   <section class="container my-5">
     <div class="card border-start border-4 shadow-sm p-4 oferta-card">
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -349,10 +393,6 @@
           </p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary me-auto" data-bs-toggle="modal" data-bs-target="#modalTodosContratos" data-bs-dismiss="modal">
-            Ver Todos os Contratos
-          </button>
-
           <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#modalAvisoMulta">
             Rescindir Contrato
           </button>
@@ -386,29 +426,30 @@
     </div>
   </div>
 
-<!-- Modal para todos os contratos -->
-<!-- Modal para todos os contratos -->
-<div class="modal fade" id="modalTodosContratos" tabindex="-1" aria-labelledby="todosContratosLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-xl">
-    <div class="modal-content">
-      <div class="modal-header oferta-bg-primary text-white">
-        <h5 class="modal-title" id="todosContratosLabel"><i class="bi bi-list-ul me-2"></i>Todos os Contratos (Ativos e Inativos)</h5>
-      </div>
-      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Data de Início</th>
-              <th>Data de Término</th>
-              <th>Prazo (meses)</th>
-              <th>Estado</th>
-              <th>Preço kWh</th>
-              <th>Geração por Hora</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each contratos}}
+  <!-- Modal para todos os contratos -->
+  <div class="modal fade" id="modalTodosContratos" tabindex="-1" aria-labelledby="todosContratosLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+      <div class="modal-content">
+        <div class="modal-header oferta-bg-primary text-white">
+          <h5 class="modal-title" id="todosContratosLabel"><i class="bi bi-list-ul me-2"></i>Todos os Contratos (Ativos
+            e Inativos)</h5>
+        </div>
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Data de Início</th>
+                <th>Data de Término</th>
+                <th>Prazo (meses)</th>
+                <th>Estado</th>
+                <th>Preço kWh</th>
+                <th>Geração por Hora</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each contratos}}
               <tr>
                 <td>{{formatarData this.data_assinatura}}</td>
                 <td>{{formatarData this.data_final}}</td>
@@ -418,26 +459,40 @@
                 <td>{{this.geracao_kwh}} kWh</td>
                 <td>
                   {{#if (eq this.status "AT")}}
-                    <span class="badge bg-success">Ativo</span>
+                  <span class="badge bg-success">Ativo</span>
                   {{else}}
-                    <span class="badge bg-secondary">Inativo</span>
+                  <span class="badge bg-secondary">Inativo</span>
                   {{/if}}
                 </td>
               </tr>
-            {{/each}}
-          </tbody>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
+  <!-- Histórico de Contratos -->
+  <section class="container my-5">
+    <div class="card border-start border-4 shadow-sm p-4 oferta-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h4 class="oferta-titulo mb-1">Histórico de Contratos</h4>
+          <small class="oferta-subtitulo">Contratos Ativos e Inativos</small>
+        </div>
+        <button class="btn oferta-btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalTodosContratos">
+          <i class="bi bi-file-earmark-text me-2"></i>Ver Todos os Contratos
+        </button>
+      </div>
+    </div>
+  </section>
 
-
-</div>
+  <!-- Espaço -->
+  <div style="height: 100px;"></div>
 
   <!-- Dicas -->
   <section class="py-5 bg-white">
@@ -511,6 +566,41 @@
       });
     });
   </script>
+
+
+  <script>
+    function gerarRecibo() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const fornecedor = document.getElementById('fornecedor').value || 'Fornecedor não informado';
+      const valor = document.getElementById('valor').value || 'Valor não informado';
+      const data = document.getElementById('data').value || new Date().toISOString().split('T')[0];
+
+      const dataFormatada = new Date(data).toLocaleDateString('pt-BR');
+
+      doc.setFontSize(14);
+      doc.text("RECIBO DE PAGAMENTO", 105, 20, null, null, 'center');
+      doc.setFontSize(12);
+      doc.text(`Recebi de SOLARO`, 20, 40);
+      doc.text(`O valor de ${valor}`, 20, 50);
+      doc.text(`Em: ${dataFormatada}`, 20, 60);
+      doc.text(`Fornecedor: ${fornecedor}`, 20, 70);
+      doc.text("Assinatura: ____________________________", 20, 90);
+
+      doc.save("recibo.pdf");
+
+      // Fecha o modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalReceberPagamento'));
+      if (modal) modal.hide();
+    }
+  </script>
+
+  <!-- Bootstrap JS e Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>
 
 </html>
