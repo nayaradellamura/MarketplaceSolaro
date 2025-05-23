@@ -690,6 +690,29 @@ h1 span {
   font-family: 'Poppins', sans-serif;
 }
 
+/* Dash geral*/
+.dashboard-header {
+  margin: 40px 0 30px;
+}
+.card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 20px;
+}
+.chart-wrapper {
+  min-height: 450px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.card h5 {
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+canvas {
+  max-width: 100%;
+}
+
 /* Animações */
 @keyframes fadeIn {
   from { opacity: 0; }
