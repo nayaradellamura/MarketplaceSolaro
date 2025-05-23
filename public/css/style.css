@@ -713,6 +713,35 @@ canvas {
   max-width: 100%;
 }
 
+/* Abas de pagamento */
+.custom-tabs .nav-link {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 2px solid #dee2e6;
+  border-radius: 0.5rem 0.5rem 0 0;
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.custom-tabs .nav-link:hover {
+  background-color: #e9ecef;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.custom-tabs .nav-link.active {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color) var(--primary-color) transparent;
+}
+
+.custom-tabs {
+  background-color: #ffffff;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
 /* Animações */
 @keyframes fadeIn {
   from { opacity: 0; }

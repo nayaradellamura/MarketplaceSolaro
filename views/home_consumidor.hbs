@@ -20,13 +20,13 @@
             <!-- if dataAssinatura
              Dashboard -->
             <div class="row g-4 justify-content-center text-center">
-               <div class="col-md-6">
+                <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-warning">Total de KWh consumido no mês:</h5>
                         <p class="display-5 fw-bold">{{consumo_medio}} kWh</p>
                     </div>
                 </div>
-               <div class="col-md-6">
+                <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-warning">Valor Total da Fatura</h5>
                         <p class="display-5 fw-bold">R$ {{valor_medio_contas}}</p>
@@ -46,7 +46,7 @@
                 </div>
             </div>
 
-           <!-- else
+            <!-- else
              Simulador -->
             <section class="my-5 border-simulador">
                 <h4 class="mb-4 text-center">Simule sua Economia</h4>
@@ -55,16 +55,11 @@
                         <div class="col-md-6">
                             <label class="form-label d-flex align-items-center gap-2">
                                 Consumo de kWh nos 3 últimos meses:
-                                <div
-                                    id="tooltipIcon"
-                                    style="cursor: pointer;"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-html="true"
-                                    data-bs-placement="right"
-                                >
+                                <div id="tooltipIcon" style="cursor: pointer;" data-bs-toggle="tooltip"
+                                    data-bs-html="true" data-bs-placement="right">
                                     <i class="bi bi-info-circle-fill text-dark"></i>
                                 </div>
-                                </label>
+                            </label>
 
 
                             <input type="number" class="form-control mb-2" id="kwh1" placeholder="Mês 1 (kWh)" required>
@@ -74,21 +69,19 @@
 
 
                         <div class="col-md-6">
-                           <label class="form-label d-flex align-items-center gap-2">
-                            Valor das 3 últimas contas (R$):
-                                 <div
-                                    id="tooltipIcon2"
-                                    style="cursor: pointer;"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-html="true"
-                                    data-bs-placement="right"
-                                >
+                            <label class="form-label d-flex align-items-center gap-2">
+                                Valor das 3 últimas contas (R$):
+                                <div id="tooltipIcon2" style="cursor: pointer;" data-bs-toggle="tooltip"
+                                    data-bs-html="true" data-bs-placement="right">
                                     <i class="bi bi-info-circle-fill text-dark"></i>
                                 </div>
                             </label>
-                            <input type="number" class="form-control mb-2" id="conta1" placeholder="Valor Conta 1 (R$)" required>
-                            <input type="number" class="form-control mb-2" id="conta2" placeholder="Valor Conta 2 (R$)" required>
-                            <input type="number" class="form-control" id="conta3" placeholder="Valor Conta 3 (R$)" required>
+                            <input type="number" class="form-control mb-2" id="conta1" placeholder="Valor Conta 1 (R$)"
+                                required>
+                            <input type="number" class="form-control mb-2" id="conta2" placeholder="Valor Conta 2 (R$)"
+                                required>
+                            <input type="number" class="form-control" id="conta3" placeholder="Valor Conta 3 (R$)"
+                                required>
                         </div>
 
 
@@ -125,7 +118,7 @@
             </div>
         </section>
 
-       <!-- /if-->
+        <!-- /if-->
 
 
 
@@ -151,19 +144,27 @@
 
                         <div class="mb-3">
                             <label class="form-label">Valor das 3 últimas contas (R$):</label>
-                            <input type="number" class="form-control mb-2" id="conta1" placeholder="Valor Conta 1 (R$)" required>
-                            <input type="number" class="form-control mb-2" id="conta2" placeholder="Valor Conta 2 (R$)" required>
-                            <input type="number" class="form-control" id="conta3" placeholder="Valor Conta 3 (R$)" required>
+                            <input type="number" class="form-control mb-2" id="conta1" placeholder="Valor Conta 1 (R$)"
+                                required>
+                            <input type="number" class="form-control mb-2" id="conta2" placeholder="Valor Conta 2 (R$)"
+                                required>
+                            <input type="number" class="form-control" id="conta3" placeholder="Valor Conta 3 (R$)"
+                                required>
                         </div>
 
                         <div class="border rounded p-3 bg-light mb-3">
                             <h6 class="text-center fw-bold">Contrato de Consumo com a SOLARO</h6>
                             <ul class="small">
-                                <li>Ao contratar pela plataforma SOLARO, você consome energia limpa fornecida por geradores parceiros, com total transparência e segurança.</li>
-                                <li>O valor pago inclui o custo da energia contratada e uma taxa por estado que garante a operação e manutenção da plataforma.</li>
-                                <li>O contrato tem início a partir da assinatura, sendo renovado mensalmente e podendo ser encerrado a qualquer momento.</li>
-                                <li>O pagamento é realizado mensalmente, considerando o consumo efetivo registrado durante o período.</li>
-                                <li>Os fornecedores parceiros garantem o fornecimento da energia contratada, conforme as condições acordadas na plataforma SOLARO.</li>
+                                <li>Ao contratar pela plataforma SOLARO, você consome energia limpa fornecida por
+                                    geradores parceiros, com total transparência e segurança.</li>
+                                <li>O valor pago inclui o custo da energia contratada e uma taxa por estado que garante
+                                    a operação e manutenção da plataforma.</li>
+                                <li>O contrato tem início a partir da assinatura, sendo renovado mensalmente e podendo
+                                    ser encerrado a qualquer momento.</li>
+                                <li>O pagamento é realizado mensalmente, considerando o consumo efetivo registrado
+                                    durante o período.</li>
+                                <li>Os fornecedores parceiros garantem o fornecimento da energia contratada, conforme as
+                                    condições acordadas na plataforma SOLARO.</li>
                             </ul>
 
 
@@ -188,60 +189,29 @@
         </div>
     </div>
 
-    <!-- Seção de Contrato Ativo 
-    if dataAssinatura -->
-    <section class="container my-5">
-        <div class="card border-start border-4 shadow-sm p-4 oferta-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h4 class="oferta-titulo mb-1">Contrato Ativo</h4>
-                    <small class="oferta-subtitulo">Parceria com a plataforma SOLARO</small>
-                </div>
-                <button class="btn oferta-btn-outline-primary" data-bs-toggle="modal"
-                    data-bs-target="#modalVisualizarContrato">
-                    <i class="bi bi-file-earmark-text me-2"></i>Ver Detalhes
-                </button>
-            </div>
-
-            <div class="row text-center text-md-start">
-                <div class="col-md-4 mb-3 mb-md-0">
-                    <p class="mb-1"><strong><i class="bi bi-calendar-check me-2"></i>Assinatura:</strong></p>
-                    <p>{{dataAssinatura}}</p>
-                </div>
-                <div class="col-md-4 mb-3 mb-md-0">
-                    <p class="mb-1"><strong><i class="bi bi-calendar-x me-2"></i>Validade:</strong></p>
-                    <p>até {{dataFinal}}</p>
-                </div>
-                <div class="col-md-4">
-                    <p class="mb-1"><strong><i class="bi bi-clock me-2"></i>Duração:</strong></p>
-                    <p>{{prazoContrato}} meses</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ABAS -->
+    <!-- ABAS     if dataAssinatura -->
     <div class="d-flex justify-content-center">
-        <ul class="nav nav-tabs rounded shadow-sm mb-4 bg-white px-3 w-75" id="myTab" role="tablist" style="max-width: 900px;">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active rounded-top fw-semibold text-dark" id="lancamento-tab" data-bs-toggle="tab" data-bs-target="#lancamento" type="button" role="tab">
+        <ul class="nav nav-tabs custom-tabs w-75 mb-4" id="myTab" role="tablist" style="max-width: 900px;">
+            <li class="nav-item me-2" role="presentation">
+                <button class="nav-link active" id="lancamento-tab" data-bs-toggle="tab" data-bs-target="#lancamento"
+                    type="button" role="tab">
                     <i class="bi bi-upload me-1"></i> Lançamento
                 </button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link rounded-top fw-semibold text-dark" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab">
+            <li class="nav-item me-2" role="presentation">
+                <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico"
+                    type="button" role="tab">
                     <i class="bi bi-clock-history me-1"></i> Histórico
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link rounded-top fw-semibold text-dark" id="faturas-tab" data-bs-toggle="tab" data-bs-target="#faturas" type="button" role="tab">
+                <button class="nav-link" id="faturas-tab" data-bs-toggle="tab" data-bs-target="#faturas" type="button"
+                    role="tab">
                     <i class="bi bi-receipt me-1"></i> Faturas
                 </button>
             </li>
         </ul>
     </div>
-
 
     <div class="tab-content">
         <div class="tab-pane fade show active" id="lancamento" role="tabpanel">
@@ -268,12 +238,13 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Total kWh Gerado</label>
-                                <input type="number" step="0.01" class="form-control" name="kwh_gerado" placeholder="Ex.: 560.50" required>
+                                <input type="number" step="0.01" class="form-control" name="kwh_gerado"
+                                    placeholder="Ex.: 560.50" required>
                             </div>
-                                
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="bi bi-save me-2"></i> Salvar Lançamento
-                                </button>
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-save me-2"></i> Salvar Lançamento
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -316,216 +287,251 @@
         </div>
         <div class="tab-pane fade" id="faturas" role="tabpanel">
             <!-- Seção Minhas Faturas -->
-<section class="container my-5">
-  <div class="card border-start border-4 shadow-sm p-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <h4 class="mb-1">Minhas Faturas</h4>
-        <small class="text-muted">Pagamento dos contratos ativos</small>
-      </div>
-      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalPagamento">
-        <i class="bi bi-credit-card-2-front me-2"></i> Efetuar Pagamento
-      </button>
-    </div>
+            <section class="container my-5">
+                <div class="card border-start border-4 shadow-sm p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h4 class="mb-1">Minhas Faturas</h4>
+                            <small class="text-muted">Pagamento dos contratos ativos</small>
+                        </div>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalPagamento">
+                            <i class="bi bi-credit-card-2-front me-2"></i> Efetuar Pagamento
+                        </button>
+                    </div>
 
-    <div class="table-responsive">
-      <table class="table table-bordered mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Mês Referente</th>
-            <th>Valor</th>
-            <th>Status</th>
-            <th>Opção</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Mai/2025</td>
-            <td>R$ 120,50</td>
-            <td><span class="badge bg-danger">Pendente</span></td>
-            <td>
-              <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalPagamento">
-                Pagar
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>Abr/2025</td>
-            <td>R$ 110,30</td>
-            <td><span class="badge bg-success">Pago</span></td>
-            <td>-</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Mês Referente</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Opção</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Mai/2025</td>
+                                    <td>R$ 120,50</td>
+                                    <td><span class="badge bg-danger">Pendente</span></td>
+                                    <td>
+                                        <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#modalPagamento">
+                                            Pagar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Abr/2025</td>
+                                    <td>R$ 110,30</td>
+                                    <td><span class="badge bg-success">Pago</span></td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-<!-- Modal de Pagamento -->
-<div class="modal fade" id="modalPagamento" tabindex="-1" aria-labelledby="modalPagamentoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form onsubmit="event.preventDefault(); gerarRecibo();">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalPagamentoLabel">
-            <i class="bi bi-credit-card-2-front me-2"></i> Efetuar Pagamento
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-        </div>
-        <div class="modal-body">
-          <p>Valor da fatura: <strong id="valorFatura">R$ 0,00</strong></p>
+            <!-- Modal de Pagamento -->
+            <div class="modal fade" id="modalPagamento" tabindex="-1" aria-labelledby="modalPagamentoLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form onsubmit="event.preventDefault(); gerarRecibo();">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalPagamentoLabel">
+                                    <i class="bi bi-credit-card-2-front me-2"></i> Efetuar Pagamento
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Fechar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Valor da fatura: <strong id="valorFatura">R$ 0,00</strong></p>
 
-          <div class="mb-3">
-            <label for="metodoPagamento" class="form-label">Método de Pagamento</label>
-            <select id="metodoPagamento" class="form-select" name="metodo" required>
-              <option value="" selected disabled>Selecione</option>
-              <option value="pix">PIX</option>
-              <option value="cartao">Cartão de Crédito</option>
-              <option value="boleto">Boleto Bancário</option>
-            </select>
-          </div>
+                                <div class="mb-3">
+                                    <label for="metodoPagamento" class="form-label">Método de Pagamento</label>
+                                    <select id="metodoPagamento" class="form-select" name="metodo" required>
+                                        <option value="" selected disabled>Selecione</option>
+                                        <option value="pix">PIX</option>
+                                        <option value="cartao">Cartão de Crédito</option>
+                                        <option value="boleto">Boleto Bancário</option>
+                                    </select>
+                                </div>
 
-          <div id="infoPix" class="d-none">
-            <p class="small mb-1">Chave PIX: <strong>financeiro@solaro.com.br</strong></p>
-            <p class="small">Após o pagamento, envie o comprovante para <a href="mailto:suporte@solaro.com.br">suporte@solaro.com.br</a></p>
-          </div>
+                                <div id="infoPix" class="d-none">
+                                    <p class="small mb-1">Chave PIX: <strong>financeiro@solaro.com.br</strong></p>
+                                    <p class="small">Após o pagamento, envie o comprovante para <a
+                                            href="mailto:suporte@solaro.com.br">suporte@solaro.com.br</a></p>
+                                </div>
 
-          <div id="infoCartao" class="d-none">
-            <label for="numCartao" class="form-label">Número do Cartão</label>
-            <input id="numCartao" type="text" class="form-control mb-2" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" />
-            <div class="row">
-              <div class="col">
-                <label for="validadeCartao" class="form-label">Validade</label>
-                <input id="validadeCartao" type="text" class="form-control" placeholder="MM/AA" maxlength="5" />
-              </div>
-              <div class="col">
-                <label for="cvvCartao" class="form-label">CVV</label>
-                <input id="cvvCartao" type="text" class="form-control" placeholder="123" maxlength="3" />
-              </div>
+                                <div id="infoCartao" class="d-none">
+                                    <label for="numCartao" class="form-label">Número do Cartão</label>
+                                    <input id="numCartao" type="text" class="form-control mb-2"
+                                        placeholder="XXXX XXXX XXXX XXXX" maxlength="19" required />
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="validadeCartao" class="form-label">Validade</label>
+                                            <input id="validadeCartao" type="text" class="form-control"
+                                                placeholder="MM/AA" maxlength="5" required />
+                                        </div>
+                                        <div class="col">
+                                            <label for="cvvCartao" class="form-label">CVV</label>
+                                            <input id="cvvCartao" type="text" class="form-control" placeholder="123"
+                                                maxlength="3" required />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="infoBoleto" class="d-none">
+                                    <p class="small mb-0">Um boleto será gerado após a confirmação do pagamento.</p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <div id="infoBoleto" class="d-none">
-            <p class="small mb-0">Um boleto será gerado após a confirmação do pagamento.</p>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+            <script>
+                // Variável global para armazenar dados da fatura
+                let dadosFatura = { mes: "", valor: "R$ 0,00" };
 
-    <script>
-    // Variável global para armazenar dados da fatura
-    let dadosFatura = { mes: "", valor: "R$ 0,00" };
+                // Função para preparar o modal com os dados da fatura ao abrir o modal
+                function prepararPagamento(button) {
+                    const mes = button.getAttribute('data-mes');
+                    const valor = button.getAttribute('data-valor') || "R$ 0,00";
+                    dadosFatura = { mes, valor };
 
-    // Função para preparar o modal com os dados da fatura ao abrir o modal
-    function prepararPagamento(button) {
-        const mes = button.getAttribute('data-mes');
-        const valor = button.getAttribute('data-valor') || "R$ 0,00";
-        dadosFatura = { mes, valor };
+                    // Atualiza o valor exibido no modal
+                    document.getElementById('valorFatura').innerText = valor;
+                }
 
-        // Atualiza o valor exibido no modal
-        document.getElementById('valorFatura').innerText = valor;
-    }
+                // Listener para exibir os campos de acordo com o método de pagamento
+                document.getElementById('metodoPagamento').addEventListener('change', function () {
+                    const pix = document.getElementById('infoPix');
+                    const cartao = document.getElementById('infoCartao');
+                    const boleto = document.getElementById('infoBoleto');
 
-    // Listener para exibir os campos de acordo com o método de pagamento
-    document.getElementById('metodoPagamento').addEventListener('change', function () {
-        const pix = document.getElementById('infoPix');
-        const cartao = document.getElementById('infoCartao');
-        const boleto = document.getElementById('infoBoleto');
+                    pix.classList.add('d-none');
+                    cartao.classList.add('d-none');
+                    boleto.classList.add('d-none');
 
-        pix.classList.add('d-none');
-        cartao.classList.add('d-none');
-        boleto.classList.add('d-none');
+                    if (this.value === 'pix') {
+                        pix.classList.remove('d-none');
+                    } else if (this.value === 'cartao') {
+                        cartao.classList.remove('d-none');
+                    } else if (this.value === 'boleto') {
+                        boleto.classList.remove('d-none');
+                    }
+                });
 
-        if (this.value === 'pix') {
-        pix.classList.remove('d-none');
-        } else if (this.value === 'cartao') {
-        cartao.classList.remove('d-none');
-        } else if (this.value === 'boleto') {
-        boleto.classList.remove('d-none');
-        }
-    });
+                async function gerarRecibo() {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    const data = new Date().toLocaleDateString("pt-BR");
+                    const metodo = document.querySelector('[name="metodo"]').value || "Não informado";
 
-    async function gerarRecibo() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const data = new Date().toLocaleDateString("pt-BR");
-    const metodo = document.querySelector('[name="metodo"]').value || "Não informado";
+                    // Configurações básicas
+                    doc.setFont("helvetica");
 
-    // Configurações básicas
-    doc.setFont("helvetica");
+                    // Título centralizado e negrito
+                    doc.setFontSize(18);
+                    doc.setFont(undefined, "bold");
+                    doc.text("Recibo de Pagamento", doc.internal.pageSize.getWidth() / 2, 20, { align: "center" });
 
-    // Título centralizado e negrito
-    doc.setFontSize(18);
-    doc.setFont(undefined, "bold");
-    doc.text("Recibo de Pagamento", doc.internal.pageSize.getWidth() / 2, 20, { align: "center" });
+                    // Linha horizontal abaixo do título
+                    doc.setDrawColor(0);
+                    doc.setLineWidth(0.5);
+                    doc.line(20, 25, doc.internal.pageSize.getWidth() - 20, 25);
 
-    // Linha horizontal abaixo do título
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-    doc.line(20, 25, doc.internal.pageSize.getWidth() - 20, 25);
+                    // Corpo do recibo
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, "normal");
+                    const startY = 40;
+                    const lineHeight = 10;
 
-    // Corpo do recibo
-    doc.setFontSize(12);
-    doc.setFont(undefined, "normal");
-    const startY = 40;
-    const lineHeight = 10;
+                    // Função para facilitar texto com label negrito
+                    function addLabelValue(label, value, y) {
+                        doc.setFont(undefined, "bold");
+                        doc.text(`${label}:`, 20, y);
+                        doc.setFont(undefined, "normal");
+                        doc.text(value, 60, y);
+                    }
 
-    // Função para facilitar texto com label negrito
-    function addLabelValue(label, value, y) {
-    doc.setFont(undefined, "bold");
-    doc.text(`${label}:`, 20, y);
-    doc.setFont(undefined, "normal");
-    doc.text(value, 60, y);
-    }
+                    addLabelValue("Mês Referente", dadosFatura.mes, startY);
+                    addLabelValue("Valor Pago", dadosFatura.valor, startY + lineHeight);
+                    addLabelValue("Método", metodo.toUpperCase(), startY + lineHeight * 2);
+                    addLabelValue("Data do Pagamento", data, startY + lineHeight * 3);
 
-    addLabelValue("Mês Referente", dadosFatura.mes, startY);
-    addLabelValue("Valor Pago", dadosFatura.valor, startY + lineHeight);
-    addLabelValue("Método", metodo.toUpperCase(), startY + lineHeight * 2);
-    addLabelValue("Data do Pagamento", data, startY + lineHeight * 3);
+                    // Mensagem final
+                    doc.setFont(undefined, "italic");
+                    doc.setFontSize(11);
+                    doc.text(
+                        "Obrigado por utilizar o Solaro Marketplace!",
+                        doc.internal.pageSize.getWidth() / 2,
+                        startY + lineHeight * 6,
+                        { align: "center" }
+                    );
 
-    // Mensagem final
-    doc.setFont(undefined, "italic");
-    doc.setFontSize(11);
-    doc.text(
-    "Obrigado por utilizar o Solaro Marketplace!",
-    doc.internal.pageSize.getWidth() / 2,
-    startY + lineHeight * 6,
-    { align: "center" }
-    );
-
-    // Salvar o arquivo
-    doc.save(`recibo_solaro_${dadosFatura.mes.replace("/", "-")}.pdf`);
+                    // Salvar o arquivo
+                    doc.save(`recibo_solaro_${dadosFatura.mes.replace("/", "-")}.pdf`);
 
 
-    // Alerta 
-    Swal.fire({
-        icon: 'success',
-        title: 'Pagamento confirmado!',
-        text: 'Recibo gerado com sucesso.',
-        confirmButtonText: 'OK'
-    }).then(() => {
-        // Fecha o modal após fechar o alerta
-        const modal = bootstrap.Modal.getInstance(document.getElementById('modalPagamento'));
-        if (modal) modal.hide();
-    });
-    }
+                    // Alerta 
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pagamento confirmado!',
+                        text: 'Recibo gerado com sucesso.',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Fecha o modal após fechar o alerta
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalPagamento'));
+                        if (modal) modal.hide();
+                    });
+                }
 
-    </script>
+            </script>
 
 
         </div>
     </div>
-    
 
+    <!-- Seção de Contrato Ativo 
+    if dataAssinatura -->
+    <section class="container my-5">
+        <div class="card border-start border-4 shadow-sm p-4 oferta-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h4 class="oferta-titulo mb-1">Contrato Ativo</h4>
+                    <small class="oferta-subtitulo">Parceria com a plataforma SOLARO</small>
+                </div>
+                <button class="btn oferta-btn-outline-primary" data-bs-toggle="modal"
+                    data-bs-target="#modalVisualizarContrato">
+                    <i class="bi bi-file-earmark-text me-2"></i>Ver Detalhes
+                </button>
+            </div>
 
-
-
+            <div class="row text-center text-md-start">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <p class="mb-1"><strong><i class="bi bi-calendar-check me-2"></i>Assinatura:</strong></p>
+                    <p>{{dataAssinatura}}</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <p class="mb-1"><strong><i class="bi bi-calendar-x me-2"></i>Validade:</strong></p>
+                    <p>até {{dataFinal}}</p>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-1"><strong><i class="bi bi-clock me-2"></i>Duração:</strong></p>
+                    <p>{{prazoContrato}} meses</p>
+                </div>
+            </div>
+        </div>
+    </section>
     <!-- /if
 
      Modal de Visualização -->
@@ -567,7 +573,8 @@
                     </p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary me-auto" data-bs-toggle="modal" data-bs-target="#modalTodosContratos" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-primary me-auto" data-bs-toggle="modal"
+                        data-bs-target="#modalTodosContratos" data-bs-dismiss="modal">
                         Ver Todos os Contratos
                     </button>
                     <button type="button" class="btn btn-danger me-auto" data-bs-toggle="modal"
@@ -602,53 +609,55 @@
     </div>
 
     <!-- Modal para todos os contratos -->
-<div class="modal fade" id="modalTodosContratos" tabindex="-1" aria-labelledby="todosContratosLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-xl">
-    <div class="modal-content">
-      <div class="modal-header oferta-bg-primary text-white">
-        <h5 class="modal-title" id="todosContratosLabel"><i class="bi bi-list-ul me-2"></i>Todos os Contratos (Ativos e Inativos)</h5>
-      </div>
-      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Data de Início</th>
-              <th>Data de Término</th>
-              <th>Prazo (meses)</th>
-              <th>Estado</th>
-              <th>Ultimo Valor da Fatura</th>
-              <th>Valor Economizado</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>01/01/2025</td>
-              <td>31/12/2025</td>
-              <td>12</td>
-              <td>SP</td>
-              <td>150,87</td>
-              <td>25,00</td>
-              <td><span class="badge bg-success">Ativo</span></td>
-            </tr>
-            <tr>
-              <td>01/07/2023</td>
-              <td>31/12/2023</td>
-              <td>6</td>
-              <td>MG</td>
-              <td>397,80</td>
-              <td>80,15</td>
-              <td><span class="badge bg-secondary">Inativo</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-      </div>
+    <div class="modal fade" id="modalTodosContratos" tabindex="-1" aria-labelledby="todosContratosLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header oferta-bg-primary text-white">
+                    <h5 class="modal-title" id="todosContratosLabel"><i class="bi bi-list-ul me-2"></i>Todos os
+                        Contratos (Ativos e Inativos)</h5>
+                </div>
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Data de Início</th>
+                                <th>Data de Término</th>
+                                <th>Prazo (meses)</th>
+                                <th>Estado</th>
+                                <th>Ultimo Valor da Fatura</th>
+                                <th>Valor Economizado</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>01/01/2025</td>
+                                <td>31/12/2025</td>
+                                <td>12</td>
+                                <td>SP</td>
+                                <td>150,87</td>
+                                <td>25,00</td>
+                                <td><span class="badge bg-success">Ativo</span></td>
+                            </tr>
+                            <tr>
+                                <td>01/07/2023</td>
+                                <td>31/12/2023</td>
+                                <td>6</td>
+                                <td>MG</td>
+                                <td>397,80</td>
+                                <td>80,15</td>
+                                <td><span class="badge bg-secondary">Inativo</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 
 
@@ -702,23 +711,23 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-        const tooltipTrigger = document.getElementById('tooltipIcon');
-        new bootstrap.Tooltip(tooltipTrigger, {
-            title: `<img src="/img/elektrokwh.png" alt="Placa Solar" />`,
-            html: true,
-            placement: 'right',
-            sanitize: false 
-        });
+            const tooltipTrigger = document.getElementById('tooltipIcon');
+            new bootstrap.Tooltip(tooltipTrigger, {
+                title: `<img src="/img/elektrokwh.png" alt="Placa Solar" />`,
+                html: true,
+                placement: 'right',
+                sanitize: false
+            });
 
-        const tooltipTrigger2 = document.getElementById('tooltipIcon2');
-        new bootstrap.Tooltip(tooltipTrigger2, {
-            title: `<img src="/img/elektrovalor.png" alt="Nova Imagem" />`,
-            html: true,
-            placement: 'right',
-            sanitize: false
+            const tooltipTrigger2 = document.getElementById('tooltipIcon2');
+            new bootstrap.Tooltip(tooltipTrigger2, {
+                title: `<img src="/img/elektrovalor.png" alt="Nova Imagem" />`,
+                html: true,
+                placement: 'right',
+                sanitize: false
+            });
         });
-        });
-</script>
+    </script>
 
 
 </body>
