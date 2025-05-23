@@ -107,14 +107,20 @@
         <div style="height: 30px;"></div>
 
         <!-- Botão abre Modal -->
-        <section class="d-flex justify-content-center align-items-center mt-5">
-            <div class="text-center">
-                <button
-                    class="btn btn-outline-primary btn-lg px-5 py-3 shadow-sm fw-bold animate__animated animate__pulse animate__infinite"
-                    data-bs-toggle="modal" data-bs-target="#modalOferta">
-                    <i class="bi bi-plus-circle me-2"></i> Cadastrar Nova Oferta
-                </button>
-                <p class="mt-2 text-muted small">Solicite uma nova oferta de energia solar personalizada para você.</p>
+        <section class="container my-5">
+            <div class="card border-start border-4 shadow-sm p-4 oferta-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h4 class="oferta-titulo mb-1">Cadastrar Nova Oferta</h4>
+                        <small class="oferta-subtitulo">Solicite uma nova oferta de energia solar personalizada para
+                            você.</small>
+                    </div>
+                    <button
+                        class="btn btn-outline-primary btn-lg px-5 py-3 shadow-sm fw-bold animate__animated animate__pulse animate__infinite"
+                        data-bs-toggle="modal" data-bs-target="#modalOferta">
+                        <i class="bi bi-plus-circle me-2"></i> Cadastrar Nova Oferta
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -188,6 +194,21 @@
             </div>
         </div>
     </div>
+
+      <!-- Histórico de Contratos -->
+  <section class="container my-5">
+    <div class="card border-start border-4 shadow-sm p-4 oferta-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h4 class="oferta-titulo mb-1">Histórico de Contratos</h4>
+          <small class="oferta-subtitulo">Contratos Ativos e Inativos</small>
+        </div>
+        <button class="btn oferta-btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalTodosContratos">
+          <i class="bi bi-file-earmark-text me-2"></i>Ver Todos os Contratos
+        </button>
+      </div>
+    </div>
+  </section>
 
     <!-- ABAS     if dataAssinatura -->
     <div class="d-flex justify-content-center">
@@ -368,17 +389,17 @@
                                 <div id="infoCartao" class="d-none">
                                     <label for="numCartao" class="form-label">Número do Cartão</label>
                                     <input id="numCartao" type="text" class="form-control mb-2"
-                                        placeholder="XXXX XXXX XXXX XXXX" maxlength="19" required />
+                                        placeholder="XXXX XXXX XXXX XXXX" maxlength="19" />
                                     <div class="row">
                                         <div class="col">
                                             <label for="validadeCartao" class="form-label">Validade</label>
                                             <input id="validadeCartao" type="text" class="form-control"
-                                                placeholder="MM/AA" maxlength="5" required />
+                                                placeholder="MM/AA" maxlength="5" />
                                         </div>
                                         <div class="col">
                                             <label for="cvvCartao" class="form-label">CVV</label>
                                             <input id="cvvCartao" type="text" class="form-control" placeholder="123"
-                                                maxlength="3" required />
+                                                maxlength="3" />
                                         </div>
                                     </div>
                                 </div>
@@ -573,10 +594,6 @@
                     </p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary me-auto" data-bs-toggle="modal"
-                        data-bs-target="#modalTodosContratos" data-bs-dismiss="modal">
-                        Ver Todos os Contratos
-                    </button>
                     <button type="button" class="btn btn-danger me-auto" data-bs-toggle="modal"
                         data-bs-target="#modalAvisoMulta">
                         Rescindir Contrato
