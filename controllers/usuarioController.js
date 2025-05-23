@@ -119,8 +119,8 @@ exports.loginUsuario = async (req, res) => {
                             ...req.session.usuario,
                             id: contrato.id,
                             usuario_id: contrato.usuario_id,
-                            data_assinatura: contrato.data_assinatura,
-                            dataFinal: contrato.dataFinal,
+                            data_assinatura: formatarData(contrato.data_assinatura),
+                            dataFinal: formatarData(contrato.dataFinal),
                             prazoContrato: contrato.prazo_contrato,
                             estado_fazenda: contrato.estado_fazenda,
                             preco_kwh: contrato.preco_kwh,
@@ -239,7 +239,6 @@ exports.rescindirContrato = (req, res) => {
     }
 
     const usuario_id = req.session.usuario.id;
-    const receitaEstimativa = 1; 
     const dataRescisao = new Date();
 
     const sqlUpdate = `
@@ -247,15 +246,66 @@ exports.rescindirContrato = (req, res) => {
         SET 
             data_rescisao = ?, 
             status = 'RE',
-            receita_prevista = ?
             flag_fornecedor = NULL
         WHERE usuario_id = ? AND status = 'AT'
     `;
 
-    db.query(sqlUpdate, [dataRescisao, receitaEstimativa, usuario_id], (err, result) => {
+    db.query(sqlUpdate, [dataRescisao, usuario_id], (err, result) => {
         if (err) return res.status(500).send('Erro ao rescindir contrato.');
         if (result.affectedRows === 0) return res.status(404).send('Nenhum contrato ativo encontrado para rescindir.');
         flagRescisao = 1;
         res.redirect('/index');
     });
 };
+
+function formatarData(data) {
+  if (!data) return '';
+  const d = new Date(data);
+  return d.toLocaleDateString('pt-BR');
+}
+
+exports.carregarContratosUsuario = (req, res) => {
+  const userId = req.session.userId;
+
+  const query = `
+    SELECT 
+      data_assinatura, 
+      data_final, 
+      data_rescisao, 
+      prazo_contrato, 
+      estado_fazenda, 
+      preco_kwh, 
+      geracao_kwh, 
+      status
+    FROM contrato_fornecedores
+    WHERE usuario_id = ?
+  `;
+
+  db.query(query, [userId], (err, resultados) => {
+    if (err) {
+      console.error('Erro ao buscar contratos:', err);
+      return res.status(500).send('Erro no servidor');
+    }
+
+    const contratosFormatados = resultados.map(contrato => {
+      const status = contrato.status?.trim(); 
+      const dataFinalOuRescisao = status === 'RE' ? contrato.data_rescisao : contrato.data_final;
+
+      return {
+        ...contrato,
+        data_assinatura: formatarData(contrato.data_assinatura),
+        data_final: formatarData(dataFinalOuRescisao),
+        status: status,
+        status_legivel: status === 'AT' ? 'Ativo' : 'Inativo'
+      };
+    });
+
+    res.render('home_fornecedor', { contratos: contratosFormatados });
+  });
+};
+
+
+function formatarData(data) {
+  const d = new Date(data);
+  return d.toLocaleDateString('pt-BR'); 
+}

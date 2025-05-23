@@ -15,6 +15,7 @@ router.get('/dash', (req, res) => res.render('dash'));
 
 
 
+
 // Partials
 router.get('/login', (req, res) => res.render('login'));
 router.get('/cadastro', (req, res) => res.render('form_cadastro'));
@@ -45,7 +46,6 @@ router.get('/home_consumidor', (req, res) => {
   res.redirect('/');
 });
 
-
 router.get('/home_fornecedor', (req, res) => {
   if (req.session.usuario?.tipo !== 'F') {
     return res.redirect('/login');
@@ -53,57 +53,70 @@ router.get('/home_fornecedor', (req, res) => {
 
   const usuario_id = req.session.usuario.id;
 
-  const sql = `
+  const contratoAtivoQuery = `
     SELECT * FROM contratos_fornecedores
     WHERE usuario_id = ? AND status = 'AT'
     ORDER BY data_assinatura DESC
     LIMIT 1
   `;
 
-  db.query(sql, [usuario_id], (err, results) => {
+  const todosContratosQuery = `
+    SELECT * FROM contratos_fornecedores
+    WHERE usuario_id = ?
+    ORDER BY data_assinatura DESC
+  `;
+
+  db.query(contratoAtivoQuery, [usuario_id], (err, ativoResults) => {
     if (err) {
-      console.error('Erro ao buscar contrato do fornecedor:', err);
+      console.error('Erro ao buscar contrato ativo:', err);
       return res.status(500).send('Erro ao carregar página do fornecedor.');
     }
 
-    if (results.length === 0) {
-      // Nenhum contrato ainda
-      return res.render('home_fornecedor', {
+    db.query(todosContratosQuery, [usuario_id], (err2, todosContratos) => {
+      if (err2) {
+        console.error('Erro ao buscar todos os contratos:', err2);
+        return res.status(500).send('Erro ao carregar todos os contratos.');
+      }
+
+      if (ativoResults.length === 0) {
+        return res.render('home_fornecedor', {
+          nomeFornecedor: req.session.usuario.nome,
+          preco_kwh: '0.00',
+          geracao_kwh: '0.00',
+          data_assinatura: null,
+          dataFinal: null,
+          prazoContrato: null,
+          estado_fazenda: null,
+          kwh_total: '0,00',
+          repasse: '0.00',
+          contratos: todosContratos, 
+        });
+      }
+
+      const contrato = ativoResults[0];
+      const preco_kwh = parseFloat(contrato.preco_kwh);
+      const geracao_kwh = parseFloat(contrato.geracao_kwh);
+      const kwh_total = geracao_kwh * 720;
+
+      res.render('home_fornecedor', {
         nomeFornecedor: req.session.usuario.nome,
-        preco_kwh: '0.00',
-        geracao_kwh: '0.00',
-        data_assinatura: null,
-        dataFinal: null,
-        prazoContrato: null,
-        estado_fazenda: null,
-        kwh_total: '0,00',
-        repasse: '0.00'
+        preco_kwh: preco_kwh.toFixed(2),
+        geracao_kwh: geracao_kwh.toFixed(2),
+        data_assinatura: contrato.data_assinatura,
+        dataFinal: contrato.data_final,
+        prazoContrato: contrato.prazo_contrato,
+        estado_fazenda: contrato.estado_fazenda,
+        kwh_total: kwh_total.toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }),
+        repasse: contrato.valor_mensal_com_taxa || '0.00',
+        flag: contrato.flag_fornecedor,
+        contratos: todosContratos, 
       });
-    }
-
-    const contrato = results[0];
-    const preco_kwh = parseFloat(contrato.preco_kwh);
-    const geracao_kwh = parseFloat(contrato.geracao_kwh);
-    const kwh_total = geracao_kwh * 720;
-
-    res.render('home_fornecedor', {
-      nomeFornecedor: req.session.usuario.nome,
-      preco_kwh: preco_kwh.toFixed(2),
-      geracao_kwh: geracao_kwh.toFixed(2),
-      data_assinatura: contrato.data_assinatura,
-      dataFinal: contrato.data_final,
-      prazoContrato: contrato.prazo_contrato,
-      estado_fazenda: contrato.estado_fazenda,
-      kwh_total: kwh_total.toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }),
-      repasse: contrato.valor_mensal_com_taxa || '0.00',
-      flag: contrato.flag_fornecedor
     });
   });
 });
-
 
 
 

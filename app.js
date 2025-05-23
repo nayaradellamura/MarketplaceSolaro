@@ -31,6 +31,14 @@ hbs.registerPartials(path.join(__dirname, '/views/partials'));
 const routes = require('./routes/routes');
 app.use('/', routes);
 
+hbs.registerHelper('eq', (a, b) => a === b);
+
+hbs.registerHelper('formatarData', function (data) {
+  if (!data) return '';
+  const d = new Date(data);
+  return d.toLocaleDateString('pt-BR');
+});
+
 app.listen(5000, () => {
     console.log("Servidor rodando na porta 5000");
 });

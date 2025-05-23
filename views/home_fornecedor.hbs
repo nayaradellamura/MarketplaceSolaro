@@ -293,11 +293,11 @@
       <div class="row text-center text-md-start">
         <div class="col-md-4 mb-3 mb-md-0">
           <p class="mb-1"><strong><i class="bi bi-calendar-check me-2"></i>Assinatura:</strong></p>
-          <p>{{data_assinatura}}</p>
+          <p>{{formatarData data_assinatura}}</p>
         </div>
         <div class="col-md-4 mb-3 mb-md-0">
           <p class="mb-1"><strong><i class="bi bi-calendar-x me-2"></i>Validade:</strong></p>
-          <p>até {{dataFinal}}</p>
+          <p>até {{formatarData dataFinal}}</p>
         </div>
         <div class="col-md-4">
           <p class="mb-1"><strong><i class="bi bi-clock me-2"></i>Duração:</strong></p>
@@ -335,10 +335,10 @@
             <dd class="col-sm-8">{{prazoContrato}} meses</dd>
 
             <dt class="col-sm-4">Data de Início</dt>
-            <dd class="col-sm-8">{{data_assinatura}}</dd>
+            <dd class="col-sm-8">{{formatarData data_assinatura}}</dd>
 
             <dt class="col-sm-4">Data de Término</dt>
-            <dd class="col-sm-8">{{dataFinal}}</dd>
+            <dd class="col-sm-8">{{formatarData dataFinal}}</dd>
           </dl>
           <hr>
           <p class="small">
@@ -387,6 +387,7 @@
   </div>
 
 <!-- Modal para todos os contratos -->
+<!-- Modal para todos os contratos -->
 <div class="modal fade" id="modalTodosContratos" tabindex="-1" aria-labelledby="todosContratosLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-xl">
     <div class="modal-content">
@@ -407,24 +408,23 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>01/01/2025</td>
-              <td>31/12/2025</td>
-              <td>12</td>
-              <td>SP</td>
-              <td>0,45</td>
-              <td>5 kWh</td>
-              <td><span class="badge bg-success">Ativo</span></td>
-            </tr>
-            <tr>
-              <td>01/07/2023</td>
-              <td>31/12/2023</td>
-              <td>6</td>
-              <td>MG</td>
-              <td>0,50</td>
-              <td>6 kWh</td>
-              <td><span class="badge bg-secondary">Inativo</span></td>
-            </tr>
+            {{#each contratos}}
+              <tr>
+                <td>{{formatarData this.data_assinatura}}</td>
+                <td>{{formatarData this.data_final}}</td>
+                <td>{{this.prazo_contrato}}</td>
+                <td>{{this.estado_fazenda}}</td>
+                <td>{{this.preco_kwh}}</td>
+                <td>{{this.geracao_kwh}} kWh</td>
+                <td>
+                  {{#if (eq this.status "AT")}}
+                    <span class="badge bg-success">Ativo</span>
+                  {{else}}
+                    <span class="badge bg-secondary">Inativo</span>
+                  {{/if}}
+                </td>
+              </tr>
+            {{/each}}
           </tbody>
         </table>
       </div>
@@ -433,6 +433,10 @@
       </div>
     </div>
   </div>
+</div>
+
+
+
 </div>
 
   <!-- Dicas -->
