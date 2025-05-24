@@ -17,8 +17,8 @@
                 Gerencie suas economias e acompanhe seu desempenho na plataforma.
             </p>
 
-            <!-- if dataAssinatura
-             Dashboard -->
+            {{#if flag}}
+            <!-- Dashboard -->
             <div class="row g-4 justify-content-center text-center">
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
@@ -35,7 +35,7 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-warning">Valor com Desconto SOLARO</h5>
-                        <p class="display-5 fw-bold">R$ {{economia_estimada}}</p>
+                        <p class="display-5 fw-bold">R$ {{fatura_com_desconto}}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -46,8 +46,8 @@
                 </div>
             </div>
 
-            <!-- else
-             Simulador -->
+            {{else}}
+            <!-- Simulador -->
             <section class="my-5 border-simulador">
                 <h4 class="mb-4 text-center">Simule sua Economia</h4>
                 <form id="simuladorForm" method="POST" action="/Simular-Contrato">
@@ -100,6 +100,8 @@
                     </div>
                 </form>
             </section>
+
+            {{/if}}
         </div>
 
 
@@ -135,62 +137,69 @@
     <div class="modal fade" id="modalOferta" tabindex="-1" aria-labelledby="modalOfertaLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form method="POST" action="/cadastro_oferta">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalOfertaLabel">Cadastrar Nova Oferta</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-                        <div class="mb-3">
-                            <label class="form-label">Consumo de kWh nos 3 últimos meses:</label>
-                            <input type="number" class="form-control mb-2" id="kwh1" placeholder="Mês 1 (kWh)" required>
-                            <input type="number" class="form-control mb-2" id="kwh2" placeholder="Mês 2 (kWh)" required>
-                            <input type="number" class="form-control" id="kwh3" placeholder="Mês 3 (kWh)" required>
-                        </div>
+                <form method="POST" action="/cadastro_contrato_cliente">
+    <div class="modal-header">
+        <h5 class="modal-title" id="modalOfertaLabel">Cadastrar Nova Oferta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+    </div>
+    <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+        <div class="mb-3">
+            <label class="form-label">Consumo de kWh nos 3 últimos meses:</label>
+            <input type="number" class="form-control mb-2" id="kwh1" name="kwh1" placeholder="Mês 1 (kWh)" required>
+            <input type="number" class="form-control mb-2" id="kwh2" name="kwh2" placeholder="Mês 2 (kWh)" required>
+            <input type="number" class="form-control" id="kwh3" name="kwh3" placeholder="Mês 3 (kWh)" required>
+        </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Valor das 3 últimas contas (R$):</label>
-                            <input type="number" class="form-control mb-2" id="conta1" placeholder="Valor Conta 1 (R$)"
-                                required>
-                            <input type="number" class="form-control mb-2" id="conta2" placeholder="Valor Conta 2 (R$)"
-                                required>
-                            <input type="number" class="form-control" id="conta3" placeholder="Valor Conta 3 (R$)"
-                                required>
-                        </div>
+        <div class="mb-3">
+            <label class="form-label">Valor das 3 últimas contas (R$):</label>
+            <input type="number" class="form-control mb-2" id="conta1" name="conta1" placeholder="Valor Conta 1 (R$)" required>
+            <input type="number" class="form-control mb-2" id="conta2" name="conta2" placeholder="Valor Conta 2 (R$)" required>
+            <input type="number" class="form-control" id="conta3" name="conta3" placeholder="Valor Conta 3 (R$)" required>
+        </div>
 
-                        <div class="border rounded p-3 bg-light mb-3">
-                            <h6 class="text-center fw-bold">Contrato de Consumo com a SOLARO</h6>
-                            <ul class="small">
-                                <li>Ao contratar pela plataforma SOLARO, você consome energia limpa fornecida por
-                                    geradores parceiros, com total transparência e segurança.</li>
-                                <li>O valor pago inclui o custo da energia contratada e uma taxa por estado que garante
-                                    a operação e manutenção da plataforma.</li>
-                                <li>O contrato tem início a partir da assinatura, sendo renovado mensalmente e podendo
-                                    ser encerrado a qualquer momento.</li>
-                                <li>O pagamento é realizado mensalmente, considerando o consumo efetivo registrado
-                                    durante o período.</li>
-                                <li>Os fornecedores parceiros garantem o fornecimento da energia contratada, conforme as
-                                    condições acordadas na plataforma SOLARO.</li>
-                            </ul>
+        <div class="border rounded p-3 bg-light mb-3">
+            <h6 class="text-center fw-bold">Contrato de Consumo com a SOLARO</h6>
+            <ul class="small">
+                <li>Ao contratar pela plataforma SOLARO, você consome energia limpa fornecida por
+                    geradores parceiros, com total transparência e segurança.</li>
+                <li>O valor pago inclui o custo da energia contratada e uma taxa por estado que garante
+                    a operação e manutenção da plataforma.</li>
+                <li>O contrato tem início a partir da assinatura, sendo renovado mensalmente e podendo
+                    ser encerrado a qualquer momento.</li>
+                <li>O pagamento é realizado mensalmente, considerando o consumo efetivo registrado
+                    durante o período.</li>
+                <li>Os fornecedores parceiros garantem o fornecimento da energia contratada, conforme as
+                    condições acordadas na plataforma SOLARO.</li>
+            </ul>
+        </div>
 
+        <div class="form-check mt-3">
+            <input class="form-check-input" type="checkbox" id="aceiteContrato" name="aceite_contrato" required>
+            <label class="form-check-label" for="aceiteContrato">
+                Eu li e aceito os termos do contrato com a plataforma SOLARO.
+            </label>
+        </div>
+    </div>
 
-                        </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Cadastrar Oferta e Assinar Contrato</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    </div>
 
+      {{!-- {{#if alerta}}
+<script>
+  Swal.fire({
+    'icon: {{alerta.tipo}}',
+    'title: {{alerta.titulo}}',
+    'text: {{alerta.texto}}'
+  }).then(() => {
+    'window.location.href = /index';
+  });
+</script>
+{{/if}} --}}
 
-                        <div class="form-check mt-3">
-                            <input class="form-check-input" type="checkbox" id="aceiteContrato" name="aceite_contrato"
-                                required>
-                            <label class="form-check-label" for="aceiteContrato">
-                                Eu li e aceito os termos do contrato com a plataforma SOLARO.
-                            </label>
-                        </div>
-                    </div>
+</form>
 
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Cadastrar Oferta e Assinar Contrato</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -210,7 +219,7 @@
     </div>
   </section>
 
-    <!-- ABAS     if dataAssinatura -->
+   
     <div class="d-flex justify-content-center">
         <ul class="nav nav-tabs custom-tabs w-75 mb-4" id="myTab" role="tablist" style="max-width: 900px;">
             <li class="nav-item me-2" role="presentation">
@@ -540,7 +549,7 @@
             <div class="row text-center text-md-start">
                 <div class="col-md-4 mb-3 mb-md-0">
                     <p class="mb-1"><strong><i class="bi bi-calendar-check me-2"></i>Assinatura:</strong></p>
-                    <p>{{dataAssinatura}}</p>
+                    <p>{{data_assinatura}}</p>
                 </div>
                 <div class="col-md-4 mb-3 mb-md-0">
                     <p class="mb-1"><strong><i class="bi bi-calendar-x me-2"></i>Validade:</strong></p>
@@ -571,16 +580,16 @@
                         <dd class="col-sm-8">{{nomeFornecedor}}</dd>
 
                         <dt class="col-sm-4">Estado do consumidor</dt>
-                        <dd class="col-sm-8">{{estado_fazenda}}</dd>
+                        <dd class="col-sm-8">{{estado_cliente}}</dd>
 
                         <dt class="col-sm-4">Média de consumo de kWh</dt>
                         <dd class="col-sm-8">R$ {{preco_kwh}}</dd>
 
                         <dt class="col-sm-4">Média de valor de contas</dt>
-                        <dd class="col-sm-8">{{geracao_kwh}} kWh</dd>
+                        <dd class="col-sm-8">{{consumo_medio}} kWh</dd>
 
                         <dt class="col-sm-4">Data de Início</dt>
-                        <dd class="col-sm-8">{{dataAssinatura}}</dd>
+                        <dd class="col-sm-8">{{data_assinatura}}</dd>
 
                         <dt class="col-sm-4">Data de Término</dt>
                         <dd class="col-sm-8">{{dataFinal}}</dd>
@@ -604,6 +613,9 @@
         </div>
     </div>
 
+  
+
+
     <!-- Modal Rescindir Contrato -->
     <div class="modal fade" id="modalAvisoMulta" tabindex="-1" aria-labelledby="modalAvisoMultaLabel"
         aria-hidden="true">
@@ -626,55 +638,99 @@
     </div>
 
     <!-- Modal para todos os contratos -->
-    <div class="modal fade" id="modalTodosContratos" tabindex="-1" aria-labelledby="todosContratosLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-xl">
-            <div class="modal-content">
-                <div class="modal-header oferta-bg-primary text-white">
-                    <h5 class="modal-title" id="todosContratosLabel"><i class="bi bi-list-ul me-2"></i>Todos os
-                        Contratos (Ativos e Inativos)</h5>
-                </div>
-                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Data de Início</th>
-                                <th>Data de Término</th>
-                                <th>Prazo (meses)</th>
-                                <th>Estado</th>
-                                <th>Ultimo Valor da Fatura</th>
-                                <th>Valor Economizado</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>01/01/2025</td>
-                                <td>31/12/2025</td>
-                                <td>12</td>
-                                <td>SP</td>
-                                <td>150,87</td>
-                                <td>25,00</td>
-                                <td><span class="badge bg-success">Ativo</span></td>
-                            </tr>
-                            <tr>
-                                <td>01/07/2023</td>
-                                <td>31/12/2023</td>
-                                <td>6</td>
-                                <td>MG</td>
-                                <td>397,80</td>
-                                <td>80,15</td>
-                                <td><span class="badge bg-secondary">Inativo</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                </div>
-            </div>
-        </div>
+   <div class="modal fade" id="modalTodosContratos" tabindex="-1" aria-labelledby="todosContratosLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl">
+    <div class="modal-content">
+      <div class="modal-header oferta-bg-primary text-white">
+        <h5 class="modal-title" id="todosContratosLabel">
+          <i class="bi bi-list-ul me-2"></i>Todos os Contratos (Ativos e Inativos)
+        </h5>
+      </div>
+      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Data de Início</th>
+              <th>Prazo (meses)</th>
+              <th>Estado</th>
+              <th>Último Valor da Fatura (R$)</th>
+              <th>Valor Economizado (R$)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each contratosCliente}}
+            <tr>
+              <td>{{this.data_assinatura}}</td>
+              <td>{{this.prazo_contrato}}</td>
+              <td>{{this.estado_cliente}}</td>
+              <td>{{this.valor_fatura_3}}</td>
+              <td>{{this.valor_economizado}}</td>
+              <td>
+                {{#if (eq this.status "AT")}}
+                <span class="badge bg-success">Ativo</span>
+                {{else}}
+                <span class="badge bg-secondary">Inativo</span>
+                {{/if}}
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
     </div>
+  </div>
+</div>
+<div class="modal fade" id="modalTodosContratos" tabindex="-1" aria-labelledby="todosContratosLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl">
+    <div class="modal-content">
+      <div class="modal-header oferta-bg-primary text-white">
+        <h5 class="modal-title" id="todosContratosLabel">
+          <i class="bi bi-list-ul me-2"></i>Todos os Contratos (Ativos e Inativos)
+        </h5>
+      </div>
+      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Data da Assinatura</th>
+              <th>Estado</th>
+              <th>Último Valor da Fatura (R$)</th>
+              <th>Valor Economizado (R$)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each contratosCliente}}
+            <tr>
+              <td>{{formatarData this.data_assinatura}}</td>
+             <td>{{this.estado_cliente}}</td>
+              <td>{{this.valor_fatura_3}}</td>
+              <td>{{this.valor_economizado}}</td>
+              <td>
+                {{#if (eq this.status "AT")}}
+                <span class="badge bg-success">Ativo</span>
+                {{else}}
+                <span class="badge bg-secondary">Inativo</span>
+                {{/if}}
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 

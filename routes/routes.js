@@ -30,6 +30,7 @@ router.post('/login', usuarioController.loginUsuario);
 router.post('/cadastro_oferta', usuarioController.cadastrarContrato);
 router.post('/Simular-Contrato', usuarioController.processaSimulacao);
 router.post('/rescindir_contrato', usuarioController.rescindirContrato);
+router.post('/cadastro_contrato_cliente', usuarioController.cadastrarContratoCliente);
 
 
 
@@ -37,14 +38,81 @@ router.post('/rescindir_contrato', usuarioController.rescindirContrato);
 
 
 
-
-// Páginas autenticadas
 router.get('/home_consumidor', (req, res) => {
   if (req.session.usuario?.tipo === 'C') {
-    return res.render('home_consumidor', { NomeConsumidor: req.session.usuario.nome });
+
+    const usuario_id = req.session.usuario.id;
+
+    const todosContratosConsumidorQuery = `
+      SELECT * FROM contratos_clientes
+      WHERE usuario_id = ? 
+      ORDER BY data_inicio DESC
+      LIMIT 1
+    `;
+
+    db.query(todosContratosConsumidorQuery, [usuario_id], (err, ativoClientesResults) => {
+      if (err) {
+        console.error('Erro ao buscar contrato ativo:', err);
+        return res.status(500).send('Erro ao carregar página do consumidor.');
+      }
+
+      if (ativoClientesResults.length === 0) {
+        // Sem contrato cadastrado, renderiza com valores zero
+        return res.render('home_consumidor', {
+          nomeFornecedor: req.session.usuario.nome,
+          consumo_medio: 0,
+          valor_medio_contas: '0.00',
+          valor_com_desconto: '0.00',
+          economia_estimada: '0.00',
+          flag: req.session.usuario.flag_cliente,
+          contratosCliente: [],
+        });
+      }
+
+      const contratoCliente = ativoClientesResults[0];
+
+      const consumoMedioKwh = parseFloat(contratoCliente.consumo_media_fatura) || 0;
+      const valorMedioContas = parseFloat(contratoCliente.media_valor_fatura) || 0;
+      const precoFinalKwh = parseFloat(contratoCliente.preco_final_kwh) || 0;
+
+      // Cálculo do preço médio atual por kWh (sem Solaro)
+      const precoMedioAtualKwh = consumoMedioKwh > 0 ? valorMedioContas / consumoMedioKwh : 0;
+
+      // Valor da fatura com desconto SOLARO
+      const valorComDesconto = consumoMedioKwh * precoFinalKwh;
+
+      // Economia estimada (valor atual - valor com desconto)
+      const economiaEstimada = valorMedioContas - valorComDesconto;
+
+      // Logs para debugging
+      console.log('consumoMedioKwh:', consumoMedioKwh);
+      console.log('valorMedioContas:', valorMedioContas);
+      console.log('precoFinalKwh (Solaro):', precoFinalKwh);
+      console.log('precoMedioAtualKwh (sem Solaro):', precoMedioAtualKwh.toFixed(4));
+      console.log('valorComDesconto:', valorComDesconto.toFixed(2));
+      console.log('economiaEstimada:', economiaEstimada.toFixed(2));
+
+      res.render('home_consumidor', {
+        nomeFornecedor: req.session.usuario.nome,
+        consumo_medio: consumoMedioKwh.toFixed(2),
+        valor_medio_contas: valorMedioContas.toFixed(2),
+        valor_com_desconto: valorComDesconto.toFixed(2),
+        economia_estimada: economiaEstimada.toFixed(2),
+        flag: contratoCliente.flag_cliente,
+        data_assinatura: formatarData(contratoCliente.data_inicio),
+        estado_cliente: contratoCliente.estado_cliente,
+        contratosCliente: ativoClientesResults,
+      });
+    });
+  } else {
+    return res.redirect('/login');
   }
-  res.redirect('/');
 });
+
+
+
+
+
 
 router.get('/home_fornecedor', (req, res) => {
   if (req.session.usuario?.tipo !== 'F') {
@@ -118,7 +186,10 @@ router.get('/home_fornecedor', (req, res) => {
   });
 });
 
-
+function formatarData(data) {
+  const d = new Date(data);
+  return d.toLocaleDateString('pt-BR'); 
+}
 
 
 
