@@ -219,7 +219,7 @@
     </div>
   </section>
 
-   
+   <!-- ABAS -->
     <div class="d-flex justify-content-center">
         <ul class="nav nav-tabs custom-tabs w-75 mb-4" id="myTab" role="tablist" style="max-width: 900px;">
             <li class="nav-item me-2" role="presentation">
@@ -552,12 +552,14 @@
                     <p>{{data_assinatura}}</p>
                 </div>
                 <div class="col-md-4 mb-3 mb-md-0">
-                    <p class="mb-1"><strong><i class="bi bi-calendar-x me-2"></i>Validade:</strong></p>
-                    <p>até {{dataFinal}}</p>
-                </div>
-                <div class="col-md-4">
-                    <p class="mb-1"><strong><i class="bi bi-clock me-2"></i>Duração:</strong></p>
-                    <p>{{prazoContrato}} meses</p>
+                    <p class="mb-1"><strong><i class="bi bi-calendar-x me-2"></i>Status:</strong></p>
+                    <p>
+                        {{#if (eq this.status "A")}}
+                        <span class="badge bg-success">Ativo</span>
+                        {{else}}
+                        <span class="badge bg-secondary">Inativo</span>
+                        {{/if}}
+                    </p>
                 </div>
             </div>
         </div>
@@ -590,9 +592,6 @@
 
                         <dt class="col-sm-4">Data de Início</dt>
                         <dd class="col-sm-8">{{data_assinatura}}</dd>
-
-                        <dt class="col-sm-4">Data de Término</dt>
-                        <dd class="col-sm-8">{{dataFinal}}</dd>
                     </dl>
                     <hr>
                     <p class="small">
@@ -652,7 +651,6 @@
           <thead>
             <tr>
               <th>Data de Início</th>
-              <th>Prazo (meses)</th>
               <th>Estado</th>
               <th>Último Valor da Fatura (R$)</th>
               <th>Valor Economizado (R$)</th>
@@ -662,13 +660,12 @@
           <tbody>
             {{#each contratosCliente}}
             <tr>
-              <td>{{this.data_assinatura}}</td>
-              <td>{{this.prazo_contrato}}</td>
+              <td>{{formatarData this.data_assinatura}}</td>
               <td>{{this.estado_cliente}}</td>
               <td>{{this.valor_fatura_3}}</td>
               <td>{{this.valor_economizado}}</td>
               <td>
-                {{#if (eq this.status "AT")}}
+                {{#if (eq this.status "A")}}
                 <span class="badge bg-success">Ativo</span>
                 {{else}}
                 <span class="badge bg-secondary">Inativo</span>
@@ -708,7 +705,7 @@
           <tbody>
             {{#each contratosCliente}}
             <tr>
-              <td>{{formatarData this.data_assinatura}}</td>
+             <td>{{formatarData this.data_assinatura}}</td>
              <td>{{this.estado_cliente}}</td>
               <td>{{this.valor_fatura_3}}</td>
               <td>{{this.valor_economizado}}</td>
@@ -801,6 +798,18 @@
             });
         });
     </script>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('estoque') === 'indisponivel') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Estoque insuficiente',
+                text: 'Não há energia disponível para esse estado.'
+            });
+        }
+    </script>
+
 
 
 </body>

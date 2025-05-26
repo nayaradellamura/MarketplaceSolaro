@@ -250,11 +250,9 @@ exports.cadastrarContratoCliente = (req, res) => {
             }
 
             if (resultadosEstoque.length === 0) {
-                return res.send(`<script>
-                    Swal.fire({ icon: 'error', title: 'Estoque insuficiente', text: 'Não há energia disponível para esse estado.' });
-                    setTimeout(() => { window.location.href = '/home_consumidor'; }, 3000);
-                </script>`);
-            }
+                return res.redirect('/home_consumidor?estoque=indisponivel');
+            }            
+        
 
             const estoqueId = resultadosEstoque[0].id;
 
