@@ -127,6 +127,7 @@ exports.loginUsuario = async (req, res) => {
                             prazoContrato: contrato.prazo_contrato,
                             estado_fazenda: contrato.estado_fazenda,
                             preco_kwh: contrato.preco_kwh,
+                            status: contrato.status,
                             geracao_kwh: contrato.geracao_kwh.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
                             taxa: contrato.taxa,
                             flag_fornecedor: contrato.flag_fornecedor

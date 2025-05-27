@@ -36,8 +36,6 @@ router.post('/cadastro_contrato_cliente', usuarioController.cadastrarContratoCli
 
 
 
-
-
 router.get('/home_consumidor', (req, res) => {
   if (req.session.usuario?.tipo === 'C') {
 
@@ -60,6 +58,7 @@ router.get('/home_consumidor', (req, res) => {
         // Sem contrato cadastrado, renderiza com valores zero
         return res.render('home_consumidor', {
           nomeFornecedor: req.session.usuario.nome,
+          data_assinatura: formatarData(contratoCliente.data_inicio),
           consumo_medio: 0,
           valor_medio_contas: '0.00',
           valor_com_desconto: '0.00',
@@ -102,16 +101,13 @@ router.get('/home_consumidor', (req, res) => {
         data_assinatura: formatarData(contratoCliente.data_inicio),
         estado_cliente: contratoCliente.estado_cliente,
         contratosCliente: ativoClientesResults,
+        status: contratoCliente.status,
       });
     });
   } else {
     return res.redirect('/login');
   }
 });
-
-
-
-
 
 
 router.get('/home_fornecedor', (req, res) => {
