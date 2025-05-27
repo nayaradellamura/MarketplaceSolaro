@@ -31,6 +31,7 @@ router.post('/cadastro_oferta', usuarioController.cadastrarContrato);
 router.post('/Simular-Contrato', usuarioController.processaSimulacao);
 router.post('/rescindir_contrato', usuarioController.rescindirContrato);
 router.post('/cadastro_contrato_cliente', usuarioController.cadastrarContratoCliente);
+router.post('/salvar_kwh', usuarioController.salvarKwh);
 
 
 
