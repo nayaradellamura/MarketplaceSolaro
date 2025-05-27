@@ -58,7 +58,7 @@ router.get('/home_consumidor', (req, res) => {
         // Sem contrato cadastrado, renderiza com valores zero
         return res.render('home_consumidor', {
           nomeFornecedor: req.session.usuario.nome,
-          data_assinatura: formatarData(contratoCliente.data_inicio),
+          data_assinatura: '',
           consumo_medio: 0,
           valor_medio_contas: '0.00',
           valor_com_desconto: '0.00',
