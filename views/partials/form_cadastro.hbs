@@ -148,7 +148,7 @@
         const form = modal.querySelector("form");
 
         modal.addEventListener('hidden.bs.modal', function () {
-            form.reset(); // limpa todos os campos
+            form.reset();
             const primeiraAba = new bootstrap.Tab(document.querySelector('#pills-tab1-tab'));
             primeiraAba.show();
             document.getElementById("progressBar").style.width = "0%";
@@ -156,6 +156,20 @@
 
         form.addEventListener("submit", function (e) {
             e.preventDefault();
+
+            const senha = document.getElementById("cadastroSenha").value;
+            const confirmarSenha = document.getElementById("confirmar_senha").value;
+
+            if (senha !== confirmarSenha) {
+                Swal.fire({
+                    title: "Erro!",
+                    text: "As senhas não coincidem.",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+                return false;
+            }
+
             Swal.fire({
                 title: "Cadastrado com Sucesso!",
                 icon: "success",
@@ -165,5 +179,4 @@
             });
         });
     });
-
 </script>

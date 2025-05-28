@@ -64,20 +64,19 @@ exports.loginUsuario = async (req, res) => {
     try {
         const sql = 'SELECT * FROM usuarios WHERE email = ?';
         db.query(sql, [loginEmail], async (err, results) => {
-            if (err) return res.status(500).send('Erro no servidor.');
+            if (err) return res.status(500).json({ erro: 'Erro no servidor.' });
 
             if (results.length === 0) {
-                return res.redirect('/index?showLoginModal=true&loginError=true');
+                return res.status(401).json({ erro: 'Usuário ou senha inválidos.' });
             }
 
             const usuario = results[0];
             const senhaCorreta = await bcrypt.compare(loginSenha, usuario.senha);
 
             if (!senhaCorreta) {
-                return res.redirect('/index?showLoginModal=true&loginError=true');
+                return res.status(401).json({ erro: 'Usuário ou senha inválidos.' });
             }
 
-            // Inicializa sessão do usuário
             req.session.usuario = {
                 id: usuario.id,
                 nome: usuario.nome,
@@ -85,10 +84,7 @@ exports.loginUsuario = async (req, res) => {
             };
 
             if (usuario.tipo === 'C') {
-                return res.redirect('/home_consumidor');
-
-                
-
+                return res.json({ sucesso: true, redirect: '/home_consumidor' });
             } else if (usuario.tipo === 'F') {
                 const contratoSQL = `
                     SELECT 
@@ -115,7 +111,7 @@ exports.loginUsuario = async (req, res) => {
                 `;
 
                 db.query(contratoSQL, [usuario.id], (errContrato, resultadosContrato) => {
-                    if (errContrato) return res.status(500).send('Erro ao buscar contrato.');
+                    if (errContrato) return res.status(500).json({ erro: 'Erro ao buscar contrato.' });
 
                     if (resultadosContrato.length > 0) {
                         const contrato = resultadosContrato[0];
@@ -135,8 +131,6 @@ exports.loginUsuario = async (req, res) => {
                             flag_fornecedor: contrato.flag_fornecedor
                         };
 
-                        console.log('Contrato carregado do fornecedor:', contrato);
-
                         const taxaEstadual = contrato.taxa / 100;
                         const precoComTaxa = contrato.preco_kwh * (1 + taxaEstadual);
                         const valorBase = precoComTaxa * contrato.geracao_kwh;
@@ -153,15 +147,15 @@ exports.loginUsuario = async (req, res) => {
                         req.session.usuario.valorMensalComTaxa = valorMensalComTaxa.toFixed(2);
                     }
 
-                    return res.redirect('/home_fornecedor');
+                    return res.json({ sucesso: true, redirect: '/home_fornecedor' });
                 });
             } else {
-                return res.redirect('/');
+                return res.json({ sucesso: true, redirect: '/' });
             }
         });
     } catch (error) {
         console.error("Erro no login:", error);
-        res.status(500).send('Erro interno.');
+        res.status(500).json({ erro: 'Erro interno.' });
     }
 };
 
