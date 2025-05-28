@@ -675,7 +675,7 @@ exports.carregaFaturaCliente = (req, res) => {
                 };
             });
 
-            res.render('home_consumidor', { faturas });
+             return res.json({ success: true, message: "Contrato rescindido com sucesso." });
 
         });
     });
@@ -797,9 +797,9 @@ exports.getDashboard = async (req, res) => {
                         }
                         console.log("Fornecedores:", fornecedoresResult[0].total);
                         console.log("Consumidores:", clientesResult[0].total);
-                         console.log("kwhPorEstado:", JSON.stringify(kwhResult));
-                         console.log("fornecedoresPorEstado:", JSON.stringify(fornecedoresEstadoResult));
-                         console.log("consumidoresPorEstado:", JSON.stringify(clientesEstadoResult));
+                        console.log("kwhPorEstado:", JSON.stringify(kwhResult));
+                        console.log("fornecedoresPorEstado:", JSON.stringify(fornecedoresEstadoResult));
+                        console.log("consumidoresPorEstado:", JSON.stringify(clientesEstadoResult));
 
 
                         res.render('dash', {
@@ -817,6 +817,81 @@ exports.getDashboard = async (req, res) => {
     });
 };
 
+exports.rescindirContratoCliente = (req, res) => {
+
+    const idUsuario = req.session.usuario.id;
+
+    const sqlContrato = `
+        SELECT id, consumo_medio_kwh, estado_cliente 
+        FROM contratos_clientes 
+        WHERE usuario_id = ? AND status = "A"
+    `;
+    const dadosContrato = [idUsuario];
+
+    db.query(sqlContrato, dadosContrato, (err, contratoResult) => {
+        if (err) {
+            console.error("Erro ao buscar contrato do usuário:", err);
+            return res.status(500).json({ success: false, message: "Erro ao buscar contrato." });
+        }
+
+        if (contratoResult.length === 0) {
+            return res.json({ success: false, message: "Contrato ativo não encontrado." });
+        }
+
+        const contrato = contratoResult[0];
+
+        const sqlPendencias = `
+            SELECT id_pagamento 
+            FROM pagamento_cliente 
+            WHERE id_contrato = ? AND status_pagamento = "PEND"
+        `;
+        const dadosPendencias = [contrato.id];
+
+        db.query(sqlPendencias, dadosPendencias, (err, pendenciasResult) => {
+            if (err) {
+                console.error("Erro ao verificar pendências:", err);
+                return res.status(500).json({ success: false, message: "Erro ao verificar pendências." });
+            }
+
+            if (pendenciasResult.length > 0) {
+                return res.json({
+                    success: false,
+                    message: "Existem faturas em aberto. É necessário quitar os débitos para rescindir o contrato."
+                });
+            }
+
+            const sqlAtualizaEstoque = `
+                UPDATE estoque_kwh_estado 
+                SET kwh_disponivel = kwh_disponivel + ? 
+                WHERE estado = ?
+            `;
+            const dadosEstoque = [contrato.consumo_medio_kwh, contrato.estado_cliente];
+
+            db.query(sqlAtualizaEstoque, dadosEstoque, (err) => {
+                if (err) {
+                    console.error("Erro ao atualizar estoque:", err);
+                    return res.status(500).json({ success: false, message: "Erro ao atualizar estoque." });
+                }
+
+                const sqlUpdateContrato = `
+                    UPDATE contratos_clientes 
+                    SET data_cancelamento = NOW(), flag_cliente = NULL, status = "C"
+                    WHERE id = ?
+                `;
+                const dadosUpdate = [contrato.id];
+
+                db.query(sqlUpdateContrato, dadosUpdate, (err) => {
+                    if (err) {
+                        console.error("Erro ao atualizar contrato:", err);
+                        return res.status(500).json({ success: false, message: "Erro ao cancelar contrato." });
+                    }
+
+                    return res.json({ success: true, message: "Contrato rescindido com sucesso." });
+                });
+            });
+        });
+    });
+};
 
 
 
