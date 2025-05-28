@@ -243,3 +243,64 @@ function openFormularioModal() {
         openLoginModal();
       }
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+  // Botões que abrem o modal
+  const botoesPagamento = document.querySelectorAll(".btn-pagar");
+
+  botoesPagamento.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idFatura = btn.getAttribute("data-id");
+      const valor = btn.getAttribute("data-valor");
+
+      document.getElementById("inputIdFatura").value = idFatura;
+      document.getElementById("inputValorFatura").value = valor;
+      document.getElementById("valorFatura").textContent = `R$ ${valor}`;
+    });
+  });
+
+  // Mostrar campos de acordo com o método de pagamento
+  const selectMetodo = document.getElementById("metodoPagamento");
+
+  if (selectMetodo) {
+    selectMetodo.addEventListener("change", () => {
+      const metodo = selectMetodo.value;
+
+      // Esconde todos os blocos primeiro
+      document.getElementById("infoPix").classList.add("d-none");
+      document.getElementById("infoCartao").classList.add("d-none");
+      document.getElementById("infoBoleto").classList.add("d-none");
+
+      // Mostra o bloco correspondente
+      if (metodo === "pix") {
+        document.getElementById("infoPix").classList.remove("d-none");
+      } else if (metodo === "cartao") {
+        document.getElementById("infoCartao").classList.remove("d-none");
+      } else if (metodo === "boleto") {
+        document.getElementById("infoBoleto").classList.remove("d-none");
+      }
+    });
+  }
+});
+
+// Função chamada ao enviar o formulário
+function gerarRecibo() {
+  const idFatura = document.getElementById("inputIdFatura").value;
+  const metodo = document.getElementById("metodoPagamento").value;
+
+  if (!idFatura || !metodo) {
+    alert("Por favor, selecione um método de pagamento.");
+    return;
+  }
+
+  // Aqui você pode fazer algo como gerar o recibo visual
+
+  // Envia o formulário manualmente
+  document.getElementById("formPagamento").submit();
+}
+
+function postToDashboard(event) {
+  event.preventDefault();
+  document.getElementById('dashPostForm').submit();
+}
+

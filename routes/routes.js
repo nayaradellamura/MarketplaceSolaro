@@ -3,7 +3,8 @@ const router = express.Router();
 const usuarioController = require('../controllers/usuarioController');
 const db = require('../db/db');
 const moment = require('moment');
-
+require('moment/locale/pt-br');
+moment.locale('pt-br');
 
 // Páginas públicas
 router.get('/', (req, res) => res.render('index'));
@@ -24,6 +25,7 @@ router.get('/cadastro', (req, res) => res.render('form_cadastro'));
 router.get('/cadastro_usuario', (req, res) => res.render('cadastro_usuario'));
 router.get('/termos', (req, res) => res.render('termos'));
 router.get('/cookies', (req, res) => res.render('cookies'));
+// router.get('/dash', usuarioController.getDashboard); //router.get('/dash', (req, res) => res.render('dash'));
 
 
 // Processamento - Usuário
@@ -34,6 +36,8 @@ router.post('/Simular-Contrato', usuarioController.processaSimulacao);
 router.post('/rescindir_contrato', usuarioController.rescindirContrato);
 router.post('/cadastro_contrato_cliente', usuarioController.cadastrarContratoCliente);
 router.post('/salvar_kwh', usuarioController.salvarKwh);
+router.post('/confirmar_pagamento', usuarioController.confirmarPagamentoCliente);
+router.post('/dash', usuarioController.getDashboard);
 
 
 
@@ -93,37 +97,64 @@ router.get('/home_consumidor', (req, res) => {
       const valorComDesconto = atualLance * precoFinalKwh;
       const economiaEstimada = valorSemSolaro - valorComDesconto;
 
-      // Buscar histórico de faturas
       const sqlPagamentos = `
-        SELECT data_pagamento, valor_total, status_pagamento
-        FROM pagamento_cliente
-        WHERE id_contrato = ?
-        ORDER BY data_pagamento DESC
-        LIMIT 6
-      `;
+          SELECT id_pagamento, data_pagamento, valor_total, status_pagamento, forma_pagamento
+          FROM pagamento_cliente
+          WHERE id_contrato = ?
+          ORDER BY data_pagamento DESC
+          LIMIT 6
+        `;
 
-      db.query(sqlPagamentos, [contratoId], (errPagamentos, resultPagamentos) => {
+      db.query(sqlPagamentos, [contratoId], async (errPagamentos, resultPagamentos) => {
         if (errPagamentos) {
           console.error('Erro ao buscar faturas:', errPagamentos);
           return res.status(500).send('Erro ao carregar faturas do cliente.');
         }
 
-        let faturas = resultPagamentos.map(pag => {
-          const data = moment(pag.data_pagamento);
-          const pendente = pag.status_pagamento === 'P';
+        // Função para buscar o preço do kWh mais recente até a data da fatura
+        const buscarPrecoKwh = (contratoClienteId, dataPagamento) => {
+          return new Promise((resolve, reject) => {
+            const sqlPreco = `
+        SELECT preco_final_cliente
+        FROM historico_precos
+        WHERE contrato_cliente_id = ?
+          AND data_inicio <= ?
+        ORDER BY data_inicio DESC
+        LIMIT 1
+      `;
 
-          return {
-            mes: data.format('MMM/YYYY'),
-            valor: pag.valor_total > 0 ? `R$ ${pag.valor_total.toFixed(2)}` : '--',
-            status: pendente ? 'Pendente' : 'Pago',
-            statusClass: pendente ? 'danger' : 'success',
-            mostrarBotaoPagar: pendente,
-            forma_pagamento: !pendente && pag.forma_pagamento ? pag.forma_pagamento : '-'
-          };
-        });
+            db.query(sqlPreco, [contratoClienteId, dataPagamento], (err, result) => {
+              if (err) return reject(err);
+              if (result.length === 0) return resolve(null);
+              resolve(result[0].preco_final_cliente);
+            });
+          });
+        };
+
+        // Para cada fatura, buscar o preço e calcular o kWh estimado
+        const faturas = await Promise.all(
+          resultPagamentos.map(async (pag) => {
+            const data = moment(pag.data_pagamento);
+            const pendente = pag.status_pagamento === 'PEND';
+
+            let precoKwh = await buscarPrecoKwh(contratoId, pag.data_pagamento);
+            let kwhEstimado = precoKwh > 0 ? (pag.valor_total / precoKwh) : 0;
+
+            return {
+              id_pagamento_cliente: pag.id_pagamento,
+              mes: data.format('MMM/YYYY'),
+              valor: pag.valor_total > 0 ? `R$ ${pag.valor_total.toFixed(2)}` : '--',
+              status: pendente ? 'Pendente' : 'Pago',
+              statusClass: pendente ? 'danger' : 'success',
+              mostrarBotaoPagar: pendente,
+              forma_pagamento: !pendente && pag.forma_pagamento ? pag.forma_pagamento : '-',
+              kwh: kwhEstimado.toFixed(2) + ' kWh'
+            };
+          })
+        );
 
 
-        faturas = faturas.map(f => {
+        const faturasLimpo = faturas.map(f => {
           const { ...resto } = f;
           return resto;
         });
@@ -140,7 +171,7 @@ router.get('/home_consumidor', (req, res) => {
           estado_cliente: contratoCliente.estado_cliente,
           contratosCliente: ativoClientesResults,
           status: contratoCliente.status,
-          faturas // ← renderizado na tela
+          faturas: faturasLimpo
         });
       });
     });

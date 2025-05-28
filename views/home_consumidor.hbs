@@ -325,10 +325,12 @@
                                     <td><span class="badge bg-{{statusClass}}">{{status}}</span></td>
                                     <td>
                                         {{#if mostrarBotaoPagar}}
-                                        <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#modalPagamento">
+                                        <button class="btn btn-outline-success btn-sm btn-pagar"
+                                            data-id="{{id_pagamento_cliente}}" data-valor="{{valor}}"
+                                            data-bs-toggle="modal" data-bs-target="#modalPagamento">
                                             Pagar
                                         </button>
+
                                         {{else}}
                                         {{forma_pagamento}}
                                         {{/if}}
@@ -346,7 +348,11 @@
                 aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <form onsubmit="event.preventDefault(); gerarRecibo();">
+                        <form onsubmit="event.preventDefault(); gerarRecibo(); this.submit();"
+                            action="/confirmar_pagamento" method="POST">
+                            <input type="hidden" name="id_fatura" id="inputIdFatura" />
+                            <input type="hidden" name="valor" id="inputValorFatura" />
+
                             <div class="modal-header">
                                 <h5 class="modal-title" id="modalPagamentoLabel">
                                     <i class="bi bi-credit-card-2-front me-2"></i> Efetuar Pagamento
@@ -354,8 +360,9 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Fechar"></button>
                             </div>
+
                             <div class="modal-body">
-                                <p>Valor da fatura: <strong id="valorFatura">R$ {{valor}}</strong></p>
+                                <p>Valor da fatura: <strong id="valorFatura">R$ 0,00</strong></p>
 
                                 <div class="mb-3">
                                     <label for="metodoPagamento" class="form-label">Método de Pagamento</label>
@@ -377,6 +384,7 @@
                                     <label for="numCartao" class="form-label">Número do Cartão</label>
                                     <input id="numCartao" type="text" class="form-control mb-2"
                                         placeholder="XXXX XXXX XXXX XXXX" maxlength="19" />
+
                                     <div class="row">
                                         <div class="col">
                                             <label for="validadeCartao" class="form-label">Validade</label>
@@ -395,12 +403,14 @@
                                     <p class="small mb-0">Um boleto será gerado após a confirmação do pagamento.</p>
                                 </div>
                             </div>
+
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
                                 <button type="button" class="btn btn-secondary"
                                     data-bs-dismiss="modal">Cancelar</button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
@@ -558,7 +568,7 @@
                         <dd class="col-sm-8">{{estado_cliente}}</dd>
 
                         <dt class="col-sm-4">Média de consumo de kWh</dt>
-                        <dd class="col-sm-8">R$ {{preco_kwh}}</dd>
+                        <dd class="col-sm-8">R$ {{valor_com_desconto}}</dd>
 
                         <dt class="col-sm-4">Média de valor de contas</dt>
                         <dd class="col-sm-8">{{consumo_medio}} kWh</dd>
@@ -794,6 +804,37 @@
                 text: 'Não há energia disponível para esse estado.'
             });
         }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const botoesPagar = document.querySelectorAll(".btn-pagar");
+
+            botoesPagar.forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const idFatura = btn.getAttribute("data-id");
+                    const valor = btn.getAttribute("data-valor");
+
+                    document.getElementById("inputIdFatura").value = idFatura;
+                    document.getElementById("inputValorFatura").value = valor;
+
+                    document.getElementById("valorFatura").textContent = `R$ ${valor}`;
+                });
+            });
+
+            const metodoSelect = document.getElementById("metodoPagamento");
+
+            metodoSelect.addEventListener("change", () => {
+                document.getElementById("infoPix").classList.add("d-none");
+                document.getElementById("infoCartao").classList.add("d-none");
+                document.getElementById("infoBoleto").classList.add("d-none");
+
+                const metodo = metodoSelect.value;
+                if (metodo === "pix") document.getElementById("infoPix").classList.remove("d-none");
+                else if (metodo === "cartao") document.getElementById("infoCartao").classList.remove("d-none");
+                else if (metodo === "boleto") document.getElementById("infoBoleto").classList.remove("d-none");
+            });
+        });
     </script>
 
 

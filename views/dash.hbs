@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-{{> head}}
+{{> head }}
 
 <body>
-{{> navbar_index }}
+  {{> navbar_index }}
 
-<!-- Modal de Login -->
-{{> login }}
+  <!-- Modal de Login -->
+  {{> login }}
 
- <!-- Modal de Cadastro -->
- {{> form_cadastro }}
+  <!-- Modal de Cadastro -->
+  {{> form_cadastro }}
 
   <div class="container">
     <div class="text-center dashboard-header">
@@ -22,13 +22,13 @@
       <div class="col-md-6 col-lg-3 offset-lg-3 mb-3">
         <div class="card bg-light">
           <h5>Fornecedores</h5>
-          <h2 id="num-fornecedores">150</h2>
+          <h2 id="num-fornecedores">{{totalFornecedores}}</h2>
         </div>
       </div>
       <div class="col-md-6 col-lg-3 mb-3">
         <div class="card bg-light">
           <h5>Consumidores</h5>
-          <h2 id="num-consumidores">320</h2>
+          <h2 id="num-consumidores">{{totalClientes}}</h2>
         </div>
       </div>
     </div>
@@ -36,7 +36,7 @@
     <!-- Gráfico de kWh -->
     <div class="card mb-4">
       <h5 class="text-center">kWh Disponíveis por Estado</h5>
-      <div class="chart-wrapper">
+      <div class="chart-wrapper" style="height: 300px;">
         <canvas id="kwhChart"></canvas>
       </div>
     </div>
@@ -46,7 +46,7 @@
       <div class="col-md-6 mb-4">
         <div class="card">
           <h5 class="text-center">Fornecedores por Estado</h5>
-          <div class="chart-wrapper">
+          <div class="chart-wrapper" style="height: 300px;">
             <canvas id="fornecedoresChart"></canvas>
           </div>
         </div>
@@ -54,7 +54,7 @@
       <div class="col-md-6 mb-4">
         <div class="card">
           <h5 class="text-center">Consumidores por Estado</h5>
-          <div class="chart-wrapper">
+          <div class="chart-wrapper" style="height: 300px;">
             <canvas id="consumidoresChart"></canvas>
           </div>
         </div>
@@ -63,14 +63,34 @@
   </div>
 
   <script>
+    // Lista de estados fixos
     const estados = [
-      "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG",
-      "PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"
+      "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
+      "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
     ];
 
-    const kwh = estados.map(() => Math.floor(Math.random() * 10000) + 1000);
-    const fornecedores = estados.map(() => Math.floor(Math.random() * 10) + 1);
-    const consumidores = estados.map(() => Math.floor(Math.random() * 20) + 1);
+    const kwhData = {{{ kwhPorEstado }}};
+    const fornecedoresData = {{{ fornecedoresPorEstado }}};
+    const consumidoresData = {{{ consumidoresPorEstado }}};
+
+
+
+
+    // Monta arrays para gráficos alinhando com os estados
+    const kwh = estados.map(estado => {
+      const found = kwhData.find(item => item.estado === estado);
+      return found ? found.kwh_disponivel : 0;
+    });
+
+    const fornecedores = estados.map(estado => {
+      const found = fornecedoresData.find(item => item.estado_fazenda === estado);
+      return found ? found.total : 0;
+    });
+
+    const consumidores = estados.map(estado => {
+      const found = consumidoresData.find(item => item.estado_cliente === estado);
+      return found ? found.total : 0;
+    });
 
     const palette = [
       "#4e73df", "#1cc88a", "#36b9cc", "#f6c23e", "#e74a3b", "#858796",
@@ -80,7 +100,7 @@
       "#8bc34a", "#ff9800", "#ff5722"
     ];
 
-    // kWh Chart
+    // Gráfico kWh Disponíveis (barras)
     new Chart(document.getElementById("kwhChart"), {
       type: "bar",
       data: {
@@ -110,7 +130,7 @@
       }
     });
 
-    // Fornecedores por Estado
+    // Gráfico Fornecedores por Estado (pizza)
     new Chart(document.getElementById("fornecedoresChart"), {
       type: "doughnut",
       data: {
@@ -136,7 +156,7 @@
       }
     });
 
-    // Consumidores por Estado
+    // Gráfico Consumidores por Estado (pizza)
     new Chart(document.getElementById("consumidoresChart"), {
       type: "doughnut",
       data: {
@@ -162,11 +182,12 @@
       }
     });
   </script>
-  
+
   <!-- Espaçamento -->
   <div style="height: 100px;"></div>
 
   <!-- Footer e JS -->
   {{> footer }}
 </body>
+
 </html>

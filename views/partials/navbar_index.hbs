@@ -17,7 +17,9 @@
         <!-- Menu de Navegação -->
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link  text-white" href="/dash">Dashboard de Energia</a></li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#" onclick="postToDashboard(event)">Dashboard de Energia</a>
+                </li>
                 <li class="nav-item"><a class="nav-link text-white" href="/sustentabilidade">Sustentabilidade</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="/duvidas">Dúvidas</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="/contato">Contato</a></li>
@@ -26,6 +28,7 @@
                         Entrar no Marketplace
                     </a>
                 </li>
+                <form id="dashPostForm" action="/dash" method="POST" style="display: none;"></form>
             </ul>
         </div>
     </div>
