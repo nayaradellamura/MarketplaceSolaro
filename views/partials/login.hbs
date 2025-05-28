@@ -33,22 +33,49 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const shouldShowLoginModal = urlParams.get('showLoginModal');
-    const loginError = urlParams.get('loginError');
+    const loginForm = document.getElementById('loginForm');
 
-    if (shouldShowLoginModal === 'true') {
-      if (loginError === 'true') {
+    loginForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(loginForm);
+      const data = {
+        loginEmail: formData.get('loginEmail'),
+        loginSenha: formData.get('loginSenha')
+      };
+
+      fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.sucesso) {
+          Swal.fire({
+            icon: "success",
+            title: "Login realizado!",
+            confirmButtonText: 'Continuar'
+          }).then(() => {
+            window.location.href = result.redirect;
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Algo deu errado!",
+            text: result.erro || 'Erro desconhecido',
+            confirmButtonText: 'Tentar novamente'
+          });
+        }
+      })
+      .catch(() => {
         Swal.fire({
           icon: "error",
-          title: "Algo deu errado!",
-          text: "Usuário ou senha inválidas",
-          confirmButtonText: 'Tentar novamente'
-        }).then(() => {
-          const newUrl = window.location.pathname + '?showLoginModal=true';
-          window.history.replaceState({}, document.title, newUrl);
+          title: "Erro de rede",
+          text: "Não foi possível conectar ao servidor.",
+          confirmButtonText: 'OK'
         });
-      }
-    }
+      });
+    });
   });
 </script>
