@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const usuarioController = require('../controllers/usuarioController');
 const db = require('../db/db');
+const moment = require('moment');
+
 
 // Páginas públicas
 router.get('/', (req, res) => res.render('index'));
@@ -56,7 +58,6 @@ router.get('/home_consumidor', (req, res) => {
       }
 
       if (ativoClientesResults.length === 0) {
-        // Sem contrato cadastrado, renderiza com valores zero
         return res.render('home_consumidor', {
           nomeFornecedor: req.session.usuario.nome,
           data_assinatura: '',
@@ -66,49 +67,88 @@ router.get('/home_consumidor', (req, res) => {
           economia_estimada: '0.00',
           flag: req.session.usuario.flag_cliente,
           contratosCliente: [],
+          faturas: []
         });
       }
 
       const contratoCliente = ativoClientesResults[0];
+      const contratoId = contratoCliente.id;
 
-      const consumoMedioKwh = parseFloat(contratoCliente.consumo_media_fatura) || 0;
-      const valorMedioContas = parseFloat(contratoCliente.media_valor_fatura) || 0;
+      const vlr1 = parseFloat(contratoCliente.valor_fatura_1) || 0;
+      const vlr2 = parseFloat(contratoCliente.valor_fatura_2) || 0;
+      const vlr3 = parseFloat(contratoCliente.valor_fatura_3) || 0;
+
+      const consumo1 = parseFloat(contratoCliente.consumo_fatura_1) || 0;
+      const consumo2 = parseFloat(contratoCliente.consumo_fatura_2) || 0;
+      const consumo3 = parseFloat(contratoCliente.consumo_fatura_3) || 0;
+
+      const atualLance = parseFloat(contratoCliente.consumo_medio_kwh) || 0;
       const precoFinalKwh = parseFloat(contratoCliente.preco_final_kwh) || 0;
 
-      // Cálculo do preço médio atual por kWh (sem Solaro)
-      const precoMedioAtualKwh = consumoMedioKwh > 0 ? valorMedioContas / consumoMedioKwh : 0;
+      const mediaConsumoAntigo = (consumo1 + consumo2 + consumo3) / 3;
+      const mediaValorAntigo = (vlr1 + vlr2 + vlr3) / 3;
+      const precoMedioAntigo = mediaConsumoAntigo > 0 ? mediaValorAntigo / mediaConsumoAntigo : 0;
 
-      // Valor da fatura com desconto SOLARO
-      const valorComDesconto = consumoMedioKwh * precoFinalKwh;
+      const valorSemSolaro = atualLance * precoMedioAntigo;
+      const valorComDesconto = atualLance * precoFinalKwh;
+      const economiaEstimada = valorSemSolaro - valorComDesconto;
 
-      // Economia estimada (valor atual - valor com desconto)
-      const economiaEstimada = valorMedioContas - valorComDesconto;
+      // Buscar histórico de faturas
+      const sqlPagamentos = `
+        SELECT data_pagamento, valor_total, status_pagamento
+        FROM pagamento_cliente
+        WHERE id_contrato = ?
+        ORDER BY data_pagamento DESC
+        LIMIT 6
+      `;
 
-      // Logs para debugging
-      console.log('consumoMedioKwh:', consumoMedioKwh);
-      console.log('valorMedioContas:', valorMedioContas);
-      console.log('precoFinalKwh (Solaro):', precoFinalKwh);
-      console.log('precoMedioAtualKwh (sem Solaro):', precoMedioAtualKwh.toFixed(4));
-      console.log('valorComDesconto:', valorComDesconto.toFixed(2));
-      console.log('economiaEstimada:', economiaEstimada.toFixed(2));
+      db.query(sqlPagamentos, [contratoId], (errPagamentos, resultPagamentos) => {
+        if (errPagamentos) {
+          console.error('Erro ao buscar faturas:', errPagamentos);
+          return res.status(500).send('Erro ao carregar faturas do cliente.');
+        }
 
-      res.render('home_consumidor', {
-        nomeFornecedor: req.session.usuario.nome,
-        consumo_medio: consumoMedioKwh.toFixed(2),
-        valor_medio_contas: valorMedioContas.toFixed(2),
-        valor_com_desconto: valorComDesconto.toFixed(2),
-        economia_estimada: economiaEstimada.toFixed(2),
-        flag: contratoCliente.flag_cliente,
-        data_assinatura: formatarData(contratoCliente.data_inicio),
-        estado_cliente: contratoCliente.estado_cliente,
-        contratosCliente: ativoClientesResults,
-        status: contratoCliente.status,
+        let faturas = resultPagamentos.map(pag => {
+          const data = moment(pag.data_pagamento);
+          const pendente = pag.status_pagamento === 'P';
+
+          return {
+            mes: data.format('MMM/YYYY'),
+            valor: pag.valor_total > 0 ? `R$ ${pag.valor_total.toFixed(2)}` : '--',
+            status: pendente ? 'Pendente' : 'Pago',
+            statusClass: pendente ? 'danger' : 'success',
+            mostrarBotaoPagar: pendente,
+            forma_pagamento: !pendente && pag.forma_pagamento ? pag.forma_pagamento : '-'
+          };
+        });
+
+
+        faturas = faturas.map(f => {
+          const { ...resto } = f;
+          return resto;
+        });
+
+
+        res.render('home_consumidor', {
+          nomeFornecedor: req.session.usuario.nome,
+          consumo_medio: atualLance.toFixed(2),
+          valor_medio_contas: valorSemSolaro.toFixed(2),
+          valor_com_desconto: valorComDesconto.toFixed(2),
+          economia_estimada: economiaEstimada.toFixed(2),
+          flag: contratoCliente.flag_cliente,
+          data_assinatura: formatarData(contratoCliente.data_inicio),
+          estado_cliente: contratoCliente.estado_cliente,
+          contratosCliente: ativoClientesResults,
+          status: contratoCliente.status,
+          faturas // ← renderizado na tela
+        });
       });
     });
   } else {
     return res.redirect('/login');
   }
 });
+
 
 
 router.get('/home_fornecedor', (req, res) => {
@@ -154,7 +194,7 @@ router.get('/home_fornecedor', (req, res) => {
           estado_fazenda: null,
           kwh_total: '0,00',
           repasse: '0.00',
-          contratos: todosContratos, 
+          contratos: todosContratos,
         });
       }
 
@@ -177,7 +217,7 @@ router.get('/home_fornecedor', (req, res) => {
         }),
         repasse: contrato.valor_mensal_com_taxa || '0.00',
         flag: contrato.flag_fornecedor,
-        contratos: todosContratos, 
+        contratos: todosContratos,
       });
     });
   });
@@ -185,7 +225,7 @@ router.get('/home_fornecedor', (req, res) => {
 
 function formatarData(data) {
   const d = new Date(data);
-  return d.toLocaleDateString('pt-BR'); 
+  return d.toLocaleDateString('pt-BR');
 }
 
 

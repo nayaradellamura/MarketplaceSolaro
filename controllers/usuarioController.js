@@ -85,11 +85,10 @@ exports.loginUsuario = async (req, res) => {
             };
 
             if (usuario.tipo === 'C') {
+
                 return res.redirect('/home_consumidor');
-
-                
-
-            } else if (usuario.tipo === 'F') {
+            }
+            else if (usuario.tipo === 'F') {
                 const contratoSQL = `
                     SELECT 
                         c.id AS id,
@@ -256,7 +255,6 @@ exports.cadastrarContratoCliente = (req, res) => {
                 return res.redirect('/home_consumidor?estoque=indisponivel');
             }
 
-
             const estoqueId = resultadosEstoque[0].id;
 
             // Buscar preços dos fornecedores ativos
@@ -315,16 +313,16 @@ exports.cadastrarContratoCliente = (req, res) => {
 
                         const contratoClienteId = resultContrato.insertId;
 
-                        // Inserir histórico de preços para o cliente
-                        const precoBaseFornecedor = parseFloat(mediaPrecos.toFixed(4)); // valor médio dos fornecedores
-                        const taxaPercentual = taxa; // já em formato percentual
-                        const precoFinalCliente = precoFinalKwh; // já calculado com a taxa
+                        // Inserir histórico de preços
+                        const precoBaseFornecedor = parseFloat(mediaPrecos.toFixed(4));
+                        const taxaPercentual = taxa;
+                        const precoFinalCliente = precoFinalKwh;
 
                         const sqlHistorico = `
-                                INSERT INTO historico_precos 
-                                (usuario_id, contrato_cliente_id, estado, preco_base_fornecedor, taxa_percentual, preco_final_cliente, data_inicio) 
-                                VALUES (?, ?, ?, ?, ?, ?, SYSDATE())
-                            `;
+                            INSERT INTO historico_precos 
+                            (usuario_id, contrato_cliente_id, estado, preco_base_fornecedor, taxa_percentual, preco_final_cliente, data_inicio) 
+                            VALUES (?, ?, ?, ?, ?, ?, SYSDATE())
+                        `;
 
                         db.query(
                             sqlHistorico,
@@ -335,140 +333,189 @@ exports.cadastrarContratoCliente = (req, res) => {
                                     return res.status(500).send("Erro ao salvar histórico de preços.");
                                 }
 
-                                // Atualizar estoque
-                                const sqlUpdateEstoque = `
-                                UPDATE estoque_kwh_estado 
-                                SET kwh_disponivel = kwh_disponivel - ? 
-                                WHERE id = ?
-                            `;
-                                db.query(sqlUpdateEstoque, [consumoMedio, estoqueId], (errUpdateEstoque) => {
-                                    if (errUpdateEstoque) {
-                                        console.error("Erro ao atualizar estoque:", errUpdateEstoque);
-                                        return res.status(500).send("Erro ao atualizar estoque.");
+                                const valorFaturaComDesconto = parseFloat((consumoMedio * precoFinalKwh).toFixed(2));
+                                const hoje = new Date();
+                                const primeiroDiaProximoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
+                                const dataPagamento = primeiroDiaProximoMes.toISOString().split('T')[0];
+
+                                const sqlPagamento = `
+                                    INSERT INTO pagamento_cliente
+                                    (id_contrato, id_cliente, valor_total, data_pagamento, forma_pagamento, status_pagamento)
+                                    VALUES (?, ?, ?, ?, ?, ?)
+                                `;
+                                const dadosPagamento = [
+                                    contratoClienteId,
+                                    usuarioId,
+                                    valorFaturaComDesconto,
+                                    dataPagamento,
+                                    'A definir',
+                                    'P'
+                                ];
+
+                                db.query(sqlPagamento, dadosPagamento, (errPagamento) => {
+                                    if (errPagamento) {
+                                        console.error("Erro ao inserir pagamento pendente:", errPagamento);
+                                        return res.status(500).send("Erro ao registrar pagamento pendente.");
                                     }
 
-                                    return res.redirect('/home_consumidor');
+                                    // Atualizar estoque
+                                    const sqlUpdateEstoque = `
+                                        UPDATE estoque_kwh_estado 
+                                        SET kwh_disponivel = kwh_disponivel - ? 
+                                        WHERE id = ?
+                                    `;
+                                    db.query(sqlUpdateEstoque, [consumoMedio, estoqueId], (errUpdateEstoque) => {
+                                        if (errUpdateEstoque) {
+                                            console.error("Erro ao atualizar estoque:", errUpdateEstoque);
+                                            return res.status(500).send("Erro ao atualizar estoque.");
+                                        }
+
+                                        return res.redirect('/home_consumidor');
+                                    });
+                                });
+                            }
+                        );
+                    });
+                });
+            });
+        });
+    });
+};
+
+    
+
+exports.salvarKwh = (req, res) => {
+    if (!req.session || !req.session.usuario) {
+        return res.status(401).send('Usuário não autenticado.');
+    }
+
+    const { kwh_gerado } = req.body;
+    const userId = req.session.usuario.id;
+
+    const sqlBuscaContrato = `
+        SELECT * FROM contratos_clientes
+        WHERE usuario_id = ?
+        ORDER BY id DESC
+        LIMIT 1
+    `;
+
+    db.query(sqlBuscaContrato, [userId], (err, resultContrato) => {
+        if (err) return res.status(500).send('Erro ao buscar contrato.');
+        if (resultContrato.length === 0) return res.status(404).send('Contrato não encontrado.');
+
+        const contrato = resultContrato[0];
+        const idContrato = contrato.id;
+        const estado = contrato.estado_cliente;
+        const precoFinalKwh = parseFloat(contrato.preco_final_kwh);
+        const mediaValorFatura = parseFloat(contrato.media_valor_fatura);
+        const consumoAntigo = parseFloat(contrato.consumo_medio_kwh);
+        const consumoNovo = parseFloat(kwh_gerado);
+        const precoBaseFornecedor = parseFloat(mediaValorFatura.toFixed(2));
+
+        // 1. Fechar histórico anterior
+        const sqlFechaHistoricoAnterior = `
+            UPDATE historico_precos
+            SET data_fim = CURDATE()
+            WHERE contrato_cliente_id = ?
+              AND usuario_id = ?
+              AND data_fim IS NULL
+        `;
+
+        db.query(sqlFechaHistoricoAnterior, [idContrato, userId], (errFechar) => {
+            if (errFechar) return res.status(500).send('Erro ao fechar histórico anterior.');
+
+            // 2. Criar novo histórico
+            const sqlNovoHistorico = `
+                INSERT INTO historico_precos (
+                    usuario_id,
+                    estado,
+                    preco_base_fornecedor,
+                    taxa_percentual,
+                    preco_final_cliente,
+                    data_inicio,
+                    data_fim,
+                    contrato_cliente_id
+                )
+                SELECT
+                    ?, ?, ?, taxa_percentual, preco_final_cliente, CURDATE(), NULL, contrato_cliente_id
+                FROM historico_precos
+                WHERE contrato_cliente_id = ?
+                  AND usuario_id = ?
+                ORDER BY id DESC
+                LIMIT 1
+            `;
+
+            db.query(sqlNovoHistorico, [userId, estado, precoBaseFornecedor, idContrato, userId], (err1) => {
+                if (err1) return res.status(500).send('Erro ao registrar histórico.');
+
+                // 3. Repor consumo antigo no estoque
+                const sqlAddEstoque = `
+                    UPDATE estoque_kwh_estado
+                    SET kwh_disponivel = kwh_disponivel + ?
+                    WHERE estado = ?
+                `;
+                db.query(sqlAddEstoque, [consumoAntigo, estado], (err2) => {
+                    if (err2) return res.status(500).send('Erro ao ajustar estoque antigo.');
+
+                    // 4. Atualizar novo consumo no contrato
+                    const sqlAtualizaConsumo = `
+                        UPDATE contratos_clientes
+                        SET consumo_medio_kwh = ?
+                        WHERE id = ?
+                    `;
+                    db.query(sqlAtualizaConsumo, [consumoNovo, idContrato], (err3) => {
+                        if (err3) return res.status(500).send('Erro ao atualizar contrato.');
+
+                        // 5. Deduzir novo consumo do estoque
+                        const sqlDeduzEstoque = `
+                            UPDATE estoque_kwh_estado
+                            SET kwh_disponivel = kwh_disponivel - ?
+                            WHERE estado = ?
+                        `;
+                        db.query(sqlDeduzEstoque, [consumoNovo, estado], (err4) => {
+                            if (err4) return res.status(500).send('Erro ao ajustar estoque novo.');
+
+                            // 6. Atualizar valor médio da fatura
+                            const novoValorFatura = parseFloat((precoFinalKwh * consumoNovo).toFixed(2));
+                            const sqlAtualizaFatura = `
+                                UPDATE contratos_clientes
+                                SET media_valor_fatura = ?
+                                WHERE id = ?
+                            `;
+
+                            // 7. Criar pagamento pendente para o próximo mês
+                            const valorFaturaComDesconto = parseFloat((consumoNovo * precoFinalKwh).toFixed(2));
+                            const hoje = new Date();
+                            const primeiroDiaProximoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
+                            const dataPagamento = primeiroDiaProximoMes.toISOString().split('T')[0];
+
+                            const sqlPagamento = `
+                                INSERT INTO pagamento_cliente
+                                (id_contrato, id_cliente, valor_total, data_pagamento, forma_pagamento, status_pagamento)
+                                VALUES (?, ?, ?, ?, ?, ?)
+                            `;
+                            const dadosPagamento = [
+                                idContrato,
+                                userId,
+                                valorFaturaComDesconto,
+                                dataPagamento,
+                                'A definir',
+                                'P'
+                            ];
+
+                            db.query(sqlPagamento, dadosPagamento, (errPagamento) => {
+                                if (errPagamento) {
+                                    console.error("Erro ao inserir pagamento pendente:", errPagamento);
+                                    return res.status(500).send("Erro ao registrar pagamento pendente.");
+                                }
+
+                                // 8. Atualizar valor médio da fatura no contrato
+                                db.query(sqlAtualizaFatura, [novoValorFatura, idContrato], (err5) => {
+                                    if (err5) return res.status(500).send('Erro ao atualizar fatura.');
+
+                                    return res.redirect('/home_consumidor?refresh=1');
                                 });
                             });
-                    });
-                });
-            });
-        });
-    });
-};
-
-exports.salvarKwh = (req, res) => {
-
-    if (!req.session || !req.session.user) {
-        return res.status(401).send('Usuário não autenticado.');
-    }
-
-    const { mes_referencia, kwh_gerado } = req.body;
-    const userId = req.session.user.id;
-
-    const sqlBuscaContrato = `
-        SELECT * FROM contratos_clientes
-        WHERE id_usuario = ?
-        ORDER BY id DESC
-        LIMIT 1
-    `;
-
-    db.query(sqlBuscaContrato, [userId], (err, resultContrato) => {
-        if (err) {
-            console.error('Erro ao buscar contrato:', err);
-            return res.status(500).send('Erro ao buscar contrato.');
-        }
-
-        if (resultContrato.length === 0) {
-            return res.status(404).send('Contrato não encontrado.');
-        }
-
-        const contrato = resultContrato[0];
-        const idContrato = contrato.id;
-        const estado = contrato.estado;
-        const precoFinalKwh = parseFloat(contrato.preco_final_kwh);
-        const mediaValorFatura = parseFloat(contrato.media_valor_fatura);
-        const consumoAntigo = parseFloat(contrato.consumo_medio_kwh);
-        const consumoNovo = parseFloat(kwh_gerado);
-
-        // 1. Inserir valor médio da fatura no histórico
-        const sqlClonarHistorico = `
-            INSERT INTO historico_precos (
-                usuario_id,
-                estado,
-                preco_base_fornecedor,
-                taxa_percentual,
-                preco_final_cliente,
-                data_inicio,
-                data_fim,
-                contrato_cliente_id
-            )
-            SELECT
-                ?, ?, ?, taxa_percentual, preco_final_cliente, CURDATE(), NULL, contrato_cliente_id
-            FROM historico_precos
-            WHERE contrato_cliente_id = ?
-                AND data_fim IS NULL
-            ORDER BY id DESC
-            LIMIT 1
-        `;
-
-        db.query(sqlClonarHistorico, [userId, estado, mediaValorFatura, idContrato], (err1) => {
-            if (err1) {
-                console.error('Erro ao clonar histórico de preços:', err1);
-                return res.status(500).send('Erro ao registrar histórico.');
-            }
-
-            // 2. Adicionar consumo antigo ao estoque
-            const sqlAddEstoque = `
-                UPDATE estoque_kwh_estado
-                SET quantidade_kwh = quantidade_kwh + ?
-                WHERE estado = ?
-            `;
-            db.query(sqlAddEstoque, [consumoAntigo, estado], (err2) => {
-                if (err2) {
-                    console.error('Erro ao atualizar estoque (adição):', err2);
-                    return res.status(500).send('Erro ao ajustar estoque antigo.');
-                }
-
-                // 3. Atualizar novo consumo no contrato
-                const sqlAtualizaConsumo = `
-                    UPDATE contratos_clientes
-                    SET consumo_medio_kwh = ?
-                    WHERE id = ?
-                `;
-                db.query(sqlAtualizaConsumo, [consumoNovo, idContrato], (err3) => {
-                    if (err3) {
-                        console.error('Erro ao atualizar consumo:', err3);
-                        return res.status(500).send('Erro ao atualizar contrato.');
-                    }
-
-                    // 4. Deduzir novo consumo do estoque
-                    const sqlDeduzEstoque = `
-                        UPDATE estoque_kwh_estado
-                        SET quantidade_kwh = quantidade_kwh - ?
-                        WHERE estado = ?
-                    `;
-                    db.query(sqlDeduzEstoque, [consumoNovo, estado], (err4) => {
-                        if (err4) {
-                            console.error('Erro ao deduzir estoque:', err4);
-                            return res.status(500).send('Erro ao ajustar estoque novo.');
-                        }
-
-                        // 5. Calcular novo valor médio da fatura e atualizar no contrato
-                        const novoValorFatura = precoFinalKwh * consumoNovo;
-                        const sqlAtualizaFatura = `
-                            UPDATE contratos_clientes
-                            SET media_valor_fatura = ?
-                            WHERE id = ?
-                        `;
-                        db.query(sqlAtualizaFatura, [novoValorFatura, idContrato], (err5) => {
-                            if (err5) {
-                                console.error('Erro ao atualizar valor da fatura:', err5);
-                                return res.status(500).send('Erro ao atualizar fatura.');
-                            }
-
-                            // ✅ Tudo feito: redirecionar para home do consumidor
-                            res.redirect('/home_consumidor?refresh=1');
                         });
                     });
                 });
@@ -476,173 +523,57 @@ exports.salvarKwh = (req, res) => {
         });
     });
 };
-exports.salvarKwh = (req, res) => {
 
-    if (!req.session || !req.session.user) {
-        return res.status(401).send('Usuário não autenticado.');
-    }
 
-    const { mes_referencia, kwh_gerado } = req.body;
-    const userId = req.session.user.id;
 
-    const sqlBuscaContrato = `
-        SELECT * FROM contratos_clientes
-        WHERE id_usuario = ?
-        ORDER BY id DESC
-        LIMIT 1
-    `;
-
-    db.query(sqlBuscaContrato, [userId], (err, resultContrato) => {
-        if (err) {
-            console.error('Erro ao buscar contrato:', err);
-            return res.status(500).send('Erro ao buscar contrato.');
-        }
-
-        if (resultContrato.length === 0) {
-            return res.status(404).send('Contrato não encontrado.');
-        }
-
-        const contrato = resultContrato[0];
-        const idContrato = contrato.id;
-        const estado = contrato.estado;
-        const precoFinalKwh = parseFloat(contrato.preco_final_kwh);
-        const mediaValorFatura = parseFloat(contrato.media_valor_fatura);
-        const consumoAntigo = parseFloat(contrato.consumo_medio_kwh);
-        const consumoNovo = parseFloat(kwh_gerado);
-
-        // 1. Inserir valor médio da fatura no histórico
-        const sqlClonarHistorico = `
-            INSERT INTO historico_precos (
-                usuario_id,
-                estado,
-                preco_base_fornecedor,
-                taxa_percentual,
-                preco_final_cliente,
-                data_inicio,
-                data_fim,
-                contrato_cliente_id
-            )
-            SELECT
-                ?, ?, ?, taxa_percentual, preco_final_cliente, CURDATE(), NULL, contrato_cliente_id
-            FROM historico_precos
-            WHERE contrato_cliente_id = ?
-                AND data_fim IS NULL
-            ORDER BY id DESC
-            LIMIT 1
-        `;
-
-        db.query(sqlClonarHistorico, [userId, estado, mediaValorFatura, idContrato], (err1) => {
-            if (err1) {
-                console.error('Erro ao clonar histórico de preços:', err1);
-                return res.status(500).send('Erro ao registrar histórico.');
-            }
-
-            // 2. Adicionar consumo antigo ao estoque
-            const sqlAddEstoque = `
-                UPDATE estoque_kwh_estado
-                SET quantidade_kwh = quantidade_kwh + ?
-                WHERE estado = ?
-            `;
-            db.query(sqlAddEstoque, [consumoAntigo, estado], (err2) => {
-                if (err2) {
-                    console.error('Erro ao atualizar estoque (adição):', err2);
-                    return res.status(500).send('Erro ao ajustar estoque antigo.');
-                }
-
-                // 3. Atualizar novo consumo no contrato
-                const sqlAtualizaConsumo = `
-                    UPDATE contratos_clientes
-                    SET consumo_medio_kwh = ?
-                    WHERE id = ?
-                `;
-                db.query(sqlAtualizaConsumo, [consumoNovo, idContrato], (err3) => {
-                    if (err3) {
-                        console.error('Erro ao atualizar consumo:', err3);
-                        return res.status(500).send('Erro ao atualizar contrato.');
-                    }
-
-                    // 4. Deduzir novo consumo do estoque
-                    const sqlDeduzEstoque = `
-                        UPDATE estoque_kwh_estado
-                        SET quantidade_kwh = quantidade_kwh - ?
-                        WHERE estado = ?
-                    `;
-                    db.query(sqlDeduzEstoque, [consumoNovo, estado], (err4) => {
-                        if (err4) {
-                            console.error('Erro ao deduzir estoque:', err4);
-                            return res.status(500).send('Erro ao ajustar estoque novo.');
-                        }
-
-                        // 5. Calcular novo valor médio da fatura e atualizar no contrato
-                        const novoValorFatura = precoFinalKwh * consumoNovo;
-                        const sqlAtualizaFatura = `
-                            UPDATE contratos_clientes
-                            SET media_valor_fatura = ?
-                            WHERE id = ?
-                        `;
-                        db.query(sqlAtualizaFatura, [novoValorFatura, idContrato], (err5) => {
-                            if (err5) {
-                                console.error('Erro ao atualizar valor da fatura:', err5);
-                                return res.status(500).send('Erro ao atualizar fatura.');
-                            }
-
-                            // ✅ Tudo feito: redirecionar para home do consumidor
-                            res.redirect('/home_consumidor?refresh=1');
-                        });
-                    });
-                });
-            });
-        });
-    });
-};
 
 
 exports.renderHomeFornecedor = (req, res) => {
-    res.render('home_fornecedor', { resultado_calculado: null });
-};
+        res.render('home_fornecedor', { resultado_calculado: null });
+    };
 
-exports.processaSimulacao = (req, res) => {
-    const { preco_kwh_sim, geracao_kwh_sim, prazo_contrato_sim, estado_fazenda_sim } = req.body;
+    exports.processaSimulacao = (req, res) => {
+        const { preco_kwh_sim, geracao_kwh_sim, prazo_contrato_sim, estado_fazenda_sim } = req.body;
 
-    const taxaSQL = `
+        const taxaSQL = `
         SELECT taxa FROM taxa_estaduais WHERE estado = ? LIMIT 1;
     `;
 
-    db.query(taxaSQL, [estado_fazenda_sim], (err, resultadosTaxa) => {
-        if (err) return res.status(500).send('Erro interno no servidor.');
-        if (resultadosTaxa.length === 0) return res.status(400).send('Estado não encontrado.');
+        db.query(taxaSQL, [estado_fazenda_sim], (err, resultadosTaxa) => {
+            if (err) return res.status(500).send('Erro interno no servidor.');
+            if (resultadosTaxa.length === 0) return res.status(400).send('Estado não encontrado.');
 
-        const taxaEstadual = resultadosTaxa[0].taxa / 100;
-        const precoComTaxa = preco_kwh_sim * (1 + taxaEstadual);
-        const valorBase = precoComTaxa * geracao_kwh_sim;
+            const taxaEstadual = resultadosTaxa[0].taxa / 100;
+            const precoComTaxa = preco_kwh_sim * (1 + taxaEstadual);
+            const valorBase = precoComTaxa * geracao_kwh_sim;
 
-        let taxaMensal = 0;
-        switch (parseInt(prazo_contrato_sim)) {
-            case 3: taxaMensal = 0.075; break;
-            case 6: taxaMensal = 0.05; break;
-            case 12: taxaMensal = 0.025; break;
+            let taxaMensal = 0;
+            switch (parseInt(prazo_contrato_sim)) {
+                case 3: taxaMensal = 0.075; break;
+                case 6: taxaMensal = 0.05; break;
+                case 12: taxaMensal = 0.025; break;
+            }
+
+            const valorMensalComTaxa = valorBase * (1 + taxaMensal);
+            const resultado_calculado = valorMensalComTaxa.toFixed(2);
+
+            if (req.session.usuario) {
+                req.session.usuario.resultado_calculado = resultado_calculado;
+            }
+
+            res.render('home_fornecedor', { resultado_calculado });
+        });
+    };
+
+    exports.rescindirContrato = (req, res) => {
+        if (!req.session.usuario) {
+            return res.status(401).send('Usuário não autenticado.');
         }
 
-        const valorMensalComTaxa = valorBase * (1 + taxaMensal);
-        const resultado_calculado = valorMensalComTaxa.toFixed(2);
+        const usuario_id = req.session.usuario.id;
+        const dataRescisao = new Date();
 
-        if (req.session.usuario) {
-            req.session.usuario.resultado_calculado = resultado_calculado;
-        }
-
-        res.render('home_fornecedor', { resultado_calculado });
-    });
-};
-
-exports.rescindirContrato = (req, res) => {
-    if (!req.session.usuario) {
-        return res.status(401).send('Usuário não autenticado.');
-    }
-
-    const usuario_id = req.session.usuario.id;
-    const dataRescisao = new Date();
-
-    const sqlUpdate = `
+        const sqlUpdate = `
         UPDATE contratos_fornecedores
         SET 
             data_rescisao = ?, 
@@ -651,24 +582,24 @@ exports.rescindirContrato = (req, res) => {
         WHERE usuario_id = ? AND status = 'AT'
     `;
 
-    db.query(sqlUpdate, [dataRescisao, usuario_id], (err, result) => {
-        if (err) return res.status(500).send('Erro ao rescindir contrato.');
-        if (result.affectedRows === 0) return res.status(404).send('Nenhum contrato ativo encontrado para rescindir.');
-        flagRescisao = 1;
-        res.redirect('/index');
-    });
-};
+        db.query(sqlUpdate, [dataRescisao, usuario_id], (err, result) => {
+            if (err) return res.status(500).send('Erro ao rescindir contrato.');
+            if (result.affectedRows === 0) return res.status(404).send('Nenhum contrato ativo encontrado para rescindir.');
+            flagRescisao = 1;
+            res.redirect('/index');
+        });
+    };
 
-function formatarData(data) {
-    if (!data) return '';
-    const d = new Date(data);
-    return d.toLocaleDateString('pt-BR');
-}
+    function formatarData(data) {
+        if (!data) return '';
+        const d = new Date(data);
+        return d.toLocaleDateString('pt-BR');
+    }
 
-exports.carregarContratosUsuario = (req, res) => {
-    const userId = req.session.userId;
+    exports.carregarContratosUsuario = (req, res) => {
+        const userId = req.session.userId;
 
-    const query = `
+        const query = `
     SELECT 
       data_assinatura, 
       data_final, 
@@ -682,30 +613,80 @@ exports.carregarContratosUsuario = (req, res) => {
     WHERE usuario_id = ?
   `;
 
-    db.query(query, [userId], (err, resultados) => {
-        if (err) {
-            console.error('Erro ao buscar contratos:', err);
-            return res.status(500).send('Erro no servidor');
-        }
+        db.query(query, [userId], (err, resultados) => {
+            if (err) {
+                console.error('Erro ao buscar contratos:', err);
+                return res.status(500).send('Erro no servidor');
+            }
 
-        const contratosFormatados = resultados.map(contrato => {
-            const status = contrato.status?.trim();
-            const dataFinalOuRescisao = status === 'RE' ? contrato.data_rescisao : contrato.data_final;
+            const contratosFormatados = resultados.map(contrato => {
+                const status = contrato.status?.trim();
+                const dataFinalOuRescisao = status === 'RE' ? contrato.data_rescisao : contrato.data_final;
 
-            return {
-                ...contrato,
-                data_assinatura: formatarData(contrato.data_assinatura),
-                data_final: formatarData(dataFinalOuRescisao),
-                status: status,
-                status_legivel: status === 'AT' ? 'Ativo' : 'Inativo'
-            };
+                return {
+                    ...contrato,
+                    data_assinatura: formatarData(contrato.data_assinatura),
+                    data_final: formatarData(dataFinalOuRescisao),
+                    status: status,
+                    status_legivel: status === 'AT' ? 'Ativo' : 'Inativo'
+                };
+            });
+
+            res.render('home_fornecedor', { contratos: contratosFormatados });
         });
+    };
 
-        res.render('home_fornecedor', { contratos: contratosFormatados });
+
+exports.carregaFaturaCliente = (req, res) => {
+    if (!req.session || !req.session.usuario) {
+        return res.status(401).send('Usuário não autenticado.');
+    }
+
+    const userId = req.session.usuario.id;
+
+    const sqlContrato = `
+        SELECT id FROM contratos_clientes
+        WHERE usuario_id = ?
+        ORDER BY id DESC
+        LIMIT 1
+    `;
+
+    db.query(sqlContrato, [userId], (errContrato, resultContrato) => {
+        if (errContrato) return res.status(500).send('Erro ao buscar contrato.');
+        if (resultContrato.length === 0) return res.status(404).send('Contrato não encontrado.');
+
+        const contratoId = resultContrato[0].id;
+
+        const sqlPagamentos = `
+            SELECT data_pagamento, valor_total, status_pagamento
+            FROM pagamento_cliente
+            WHERE id_contrato = ?
+            ORDER BY data_pagamento DESC
+            LIMIT 6
+        `;
+
+        db.query(sqlPagamentos, [contratoId], (errPagamentos, resultPagamentos) => {
+            if (errPagamentos) return res.status(500).send('Erro ao buscar faturas.');
+
+            // Formata os dados
+            const faturas = resultPagamentos.map(pag => {
+                const data = moment(pag.data_pagamento);
+                return {
+                    mes: data.format('MMM/YYYY'), // Ex: Mai/2025
+                    kwh: pag.valor_total > 0 ? (pag.valor_total / 0.5).toFixed(2) : '--', // supondo valor médio de R$0.50/kWh
+                    valor: pag.valor_total > 0 ? `R$ ${pag.valor_total.toFixed(2)}` : '--',
+                    status: pag.status_pagamento === 'P' ? 'Faturado' : 'Aguardando Lançamento',
+                    statusClass: pag.status_pagamento === 'P' ? 'success' : 'warning'
+                };
+            });
+
+            res.render('home_consumidor', {faturas});
+
+        });
     });
 };
 
-function formatarData(data) {
-    const d = new Date(data);
-    return d.toLocaleDateString('pt-BR');
-}
+    function formatarData(data) {
+        const d = new Date(data);
+        return d.toLocaleDateString('pt-BR');
+    }

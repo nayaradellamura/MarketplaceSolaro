@@ -35,7 +35,7 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-warning">Valor com Desconto SOLARO</h5>
-                        <p class="display-5 fw-bold">R$ {{fatura_com_desconto}}</p>
+                        <p class="display-5 fw-bold">R$ {{valor_com_desconto}}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -143,8 +143,8 @@
                                 placeholder="Mês 1 (kWh)" required>
                             <input type="number" step="0.01" class="form-control mb-2" name="kwh2"
                                 placeholder="Mês 2 (kWh)" required>
-                            <input type="number" step="0.01" class="form-control" name="kwh3"
-                                placeholder="Mês 3 (kWh)" required>
+                            <input type="number" step="0.01" class="form-control" name="kwh3" placeholder="Mês 3 (kWh)"
+                                required>
                         </div>
 
                         <div class="mb-3">
@@ -196,7 +196,8 @@
     <div class="d-flex justify-content-center">
         <ul class="nav nav-tabs custom-tabs w-75 mb-4" id="myTab" role="tablist" style="max-width: 900px;">
             <li class="nav-item me-2" role="presentation">
-                <button class="nav-link active" id="lancamento-tab" data-bs-toggle="tab" data-bs-target="#lancamento" type="button" role="tab">
+                <button class="nav-link active" id="lancamento-tab" data-bs-toggle="tab" data-bs-target="#lancamento"
+                    type="button" role="tab">
                     <i class="bi bi-upload me-1"></i> Lançamento
                 </button>
             </li>
@@ -206,15 +207,13 @@
                     <i class="bi bi-clock-history me-1"></i> Histórico
                 </button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="faturas-tab" data-bs-toggle="tab" data-bs-target="#faturas" type="button"
-                    role="tab">
-                    <i class="bi bi-receipt me-1"></i> Faturas
-                </button>
-            </li>
+            <button class="nav-link" id="faturas-tab" data-bs-toggle="tab" data-bs-target="#faturas" type="button"
+                role="tab">
+                <i class="bi bi-receipt me-1"></i> Faturas
+            </button>
         </ul>
     </div>
-    
+
     <div class="tab-content">
         <div class="tab-pane fade show active" id="lancamento" role="tabpanel">
             <!-- Lançamento de KWh Mensal -->
@@ -233,17 +232,18 @@
                                 <label class="form-label">Mês Referente</label>
                                 <select class="form-select" name="mes_referencia" required>
                                     <option value="">Selecione</option>
-                                    <option value="2025-05">Janeiro</option>
-                                    <option value="2025-05">Fevereiro</option>
-                                    <option value="2025-05">Março</option>
-                                    <option value="2025-05">Abril</option>
-                                    <option value="2025-05">Junho</option>
-                                    <option value="2025-05">Julho</option>
-                                    <option value="2025-05">Agosto</option>
-                                    <option value="2025-05">Setembro</option>
-                                    <option value="2025-05">Outubro</option>
-                                    <option value="2025-05">Novembro</option>
-                                    <option value="2025-06">Dezembro</option>
+                                    <option value="1">Janeiro</option>
+                                    <option value="2">Fevereiro</option>
+                                    <option value="3">Março</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Maio</option>
+                                    <option value="6">Junho</option>
+                                    <option value="7">Julho</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
@@ -277,25 +277,22 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {{#each faturas}}
                                 <tr>
-                                    <td>Mai/2025</td>
-                                    <td>560,50</td>
-                                    <td>R$ 280,25</td>
-                                    <td><span class="badge bg-success">Faturado</span></td>
+                                    <td>{{mes}}</td>
+                                    <td>{{kwh}}</td>
+                                    <td>{{valor}}</td>
+                                    <td><span class="badge bg-{{statusClass}}">{{status}}</span></td>
                                 </tr>
-                                <tr>
-                                    <td>Jun/2025</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                    <td><span class="badge bg-warning">Aguardando Lançamento</span></td>
-                                </tr>
+                                {{/each}}
                             </tbody>
+
                         </table>
                     </div>
                 </div>
             </section>
         </div>
-        
+
         <div class="tab-pane fade" id="faturas" role="tabpanel">
             <!-- Seção Minhas Faturas -->
             <section class="container my-5">
@@ -321,23 +318,23 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {{#each faturas}}
                                 <tr>
-                                    <td>Mai/2025</td>
-                                    <td>R$ 120,50</td>
-                                    <td><span class="badge bg-danger">Pendente</span></td>
+                                    <td>{{mes}}</td>
+                                    <td>{{valor}}</td>
+                                    <td><span class="badge bg-{{statusClass}}">{{status}}</span></td>
                                     <td>
+                                        {{#if mostrarBotaoPagar}}
                                         <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#modalPagamento">
                                             Pagar
                                         </button>
+                                        {{else}}
+                                        {{forma_pagamento}}
+                                        {{/if}}
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>Abr/2025</td>
-                                    <td>R$ 110,30</td>
-                                    <td><span class="badge bg-success">Pago</span></td>
-                                    <td>-</td>
-                                </tr>
+                                {{/each}}
                             </tbody>
                         </table>
                     </div>
@@ -358,7 +355,7 @@
                                     aria-label="Fechar"></button>
                             </div>
                             <div class="modal-body">
-                                <p>Valor da fatura: <strong id="valorFatura">R$ 0,00</strong></p>
+                                <p>Valor da fatura: <strong id="valorFatura">R$ {{valor}}</strong></p>
 
                                 <div class="mb-3">
                                     <label for="metodoPagamento" class="form-label">Método de Pagamento</label>
