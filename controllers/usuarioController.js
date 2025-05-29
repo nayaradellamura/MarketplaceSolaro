@@ -1,5 +1,5 @@
 const db = require('../db/db');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const Swal = require('sweetalert2');
 const moment = require('moment');
 
