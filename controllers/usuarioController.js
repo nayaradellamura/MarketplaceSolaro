@@ -630,8 +630,9 @@ exports.rescindirContrato = (req, res) => {
     const usuario_id = req.session.usuario.id;
     const dataRescisao = new Date();
     const estadoFornecedor = req.session.usuario.estado_fazenda;
+    const geracaoKwh = req.session.usuario.geracao_kwh;
     const kwhFormatado = parseFloat(
-        req.session.usuario.geracao_kwh.replace('.', '').replace(',', '.')
+        geracaoKwh.replace('.', '').replace(',', '.')
     );
 
 
