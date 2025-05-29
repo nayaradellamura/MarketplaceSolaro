@@ -137,18 +137,6 @@
                         </div>
                     </div>
 
-                    {{#if alertaCadastro}}
-                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                    <script>
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Usuário já cadastrado',
-                            text: '{{alertaCadastro.campo}} já existe: {{alertaCadastro.valor}}',
-                            confirmButtonText: 'OK'
-                        });
-                    </script>
-                    {{/if}}
-
                 </div>
             </form>
         </div>
