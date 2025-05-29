@@ -646,7 +646,7 @@ exports.rescindirContrato = (req, res) => {
     `;
 
     const sqlRemoveEstoque = `
-        UPDATE estoque_kwh_estado SET kwh_disponivel = kwh_disponivel - ? 
+        UPDATE estoque_kwh_estado SET kwh_disponivel =  ? - kwh_disponivel
          WHERE estado = ?
     `;
 
