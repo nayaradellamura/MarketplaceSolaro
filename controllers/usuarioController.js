@@ -13,41 +13,74 @@ exports.cadastrarUsuario = async (req, res) => {
     } = req.body;
 
     try {
-        const hashedSenha = await bcrypt.hash(cadastroSenha, 10);
-
-        const insertUsuarioSQL = `
-            INSERT INTO usuarios (
-                cpf_cnpj, nome, contato, tipo,
-                email, senha
-            ) VALUES (?, ?, ?, ?, ?, ?)
+        const verificarSQL = `
+            SELECT * FROM usuarios 
+            WHERE cpf_cnpj = ? OR email = ?
         `;
 
-        db.query(insertUsuarioSQL, [
-            cpf_cnpj, nome, contato, tipo,
-            cadastroEmail, hashedSenha
-        ], (err, result) => {
+        db.query(verificarSQL, [cpf_cnpj, cadastroEmail], async (err, results) => {
             if (err) {
-                console.error("Erro ao cadastrar usuário:", err);
-                return res.status(500).send('Erro ao cadastrar usuário.');
+                console.error("Erro ao verificar usuário:", err);
+                return res.status(500).send('Erro interno ao verificar usuário.');
             }
 
-            const usuario_id = result.insertId;
+            if (results.length > 0) {
+                const usuarioExistente = results[0];
+                const campoRepetido = usuarioExistente.cpf_cnpj === cpf_cnpj ? 'CPF/CNPJ' : 'Email';
+                const valorRepetido = usuarioExistente.cpf_cnpj === cpf_cnpj ? cpf_cnpj : cadastroEmail;
 
-            const insertEnderecoSQL = `
-                INSERT INTO enderecos (
-                    usuario_id, cep, rua, numero, bairro, cidade, estado, pais
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                return res.send(`
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Usuário já cadastrado',
+                            text: '${campoRepetido} já existe: ${valorRepetido}',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.history.back();
+                        });
+                    </script>
+                `);
+            }
+
+            // Continua cadastro normalmente
+            const hashedSenha = await bcrypt.hash(cadastroSenha, 10);
+
+            const insertUsuarioSQL = `
+                INSERT INTO usuarios (
+                    cpf_cnpj, nome, contato, tipo,
+                    email, senha
+                ) VALUES (?, ?, ?, ?, ?, ?)
             `;
 
-            db.query(insertEnderecoSQL, [
-                usuario_id, cep, rua, numero, bairro, cidade, estado, pais
-            ], (err2) => {
+            db.query(insertUsuarioSQL, [
+                cpf_cnpj, nome, contato, tipo,
+                cadastroEmail, hashedSenha
+            ], (err2, result) => {
                 if (err2) {
-                    console.error("Erro ao cadastrar endereço:", err2);
-                    return res.status(500).send('Erro ao cadastrar endereço.');
+                    console.error("Erro ao cadastrar usuário:", err2);
+                    return res.status(500).send('Erro ao cadastrar usuário.');
                 }
 
-                res.redirect('/index?showLoginModal=true');
+                const usuario_id = result.insertId;
+
+                const insertEnderecoSQL = `
+                    INSERT INTO enderecos (
+                        usuario_id, cep, rua, numero, bairro, cidade, estado, pais
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                `;
+
+                db.query(insertEnderecoSQL, [
+                    usuario_id, cep, rua, numero, bairro, cidade, estado, pais
+                ], (err3) => {
+                    if (err3) {
+                        console.error("Erro ao cadastrar endereço:", err3);
+                        return res.status(500).send('Erro ao cadastrar endereço.');
+                    }
+
+                    res.redirect('/index?showLoginModal=true');
+                });
             });
         });
 
@@ -56,6 +89,7 @@ exports.cadastrarUsuario = async (req, res) => {
         res.status(500).send('Erro ao processar cadastro.');
     }
 };
+
 
 // LOGIN DE USUÁRIO
 exports.loginUsuario = async (req, res) => {
