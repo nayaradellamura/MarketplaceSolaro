@@ -629,6 +629,8 @@ exports.rescindirContrato = (req, res) => {
 
     const usuario_id = req.session.usuario.id;
     const dataRescisao = new Date();
+    const estadoFornecedor = contrato.estado_fazenda;
+    const geracaoKwh = contrato.geracao_kwh;
 
     const sqlUpdate = `
         UPDATE contratos_fornecedores
@@ -639,6 +641,18 @@ exports.rescindirContrato = (req, res) => {
         WHERE usuario_id = ? AND status = 'AT'
     `;
 
+     const sqlRemoveEstoque = `
+        UPDATE estoque_kwh_estado SET kwh_disponivel = kwh_disponivel - ? 
+         WHERE estado = ?
+    `;
+    
+    db.query(sqlRemoveEstoque, [geracaoKwh, estadoFornecedor], (err2) => {
+        if (err2) {
+            console.error('Erro ao cadastrar contrato:', err2);
+            return res.status(500).send('Erro ao cadastrar contrato.');
+        };
+    });
+
     db.query(sqlUpdate, [dataRescisao, usuario_id], (err, result) => {
         if (err) return res.status(500).send('Erro ao rescindir contrato.');
         if (result.affectedRows === 0) return res.status(404).send('Nenhum contrato ativo encontrado para rescindir.');
@@ -646,6 +660,7 @@ exports.rescindirContrato = (req, res) => {
         res.redirect('/index');
     });
 };
+
 
 function formatarData(data) {
     if (!data) return '';
