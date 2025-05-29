@@ -629,8 +629,8 @@ exports.rescindirContrato = (req, res) => {
 
     const usuario_id = req.session.usuario.id;
     const dataRescisao = new Date();
-    const estadoFornecedor = contrato.estado_fazenda;
-    const geracaoKwh = contrato.geracao_kwh;
+    const estadoFornecedor = req.session.usuario.estado_fazenda;
+    const geracaoKwh = req.session.usuario.geracao_kwh;
 
     const sqlUpdate = `
         UPDATE contratos_fornecedores
