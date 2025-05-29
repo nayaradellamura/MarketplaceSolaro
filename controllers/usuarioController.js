@@ -186,7 +186,7 @@ exports.cadastrarContrato = (req, res) => {
     `;
 
     const sqlInsereEstoque = `
-        UPDATE estoque_kwh_estados SET kwh_disponivel = kwh_disponivel + ? 
+        UPDATE estoque_kwh_estado SET kwh_disponivel = kwh_disponivel + ? 
          WHERE estado = ?
     `;
     
