@@ -29,20 +29,14 @@ exports.cadastrarUsuario = async (req, res) => {
                 const campoRepetido = usuarioExistente.cpf_cnpj === cpf_cnpj ? 'CPF/CNPJ' : 'Email';
                 const valorRepetido = usuarioExistente.cpf_cnpj === cpf_cnpj ? cpf_cnpj : cadastroEmail;
 
-                return res.send(`
-                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                    <script>
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Usuário já cadastrado',
-                            text: '${campoRepetido} já existe: ${valorRepetido}',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            window.history.back();
-                        });
-                    </script>
-                `);
+                req.session.alertaCadastro = {
+                    campo: campoRepetido,
+                    valor: valorRepetido
+                };
+
+                return res.redirect('/form_cadastro'); 
             }
+
 
             // Continua cadastro normalmente
             const hashedSenha = await bcrypt.hash(cadastroSenha, 10);
