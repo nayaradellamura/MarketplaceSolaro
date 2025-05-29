@@ -37,7 +37,7 @@
         Cadastre-se como <strong>consumidor</strong> ou <strong>fornecedor</strong> e tenha acesso à <strong>simulação
           gratuita</strong> antes de assinar qualquer contrato com o SOLARO.
       </p>
-      <a class="btn btn-primary px-4 py-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#loginModal">
+      <a class="btn btn-primary px-4 py-2 rounded-pill" data-bs-toggle="modal" data-bs-target="#CadastroModal">
         Cadastre-se gratuitamente
       </a>    
       </div>
@@ -241,6 +241,16 @@
       if (urlParams.get('showLoginModal') === 'true') {
         const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
         loginModal.show();
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('showCadastroModal') === 'true') {
+        const CadastroModal = new bootstrap.Modal(document.getElementById('CadastroModal'));
+        CadastroModal.show();
       }
     });
   </script>
