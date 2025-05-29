@@ -484,7 +484,7 @@
                     addLabelValue("Mês Referente", dadosFatura.mes, startY);
                     addLabelValue("Valor Pago", dadosFatura.valor, startY + lineHeight);
                     addLabelValue("Método", metodo.toUpperCase(), startY + lineHeight * 2);
-                    addLabelValue("Data do Pagamento", data, startY + lineHeight * 3);
+                    addLabelValue("Data do Pagamento ", data, startY + lineHeight * 3);
 
                     // Mensagem final
                     doc.setFont(undefined, "italic");
@@ -585,17 +585,17 @@
                     </p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger me-auto" data-bs-toggle="modal"
-                        data-bs-target="#modalAvisoMulta">
+                    <button type="button" class="btn btn-danger me-auto" id="btn-rescindir">
                         Rescindir Contrato
                     </button>
+
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Rescindir Contrato -->
+    {{!-- <!-- Modal Rescindir Contrato -->
     <div class="modal fade" id="modalAvisoMulta" tabindex="-1" aria-labelledby="modalAvisoMultaLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -614,7 +614,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     {{/if}}
 
     <!-- Histórico de Contratos -->
@@ -836,6 +836,45 @@
             });
         });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('btn-rescindir').addEventListener('click', function () {
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: 'Encerrar seu contrato com o Solaro significa abrir mão da sua energia limpa e sustentável. Tem certeza que deseja continuar?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, rescindir!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/rescindir_contrato_cliente', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({}),
+                        credentials: 'same-origin'
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Sucesso!', data.message, 'success').then(() => location.reload());
+                            } else {
+                                Swal.fire('Atenção!', data.message, 'warning');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Erro no fetch /rescindir_contrato:', err);
+                            Swal.fire('Erro!', 'Erro ao rescindir contrato.', 'error');
+                        });
+
+                }
+            });
+        });
+    </script>
+
 
 
 

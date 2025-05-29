@@ -6,6 +6,7 @@ const moment = require('moment');
 require('moment/locale/pt-br');
 moment.locale('pt-br');
 
+
 // Páginas públicas
 router.get('/', (req, res) => res.render('index'));
 router.get('/index', (req, res) => res.render('index'));
@@ -38,6 +39,7 @@ router.post('/cadastro_contrato_cliente', usuarioController.cadastrarContratoCli
 router.post('/salvar_kwh', usuarioController.salvarKwh);
 router.post('/confirmar_pagamento', usuarioController.confirmarPagamentoCliente);
 router.post('/dash', usuarioController.getDashboard);
+router.post('/rescindir_contrato_cliente', usuarioController.rescindirContratoCliente);
 
 
 
@@ -50,7 +52,7 @@ router.get('/home_consumidor', (req, res) => {
 
     const todosContratosConsumidorQuery = `
       SELECT * FROM contratos_clientes
-      WHERE usuario_id = ? 
+      WHERE usuario_id = ?  AND status = 'A'
       ORDER BY data_inicio DESC
       LIMIT 1
     `;

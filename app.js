@@ -5,6 +5,7 @@ const session = require("express-session");
 const app = express();
 require('dotenv').config();
 
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -42,6 +43,8 @@ hbs.registerHelper('formatarData', function (data) {
 hbs.registerHelper('json', function (context) {
   return JSON.stringify(context);
 });
+
+
 
 app.listen(5001, () => {
     console.log("Servidor rodando na porta 5001");

@@ -283,7 +283,6 @@ function openFormularioModal() {
   }
 });
 
-// Função chamada ao enviar o formulário
 function gerarRecibo() {
   const idFatura = document.getElementById("inputIdFatura").value;
   const metodo = document.getElementById("metodoPagamento").value;
@@ -293,9 +292,6 @@ function gerarRecibo() {
     return;
   }
 
-  // Aqui você pode fazer algo como gerar o recibo visual
-
-  // Envia o formulário manualmente
   document.getElementById("formPagamento").submit();
 }
 

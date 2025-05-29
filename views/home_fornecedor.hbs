@@ -392,7 +392,7 @@
           </p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#modalAvisoMulta">
+          <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#modalAvisoMulta" id="btn-rescindir">
             Rescindir Contrato
           </button>
 
@@ -405,7 +405,7 @@
     </div>
   </div>
 
-  <!-- Modal Rescindir Contrato -->
+  {{!-- <!-- Modal Rescindir Contrato -->
   <div class="modal fade" id="modalAvisoMulta" tabindex="-1" aria-labelledby="modalAvisoMultaLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -423,7 +423,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> --}}
 
   <!-- Modal para todos os contratos -->
   <div class="modal fade" id="modalTodosContratos" tabindex="-1" aria-labelledby="todosContratosLabel"
@@ -533,38 +533,77 @@
     });
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  {{!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const form = document.getElementById("rescindir");
+   // document.addEventListener("DOMContentLoaded", function () {
+   //   const form = document.getElementById("rescindir");
 
-      form.addEventListener("submit", function (e) {
+   //   form.addEventListener("submit", function (e) {
         e.preventDefault();
 
         Swal.fire({
-          icon: "warning",
-          title: "Tem certeza?",
-          text: "Você está prestes a rescindir o contrato. Deseja continuar?",
-          showCancelButton: true,
-          confirmButtonText: "Sim, confirmar!",
-          cancelButtonText: "Cancelar"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Swal.fire({
-              icon: "success",
-              title: "Contrato Anulado!",
-              text: "As informações foram enviadas para seu e-mail.",
-              timer: 2000,
-              showConfirmButton: false
+     //     icon: "warning",
+     //     title: "Tem certeza?",
+     //     text: "Você está prestes a rescindir o contrato. Deseja continuar?",
+     //     showCancelButton: true,
+      //    confirmButtonText: "Sim, confirmar!",
+       //   cancelButtonText: "Cancelar"
+      //  }).then((result) => {
+        //  if (result.isConfirmed) {
+         //   Swal.fire({
+         //     icon: "success",
+          //    title: "Contrato Anulado!",
+          //    text: "As informações foram enviadas para seu e-mail.",
+           //   timer: 2000,
+            //  showConfirmButton: false
             });
-            setTimeout(() => {
+          //  setTimeout(() => {
               form.submit();
             }, 2000);
           }
         });
       });
     });
-  </script>
+  </script> --}}
+
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('btn-rescindir').addEventListener('click', function () {
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: 'Você está prestes a rescindir o contrato. Deseja continuar?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, rescindir!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/rescindir_contrato', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({}),
+                        credentials: 'same-origin'
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Sucesso!', data.message, 'success').then(() => location.reload());
+                            } else {
+                                Swal.fire('Atenção!', data.message, 'warning');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Erro no fetch /rescindir_contrato:', err);
+                            Swal.fire('Erro!', 'Erro ao rescindir contrato.', 'error');
+                        });
+
+                }
+            });
+        });
+    </script>
+
 
 
   <script>
