@@ -189,7 +189,7 @@ exports.cadastrarContrato = (req, res) => {
         UPDATE estoque_kwh_estado SET kwh_disponivel = kwh_disponivel + ? 
          WHERE estado = ?
     `;
-    
+
     db.query(sqlInsereEstoque, [geracao_kwh, estado_fazenda], (err2) => {
         if (err2) {
             console.error('Erro ao cadastrar contrato:', err2);
@@ -397,7 +397,7 @@ exports.salvarKwh = (req, res) => {
         return res.status(401).send('Usuário não autenticado.');
     }
 
-    const { kwh_gerado, mes_referencia} = req.body;
+    const { kwh_gerado, mes_referencia } = req.body;
     const userId = req.session.usuario.id;
 
     const sqlBuscaContrato = `
@@ -426,46 +426,46 @@ exports.salvarKwh = (req, res) => {
 
         console.log('Mês: ', mesReferencia);
 
-    switch (parseInt(mesReferencia)) {
-        case 1:
-            dataReferencia = `${anoAtual}-01-01`;
-            break;
-        case 2:
-            dataReferencia = `${anoAtual}-02-01`;
-            break;
-        case 3:
-            dataReferencia = `${anoAtual}-03-01`;
-            break;
-        case 4:
-            dataReferencia = `${anoAtual}-04-01`;
-            break;
-        case 5:
-            dataReferencia = `${anoAtual}-05-01`;
-            break;
-        case 6:
-            dataReferencia = `${anoAtual}-06-01`;
-            break;
-        case 7:
-            dataReferencia = `${anoAtual}-07-01`;
-            break;
-        case 8:
-            dataReferencia = `${anoAtual}-08-01`;
-            break;
-        case 9:
-            dataReferencia = `${anoAtual}-09-01`;
-            break;
-        case 10:
-            dataReferencia = `${anoAtual}-10-01`;
-            break;
-        case 11:
-            dataReferencia = `${anoAtual}-11-01`;
-            break;
-        case 12:
-            dataReferencia = `${anoAtual}-12-01`;
-            break;
-        default:
-            return res.status(400).send('Mês inválido.');
-    }
+        switch (parseInt(mesReferencia)) {
+            case 1:
+                dataReferencia = `${anoAtual}-01-01`;
+                break;
+            case 2:
+                dataReferencia = `${anoAtual}-02-01`;
+                break;
+            case 3:
+                dataReferencia = `${anoAtual}-03-01`;
+                break;
+            case 4:
+                dataReferencia = `${anoAtual}-04-01`;
+                break;
+            case 5:
+                dataReferencia = `${anoAtual}-05-01`;
+                break;
+            case 6:
+                dataReferencia = `${anoAtual}-06-01`;
+                break;
+            case 7:
+                dataReferencia = `${anoAtual}-07-01`;
+                break;
+            case 8:
+                dataReferencia = `${anoAtual}-08-01`;
+                break;
+            case 9:
+                dataReferencia = `${anoAtual}-09-01`;
+                break;
+            case 10:
+                dataReferencia = `${anoAtual}-10-01`;
+                break;
+            case 11:
+                dataReferencia = `${anoAtual}-11-01`;
+                break;
+            case 12:
+                dataReferencia = `${anoAtual}-12-01`;
+                break;
+            default:
+                return res.status(400).send('Mês inválido.');
+        }
 
         // 1. Fechar histórico anterior
         const sqlFechaHistoricoAnterior = `
@@ -475,7 +475,7 @@ exports.salvarKwh = (req, res) => {
               AND usuario_id = ?
               AND data_fim IS NULL
         `;
-        
+
 
         db.query(sqlFechaHistoricoAnterior, [idContrato, userId], (errFechar) => {
             if (errFechar) return res.status(500).send('Erro ao fechar histórico anterior.');
@@ -542,7 +542,7 @@ exports.salvarKwh = (req, res) => {
                             // 7. Criar pagamento pendente para o próximo mês
                             const valorFaturaComDesconto = parseFloat((consumoNovo * precoFinalKwh).toFixed(2));
                             const hoje = new Date();
-                     //     const primeiroDiaProximoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
+                            //     const primeiroDiaProximoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
                             const dataPagamento = new Date(dataReferencia).toISOString().split('T')[0];
 
 
@@ -630,7 +630,10 @@ exports.rescindirContrato = (req, res) => {
     const usuario_id = req.session.usuario.id;
     const dataRescisao = new Date();
     const estadoFornecedor = req.session.usuario.estado_fazenda;
-    const geracaoKwh = req.session.usuario.geracao_kwh;
+    const kwhFormatado = parseFloat(
+        req.session.usuario.geracao_kwh.replace('.', '').replace(',', '.')
+    );
+
 
     const sqlUpdate = `
         UPDATE contratos_fornecedores
@@ -641,12 +644,12 @@ exports.rescindirContrato = (req, res) => {
         WHERE usuario_id = ? AND status = 'AT'
     `;
 
-     const sqlRemoveEstoque = `
+    const sqlRemoveEstoque = `
         UPDATE estoque_kwh_estado SET kwh_disponivel = kwh_disponivel - ? 
          WHERE estado = ?
     `;
-    
-    db.query(sqlRemoveEstoque, [geracaoKwh, estadoFornecedor], (err2) => {
+
+    db.query(sqlRemoveEstoque, [kwhFormatado, estadoFornecedor], (err2) => {
         if (err2) {
             console.error('Erro ao cadastrar contrato:', err2);
             return res.status(500).send('Erro ao cadastrar contrato.');
@@ -752,7 +755,7 @@ exports.carregaFaturaCliente = (req, res) => {
                 };
             });
 
-             return res.json({ success: true, message: "Contrato rescindido com sucesso." });
+            return res.json({ success: true, message: "Contrato rescindido com sucesso." });
 
         });
     });
