@@ -34,7 +34,7 @@ exports.cadastrarUsuario = async (req, res) => {
                     valor: valorRepetido
                 };
 
-                return res.redirect('/index?showCadastroModal=true'); 
+                return res.redirect('/form_cadastro'); 
             }
 
 

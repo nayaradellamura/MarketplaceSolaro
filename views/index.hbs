@@ -211,17 +211,7 @@
     </div>
   </div>
 
-  {{#if alertaCadastro}}
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    Swal.fire({
-      icon: 'error',
-      title: 'Usuário já cadastrado',
-      text: '{{alertaCadastro.campo}} já existe: {{alertaCadastro.valor}}',
-      confirmButtonText: 'OK'
-    });
-  </script>
-  {{/if}}
+  
   <!-- Espaçamento -->
   <div style="height: 100px;"></div>
 
@@ -256,15 +246,7 @@
     });
   </script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('showCadastroModal') === 'true') {
-        const CadastroModal = new bootstrap.Modal(document.getElementById('CadastroModal'));
-        CadastroModal.show();
-      }
-    });
-  </script>
+  
 
   <!-- Código do Tawk.to -->
   <script type="text/javascript">
