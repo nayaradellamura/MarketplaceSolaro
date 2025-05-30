@@ -52,7 +52,7 @@ router.get('/home_consumidor', (req, res) => {
 
     const todosContratosConsumidorQuery = `
       SELECT * FROM contratos_clientes
-      WHERE usuario_id = ?  AND status = 'A'
+      WHERE usuario_id = ? 
       ORDER BY data_inicio DESC
       LIMIT 1
     `;
