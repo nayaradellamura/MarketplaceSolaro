@@ -337,11 +337,11 @@ exports.cadastrarContrato = (req, res) => {
 
             const insertRepasseSQL = `
                 INSERT INTO recebimento_fornecedor
-                (id_contrato, id_fornecedor, valor_repasse, data_repasse, taxa_administrativa)
+                (id_contrato, id_fornecedor, valor_repasse, taxa_administrativa)
                 VALUES (?, ?, ?, ?)
             `;
 
-            db.query(insertRepasseSQL, [contratoId, usuario_id, valorRepasse, taxaAdm], (errRepasse) => {
+            db.query(insertRepasseSQL, [contratoId, usuario_id, taxaAdm], (errRepasse) => {
                 if (errRepasse) {
                     console.error('Erro ao inserir primeiro repasse:', errRepasse);
                     return res.status(500).send('Erro ao registrar repasse inicial.');
