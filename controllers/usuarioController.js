@@ -341,7 +341,7 @@ exports.cadastrarContrato = (req, res) => {
                 VALUES (?, ?, ?, ?)
             `;
 
-            db.query(insertRepasseSQL, [contratoId, usuario_id, taxaAdm], (errRepasse) => {
+            db.query(insertRepasseSQL, [contratoId, usuario_id, valorRepasse, taxaAdm], (errRepasse) => {
                 if (errRepasse) {
                     console.error('Erro ao inserir primeiro repasse:', errRepasse);
                     return res.status(500).send('Erro ao registrar repasse inicial.');
