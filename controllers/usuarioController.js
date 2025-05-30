@@ -162,7 +162,7 @@ exports.loginUsuario = async (req, res) => {
                         }),
                         flag_fornecedor: contrato.flag_fornecedor
                     };
-
+                    
                     const valorBase = contrato.preco_kwh * contrato.geracao_kwh;
                     let taxaMensal = 0;
 
@@ -212,8 +212,8 @@ exports.loginUsuario = async (req, res) => {
 
                             const insertRepasseSQL = `
                                 INSERT INTO recebimento_fornecedor
-                                (id_contrato, id_fornecedor, valor_repasse, data_repasse, taxa_administrativa)
-                                VALUES (?, ?, ?, CURDATE(), ?);
+                                (id_contrato, id_fornecedor, valor_repasse, taxa_administrativa)
+                                VALUES (?, ?, ?, ?);
                             `;
 
                             db.query(insertRepasseSQL, [
@@ -228,6 +228,7 @@ exports.loginUsuario = async (req, res) => {
                                 }
 
                                 return res.json({ sucesso: true, redirect: '/home_fornecedor' });
+                                
                             });
 
                         } else {
@@ -245,6 +246,34 @@ exports.loginUsuario = async (req, res) => {
     }
 };
 
+exports.recebimentoFornecedor = (req, res) => {
+    const idFornecedor = req.session.usuario.id;
+    const idContrato = req.session.usuario.contrato_id;
+
+    if (!idFornecedor || !idContrato) {
+        return res.status(400).json({ erro: 'Sessão inválida. Fornecedor ou contrato não encontrado.' });
+    }
+
+    const sql = `
+        UPDATE recebimento_fornecedor
+        SET status_repasse = 'PAG',
+            data_repasse = CURDATE()
+        WHERE id_fornecedor = ? AND id_contrato = ?;
+    `;
+
+    db.query(sql, [idFornecedor, idContrato], (err, result) => {
+        if (err) {
+            console.error("Erro ao atualizar status de repasse:", err);
+            return res.status(500).json({ erro: 'Erro ao atualizar repasse.' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Nenhum repasse encontrado para atualizar.' });
+        }
+
+        return res.redirect('/home_fornecedor');
+    });
+};
 
 
 
@@ -309,7 +338,7 @@ exports.cadastrarContrato = (req, res) => {
             const insertRepasseSQL = `
                 INSERT INTO recebimento_fornecedor
                 (id_contrato, id_fornecedor, valor_repasse, data_repasse, taxa_administrativa)
-                VALUES (?, ?, ?, CURDATE(), ?)
+                VALUES (?, ?, ?, ?)
             `;
 
             db.query(insertRepasseSQL, [contratoId, usuario_id, valorRepasse, taxaAdm], (errRepasse) => {
@@ -317,8 +346,9 @@ exports.cadastrarContrato = (req, res) => {
                     console.error('Erro ao inserir primeiro repasse:', errRepasse);
                     return res.status(500).send('Erro ao registrar repasse inicial.');
                 }
-
+                req.session.usuario.valorMensalComTaxa = valorMensalComTaxa;
                 return res.redirect('/home_fornecedor');
+                
             });
         });
     });

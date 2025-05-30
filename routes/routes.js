@@ -27,7 +27,7 @@ router.get('/cadastro_usuario', (req, res) => res.render('cadastro_usuario'));
 router.get('/termos', (req, res) => res.render('termos'));
 router.get('/cookies', (req, res) => res.render('cookies'));
 // router.get('/dash', usuarioController.getDashboard); //router.get('/dash', (req, res) => res.render('dash'));
-
+ 
 
 // Processamento - Usuário
 router.post('/cadastro', usuarioController.cadastrarUsuario);
@@ -40,7 +40,7 @@ router.post('/salvar_kwh', usuarioController.salvarKwh);
 router.post('/confirmar_pagamento', usuarioController.confirmarPagamentoCliente);
 router.post('/dash', usuarioController.getDashboard);
 router.post('/rescindir_contrato_cliente', usuarioController.rescindirContratoCliente);
-
+router.post('/receber_fornecedor', usuarioController.recebimentoFornecedor);
 
 
 
@@ -175,6 +175,7 @@ router.get('/home_consumidor', (req, res) => {
           status: contratoCliente.status,
           faturas: faturasLimpo
         });
+        console.log('Valor Modal:', exibirModalRescisao);
       });
     });
   } else {
@@ -244,15 +245,15 @@ router.get('/home_fornecedor', (req, res) => {
         data_assinatura: contrato.data_assinatura,
         dataFinal: contrato.data_final,
         prazoContrato: contrato.prazo_contrato,
+        exibirModalRescisao: !req.session.usuario.data_rescisao,
         estado_fazenda: contrato.estado_fazenda,
         kwh_total: kwh_total.toLocaleString('pt-BR', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         }),
-        repasse: contrato.valor_mensal_com_taxa || '0.00',
         flag: contrato.flag_fornecedor,
       repasse: req.session.usuario.valorMensalComTaxa,
-        contratos: todosContratos,
+        contratos: todosContratos
       });
     });
   });

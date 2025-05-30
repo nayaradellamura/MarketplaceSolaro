@@ -277,6 +277,8 @@
   <!-- Seção de Contrato Ativo -->
   {{#if flag}}
 
+{{#if !exibirModalRescisao}}
+
   <!-- Modal de Receber Pagamento -->
   <section class="container my-5">
     <div class="card border-start border-4 shadow-sm p-4 oferta-card">
@@ -292,36 +294,38 @@
     </div>
   </section>
 
+{{/if}}
 
-  <div class="modal fade" id="modalReceberPagamento" tabindex="-1" aria-labelledby="modalReceberPagamentoLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content border-start border-4 shadow-sm" style="border-left-color: var(--primary-color);">
-        <div class="modal-header text-white" style="background-color: var(--primary-color);">
-          <h5 class="modal-title" id="modalReceberPagamentoLabel">Receber Pagamento</h5>
-        </div>
-        <div class="modal-body">
+  <!-- Modal para Receber Pagamento -->
+<div class="modal fade" id="modalReceberPagamento" tabindex="-1" aria-labelledby="modalReceberPagamentoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content border-start border-4 shadow-sm" style="border-left-color: var(--primary-color);">
+      <div class="modal-header text-white" style="background-color: var(--primary-color);">
+        <h5 class="modal-title" id="modalReceberPagamentoLabel">Receber Pagamento</h5>
+      </div>
+      <div class="modal-body">
+        <form action="/receber_fornecedor" method="POST">
           <div class="mb-3">
             <label for="fornecedor" class="form-label">Fornecedor</label>
             <p class="form-control">{{nomeFornecedor}}</p>
           </div>
           <div class="mb-3">
             <label for="valor" class="form-label">Valor</label>
-            <input type="text" class="form-control" id="valor" placeholder="R$ {{repasse}}" disabled>
+            <input type="text" class="form-control" id="valor" name="valor" placeholder="R$ {{repasse}}" disabled>
           </div>
           <div class="mb-3">
             <label for="data" class="form-label">Data</label>
-            <input type="date" class="form-control" id="data">
+            <input type="date" class="form-control" id="data" name="data" required>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn text-white" style="background-color: var(--primary-color);"
-            onclick="gerarRecibo()">Receber e Gerar Recibo</button>
-        </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn text-white" style="background-color: var(--primary-color);" onclick="gerarRecibo()">Receber e Gerar Recibo</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
 
   <section class="container my-5">
     <div class="card border-start border-4 shadow-sm p-4 oferta-card">
