@@ -175,7 +175,6 @@ router.get('/home_consumidor', (req, res) => {
           status: contratoCliente.status,
           faturas: faturasLimpo
         });
-        console.log('Valor Modal:', exibirModalRescisao);
       });
     });
   } else {

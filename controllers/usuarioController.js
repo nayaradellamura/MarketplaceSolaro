@@ -766,7 +766,7 @@ exports.processaSimulacao = (req, res) => {
 
     
     res.render('home_fornecedor', {
-        //...req.session.usuario,
+        ...req.session.usuario,
         resultado_calculado
     });
     // });
