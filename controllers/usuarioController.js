@@ -146,7 +146,7 @@ exports.loginUsuario = async (req, res) => {
 
                         req.session.usuario = {
                             ...req.session.usuario,
-                            id: contrato.id,
+                            contrato_id: contrato.id,
                             usuario_id: contrato.usuario_id,
                             data_assinatura: formatarData(contrato.data_assinatura),
                             dataFinal: formatarData(contrato.dataFinal),

@@ -191,6 +191,8 @@ router.get('/home_fornecedor', (req, res) => {
 
   const usuario_id = req.session.usuario.id;
 
+  console.log('ID Usuário:', usuario_id);
+
   const contratoAtivoQuery = `
     SELECT * FROM contratos_fornecedores
     WHERE usuario_id = ? AND status = 'AT'
@@ -201,7 +203,6 @@ router.get('/home_fornecedor', (req, res) => {
   const todosContratosQuery = `
     SELECT * FROM contratos_fornecedores
     WHERE usuario_id = ?
-    ORDER BY data_assinatura DESC
   `;
 
   db.query(contratoAtivoQuery, [usuario_id], (err, ativoResults) => {
