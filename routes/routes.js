@@ -251,6 +251,7 @@ router.get('/home_fornecedor', (req, res) => {
         }),
         repasse: contrato.valor_mensal_com_taxa || '0.00',
         flag: contrato.flag_fornecedor,
+      repasse: req.session.usuario.valorMensalComTaxa,
         contratos: todosContratos,
       });
     });

@@ -113,79 +113,140 @@ exports.loginUsuario = async (req, res) => {
 
             if (usuario.tipo === 'C') {
                 return res.json({ sucesso: true, redirect: '/home_consumidor' });
-            } else if (usuario.tipo === 'F') {
+            }
+
+            // TIPO FORNECEDOR
+            if (usuario.tipo === 'F') {
                 const contratoSQL = `
                     SELECT 
-                        c.id AS id,
-                        c.usuario_id,
-                        DATE_FORMAT(c.data_assinatura, '%d/%m/%Y') AS data_assinatura, 
-                        DATE_FORMAT(c.data_final, '%d/%m/%Y') AS dataFinal, 
-                        c.prazo_contrato,
-                        c.estado_fazenda, 
-                        c.preco_kwh, 
-                        c.geracao_kwh,
-                        t.taxa,
-                        c.status,
-                        c.flag_fornecedor
+                        id,
+                        usuario_id,
+                        DATE_FORMAT(data_assinatura, '%d/%m/%Y') AS data_assinatura, 
+                        DATE_FORMAT(data_final, '%d/%m/%Y') AS dataFinal, 
+                        prazo_contrato,
+                        estado_fazenda, 
+                        preco_kwh, 
+                        geracao_kwh,
+                        status,
+                        flag_fornecedor
                     FROM 
-                        contratos_fornecedores c
-                    JOIN 
-                        taxa_estaduais t ON c.estado_fazenda = t.estado
+                        contratos_fornecedores
                     WHERE 
-                        c.usuario_id = ? AND c.status = 'AT' AND c.flag_fornecedor = 1
+                        usuario_id = ? AND status = 'AT' AND flag_fornecedor = 1
                     ORDER BY 
-                        c.id DESC
-                    LIMIT 1;
+                        id DESC LIMIT 1;
                 `;
 
                 db.query(contratoSQL, [usuario.id], (errContrato, resultadosContrato) => {
                     if (errContrato) return res.status(500).json({ erro: 'Erro ao buscar contrato.' });
 
-                    if (resultadosContrato.length > 0) {
-                        const contrato = resultadosContrato[0];
-
-                        req.session.usuario = {
-                            ...req.session.usuario,
-                            contrato_id: contrato.id,
-                            usuario_id: contrato.usuario_id,
-                            data_assinatura: formatarData(contrato.data_assinatura),
-                            dataFinal: formatarData(contrato.dataFinal),
-                            prazoContrato: contrato.prazo_contrato,
-                            estado_fazenda: contrato.estado_fazenda,
-                            preco_kwh: contrato.preco_kwh,
-                            status: contrato.status,
-                            geracao_kwh: contrato.geracao_kwh.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                            taxa: contrato.taxa,
-                            flag_fornecedor: contrato.flag_fornecedor
-                        };
-
-                        const taxaEstadual = contrato.taxa / 100;
-                        const precoComTaxa = contrato.preco_kwh * (1 + taxaEstadual);
-                        const valorBase = precoComTaxa * contrato.geracao_kwh;
-
-                        let taxaMensal = 0;
-                        switch (contrato.prazo_contrato) {
-                            case 3: taxaMensal = 0.075; break;
-                            case 6: taxaMensal = 0.05; break;
-                            case 12: taxaMensal = 0.025; break;
-                            default: taxaMensal = 0;
-                        }
-
-                        const valorMensalComTaxa = valorBase * (1 + taxaMensal);
-                        req.session.usuario.valorMensalComTaxa = valorMensalComTaxa.toFixed(2);
+                    if (resultadosContrato.length === 0) {
+                        return res.json({ sucesso: true, redirect: '/home_fornecedor' });
                     }
 
-                    return res.json({ sucesso: true, redirect: '/home_fornecedor' });
+                    const contrato = resultadosContrato[0];
+
+                    req.session.usuario = {
+                        ...req.session.usuario,
+                        contrato_id: contrato.id,
+                        usuario_id: contrato.usuario_id,
+                        data_assinatura: formatarData(contrato.data_assinatura),
+                        dataFinal: formatarData(contrato.dataFinal),
+                        prazoContrato: contrato.prazo_contrato,
+                        estado_fazenda: contrato.estado_fazenda,
+                        preco_kwh: contrato.preco_kwh,
+                        status: contrato.status,
+                        geracao_kwh: contrato.geracao_kwh.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }),
+                        flag_fornecedor: contrato.flag_fornecedor
+                    };
+
+                    const valorBase = contrato.preco_kwh * contrato.geracao_kwh;
+                    let taxaMensal = 0;
+
+                    switch (contrato.prazo_contrato) {
+                        case 3: taxaMensal = 0.075; break;
+                        case 6: taxaMensal = 0.05; break;
+                        case 12: taxaMensal = 0.025; break;
+                    }
+
+                    const valorMensalComTaxa = parseFloat((valorBase * (1 + taxaMensal)).toFixed(2));
+                    req.session.usuario.valorMensalComTaxa = valorMensalComTaxa;
+
+                    const verificaRepasseSQL = `
+                        SELECT * FROM recebimento_fornecedor 
+                        WHERE id_contrato = ? 
+                        ORDER BY dh_inclusao DESC 
+                        LIMIT 1;
+                    `;
+
+                    db.query(verificaRepasseSQL, [contrato.id], (errRepasse, resultadosRepasse) => {
+                        if (errRepasse) {
+                            console.error("Erro ao verificar repasse:", errRepasse);
+                            return res.status(500).json({ erro: 'Erro ao verificar repasse.' });
+                        }
+
+                        const hoje = new Date();
+                        const mesAtual = hoje.getMonth();
+                        const anoAtual = hoje.getFullYear();
+                        let deveInserir = false;
+
+                        if (resultadosRepasse.length === 0) {
+                            deveInserir = true;
+                        } else {
+                            const ultimaData = new Date(resultadosRepasse[0].dh_inclusao);
+                            if (
+                                ultimaData.getMonth() !== mesAtual ||
+                                ultimaData.getFullYear() !== anoAtual
+                            ) {
+                                deveInserir = true;
+                            }
+                        }
+
+                        if (deveInserir) {
+                            const valorMensal = valorMensalComTaxa;
+                            const taxaAdm = parseFloat((taxaMensal * valorMensal).toFixed(2));
+                            const valorRepasse = parseFloat((valorMensal - taxaAdm).toFixed(2));
+
+                            const insertRepasseSQL = `
+                                INSERT INTO recebimento_fornecedor
+                                (id_contrato, id_fornecedor, valor_repasse, data_repasse, taxa_administrativa)
+                                VALUES (?, ?, ?, CURDATE(), ?);
+                            `;
+
+                            db.query(insertRepasseSQL, [
+                                contrato.id,
+                                contrato.usuario_id,
+                                valorRepasse,
+                                taxaAdm
+                            ], (errInsert) => {
+                                if (errInsert) {
+                                    console.error("Erro ao inserir repasse:", errInsert);
+                                    return res.status(500).json({ erro: 'Erro ao inserir repasse.' });
+                                }
+
+                                return res.json({ sucesso: true, redirect: '/home_fornecedor' });
+                            });
+
+                        } else {
+                            return res.json({ sucesso: true, redirect: '/home_fornecedor' });
+                        }
+                    });
                 });
             } else {
                 return res.json({ sucesso: true, redirect: '/' });
             }
         });
-    } catch (error) {
-        console.error("Erro no login:", error);
-        res.status(500).json({ erro: 'Erro interno.' });
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({ erro: 'Erro inesperado no login.' });
     }
 };
+
+
+
 
 // CADASTRAR CONTRATO FORNECEDOR
 exports.cadastrarContrato = (req, res) => {
@@ -215,25 +276,54 @@ exports.cadastrarContrato = (req, res) => {
 
     const sqlInsereEstoque = `
         UPDATE estoque_kwh_estado SET kwh_disponivel = kwh_disponivel + ? 
-         WHERE estado = ?
+        WHERE estado = ?
     `;
 
-    db.query(sqlInsereEstoque, [geracao_kwh, estado_fazenda], (err2) => {
-        if (err2) {
-            console.error('Erro ao cadastrar contrato:', err2);
+    db.query(sqlInsereEstoque, [geracao_kwh, estado_fazenda], (errEstoque) => {
+        if (errEstoque) {
+            console.error('Erro ao atualizar estoque:', errEstoque);
             return res.status(500).send('Erro ao cadastrar contrato.');
         }
 
-        db.query(sqlContrato, [usuario_id, meses, meses, estado_fazenda, preco_kwh, geracao_kwh], (err2) => {
-            if (err2) {
-                console.error('Erro ao cadastrar contrato:', err2);
+        db.query(sqlContrato, [usuario_id, meses, meses, estado_fazenda, preco_kwh, geracao_kwh], (errContrato, resultadoContrato) => {
+            if (errContrato) {
+                console.error('Erro ao cadastrar contrato:', errContrato);
                 return res.status(500).send('Erro ao cadastrar contrato.');
             }
 
-            return res.redirect('/home_fornecedor');
+            const contratoId = resultadoContrato.insertId;
+
+            const valorBase = preco_kwh * geracao_kwh;
+
+            let taxaMensal = 0;
+            switch (meses) {
+                case 3: taxaMensal = 0.075; break;
+                case 6: taxaMensal = 0.05; break;
+                case 12: taxaMensal = 0.025; break;
+            }
+
+            const valorMensal = parseFloat((valorBase * (1 + taxaMensal)).toFixed(2));
+            const taxaAdm = parseFloat((taxaMensal * valorMensal).toFixed(2));
+            const valorRepasse = parseFloat((valorMensal - taxaAdm).toFixed(2));
+
+            const insertRepasseSQL = `
+                INSERT INTO recebimento_fornecedor
+                (id_contrato, id_fornecedor, valor_repasse, data_repasse, taxa_administrativa)
+                VALUES (?, ?, ?, CURDATE(), ?)
+            `;
+
+            db.query(insertRepasseSQL, [contratoId, usuario_id, valorRepasse, taxaAdm], (errRepasse) => {
+                if (errRepasse) {
+                    console.error('Erro ao inserir primeiro repasse:', errRepasse);
+                    return res.status(500).send('Erro ao registrar repasse inicial.');
+                }
+
+                return res.redirect('/home_fornecedor');
+            });
         });
     });
 };
+
 
 
 exports.cadastrarContratoCliente = (req, res) => {
@@ -371,7 +461,7 @@ exports.cadastrarContratoCliente = (req, res) => {
 
                                 const valorFaturaComDesconto = parseFloat((consumoMedio * precoFinalKwh).toFixed(2));
                                 const hoje = new Date();
-                        //    const primeiroDiaProximoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
+                                //    const primeiroDiaProximoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
                                 const dataPagamento = hoje.toISOString().split('T')[0];
 
                                 const sqlPagamento = `
@@ -630,44 +720,42 @@ exports.processaSimulacao = (req, res) => {
 
     //    const taxaEstadual = resultadosTaxa[0].taxa / 100;
     //    const precoComTaxa = preco_kwh_sim * (1 + taxaEstadual);
-        const valorBase = geracao_kwh_sim;
+  
+    const valorBase = preco_kwh_sim * geracao_kwh_sim;
 
-        let taxaMensal = 0;
-        switch (parseInt(prazo_contrato_sim)) {
-            case 3: taxaMensal = 0.075; break;
-            case 6: taxaMensal = 0.05; break;
-            case 12: taxaMensal = 0.025; break;
-        }
+    let taxaMensal = 0;
+    switch (parseInt(prazo_contrato_sim)) {
+        case 3: taxaMensal = 0.075; break;
+        case 6: taxaMensal = 0.05; break;
+        case 12: taxaMensal = 0.025; break;
+    }
 
-        const valorMensalComTaxa = valorBase * (1 + taxaMensal);
-        const resultado_calculado = valorMensalComTaxa.toFixed(2);
+    const valorMensalComTaxa = parseFloat((valorBase * (1 + taxaMensal)).toFixed(2));
+    resultado_calculado = valorMensalComTaxa;
 
-        if (req.session.usuario) {
-            req.session.usuario.resultado_calculado = resultado_calculado;
-        }
 
-        res.render('home_fornecedor', {
-            ...req.session.usuario,
-            resultado_calculado
-        });
-   // });
+    
+    res.render('home_fornecedor', {
+        //...req.session.usuario,
+        resultado_calculado
+    });
+    // });
 };
 
-    exports.rescindirContrato = (req, res) => {
-        if (!req.session.usuario) {
-            return res.status(401).send('Usuário não autenticado.');
-        }
+exports.rescindirContrato = (req, res) => {
+    if (!req.session.usuario) {
+        return res.status(401).send('Usuário não autenticado.');
+    }
 
-        const usuario_id = req.session.usuario.id;
-        const dataRescisao = new Date();
-        const estadoFornecedor = req.session.usuario.estado_fazenda;
-        const geracaoKwh = req.session.usuario.geracao_kwh;
-        const kwhFormatado = parseFloat(
-            geracaoKwh.replace('.', '').replace(',', '.')
-        );
+    const usuario_id = req.session.usuario.id;
+    const dataRescisao = new Date();
+    const geracaoKwh = req.session.usuario.geracao_kwh;
+    const kwhFormatado = parseFloat(
+        geracaoKwh.replace('.', '').replace(',', '.')
+    ) * -1;
 
 
-        const sqlUpdate = `
+    const sqlUpdate = `
         UPDATE contratos_fornecedores
         SET 
             data_rescisao = ?, 
@@ -676,38 +764,38 @@ exports.processaSimulacao = (req, res) => {
         WHERE usuario_id = ? AND status = 'AT'
     `;
 
-        const sqlRemoveEstoque = `
+    const sqlRemoveEstoque = `
         UPDATE estoque_kwh_estado 
-            SET kwh_disponivel = kwh_disponivel - ? 
+            SET kwh_disponivel = kwh_disponivel + ? 
             WHERE id = ?
     `;
 
-        db.query(sqlRemoveEstoque, [kwhFormatado, usuario_id], (err2) => {
-            if (err2) {
-                console.error('Erro ao cadastrar contrato:', err2);
-                return res.status(500).send('Erro ao cadastrar contrato.');
-            };
-        });
+    db.query(sqlRemoveEstoque, [kwhFormatado, usuario_id], (err2) => {
+        if (err2) {
+            console.error('Erro ao cadastrar contrato:', err2);
+            return res.status(500).send('Erro ao cadastrar contrato.');
+        };
+    });
 
-        db.query(sqlUpdate, [dataRescisao, usuario_id], (err, result) => {
-            if (err) return res.status(500).send('Erro ao rescindir contrato.');
-            if (result.affectedRows === 0) return res.status(404).send('Nenhum contrato ativo encontrado para rescindir.');
-            flagRescisao = 1;
-            return res.json({ success: true, message: "Contrato rescindido com sucesso." });
-        });
-    };
+    db.query(sqlUpdate, [dataRescisao, usuario_id], (err, result) => {
+        if (err) return res.status(500).send('Erro ao rescindir contrato.');
+        if (result.affectedRows === 0) return res.status(404).send('Nenhum contrato ativo encontrado para rescindir.');
+        flagRescisao = 1;
+        return res.json({ success: true, message: "Contrato rescindido com sucesso." });
+    });
+};
 
 
-    function formatarData(data) {
-        if (!data) return '';
-        const d = new Date(data);
-        return d.toLocaleDateString('pt-BR');
-    }
+function formatarData(data) {
+    if (!data) return '';
+    const d = new Date(data);
+    return d.toLocaleDateString('pt-BR');
+}
 
-    exports.carregarContratosUsuario = (req, res) => {
-        const userId = req.session.userId;
+exports.carregarContratosUsuario = (req, res) => {
+    const userId = req.session.userId;
 
-        const query = `
+    const query = `
     SELECT 
       data_assinatura, 
       data_final, 
@@ -721,51 +809,51 @@ exports.processaSimulacao = (req, res) => {
     WHERE usuario_id = ?
   `;
 
-        db.query(query, [userId], (err, resultados) => {
-            if (err) {
-                console.error('Erro ao buscar contratos:', err);
-                return res.status(500).send('Erro no servidor');
-            }
-
-            const contratosFormatados = resultados.map(contrato => {
-                const status = contrato.status?.trim();
-                const dataFinalOuRescisao = status === 'RE' ? contrato.data_rescisao : contrato.data_final;
-
-                return {
-                    ...contrato,
-                    data_assinatura: formatarData(contrato.data_assinatura),
-                    data_final: formatarData(dataFinalOuRescisao),
-                    status: status,
-                    status_legivel: status === 'AT' ? 'Ativo' : 'Inativo'
-                };
-            });
-
-            res.render('home_fornecedor', { contratos: contratosFormatados });
-        });
-    };
-
-
-    exports.carregaFaturaCliente = (req, res) => {
-        if (!req.session || !req.session.usuario) {
-            return res.status(401).send('Usuário não autenticado.');
+    db.query(query, [userId], (err, resultados) => {
+        if (err) {
+            console.error('Erro ao buscar contratos:', err);
+            return res.status(500).send('Erro no servidor');
         }
 
-        const userId = req.session.usuario.id;
+        const contratosFormatados = resultados.map(contrato => {
+            const status = contrato.status?.trim();
+            const dataFinalOuRescisao = status === 'RE' ? contrato.data_rescisao : contrato.data_final;
 
-        const sqlContrato = `
+            return {
+                ...contrato,
+                data_assinatura: formatarData(contrato.data_assinatura),
+                data_final: formatarData(dataFinalOuRescisao),
+                status: status,
+                status_legivel: status === 'AT' ? 'Ativo' : 'Inativo'
+            };
+        });
+
+        res.render('home_fornecedor', { contratos: contratosFormatados });
+    });
+};
+
+
+exports.carregaFaturaCliente = (req, res) => {
+    if (!req.session || !req.session.usuario) {
+        return res.status(401).send('Usuário não autenticado.');
+    }
+
+    const userId = req.session.usuario.id;
+
+    const sqlContrato = `
         SELECT id FROM contratos_clientes
         WHERE usuario_id = ?
         ORDER BY id DESC
         LIMIT 1
     `;
 
-        db.query(sqlContrato, [userId], (errContrato, resultContrato) => {
-            if (errContrato) return res.status(500).send('Erro ao buscar contrato.');
-            if (resultContrato.length === 0) return res.status(404).send('Contrato não encontrado.');
+    db.query(sqlContrato, [userId], (errContrato, resultContrato) => {
+        if (errContrato) return res.status(500).send('Erro ao buscar contrato.');
+        if (resultContrato.length === 0) return res.status(404).send('Contrato não encontrado.');
 
-            const contratoId = resultContrato[0].id;
+        const contratoId = resultContrato[0].id;
 
-            const sqlPagamentos = `
+        const sqlPagamentos = `
             SELECT data_pagamento, valor_total, status_pagamento
             FROM pagamento_cliente
             WHERE id_contrato = ?
@@ -773,39 +861,39 @@ exports.processaSimulacao = (req, res) => {
             LIMIT 6
         `;
 
-            db.query(sqlPagamentos, [contratoId], (errPagamentos, resultPagamentos) => {
-                if (errPagamentos) return res.status(500).send('Erro ao buscar faturas.');
+        db.query(sqlPagamentos, [contratoId], (errPagamentos, resultPagamentos) => {
+            if (errPagamentos) return res.status(500).send('Erro ao buscar faturas.');
 
-                // Formata os dados
-                const faturas = resultPagamentos.map(pag => {
-                    const data = moment(pag.data_pagamento);
-                    return {
-                        mes: data.format('MMM/YYYY'), // Ex: Mai/2025
-                        kwh: pag.valor_total > 0 ? (pag.valor_total / 0.5).toFixed(2) : '--', // supondo valor médio de R$0.50/kWh
-                        valor: pag.valor_total > 0 ? `R$ ${pag.valor_total.toFixed(2)}` : '--',
-                        status: pag.status_pagamento === 'P' ? 'Faturado' : 'Aguardando Lançamento',
-                        statusClass: pag.status_pagamento === 'P' ? 'success' : 'warning'
-                    };
-                });
-
-                return res.json({ success: true, message: "Contrato rescindido com sucesso." });
-
+            // Formata os dados
+            const faturas = resultPagamentos.map(pag => {
+                const data = moment(pag.data_pagamento);
+                return {
+                    mes: data.format('MMM/YYYY'), // Ex: Mai/2025
+                    kwh: pag.valor_total > 0 ? (pag.valor_total / 0.5).toFixed(2) : '--', // supondo valor médio de R$0.50/kWh
+                    valor: pag.valor_total > 0 ? `R$ ${pag.valor_total.toFixed(2)}` : '--',
+                    status: pag.status_pagamento === 'P' ? 'Faturado' : 'Aguardando Lançamento',
+                    statusClass: pag.status_pagamento === 'P' ? 'success' : 'warning'
+                };
             });
+
+            return res.json({ success: true, message: "Contrato rescindido com sucesso." });
+
         });
-    };
+    });
+};
 
 
-    exports.confirmarPagamento = async (req, res) => {
-        const { id_fatura, metodo } = req.body;
+exports.confirmarPagamento = async (req, res) => {
+    const { id_fatura, metodo } = req.body;
 
-        if (!id_fatura || !metodo) {
-            return res.status(400).send('Dados incompletos');
-        }
+    if (!id_fatura || !metodo) {
+        return res.status(400).send('Dados incompletos');
+    }
 
-        try {
-            const dataPagamento = new Date().toISOString().split('T')[0];
+    try {
+        const dataPagamento = new Date().toISOString().split('T')[0];
 
-            await db.query(`
+        await db.query(`
       UPDATE pagamento_cliente
       SET status = 'PAGO',
           data_pagamento = ?,
@@ -813,27 +901,27 @@ exports.processaSimulacao = (req, res) => {
       WHERE id_pagamento_cliente = ?
     `, [dataPagamento, metodo, id_fatura]);
 
-            res.redirect('/pagina_faturas'); // ajuste o redirecionamento conforme necessário
-        } catch (err) {
-            console.error('Erro ao confirmar pagamento:', err);
-            res.status(500).send('Erro no servidor');
-        }
-    };
+        res.redirect('/pagina_faturas'); // ajuste o redirecionamento conforme necessário
+    } catch (err) {
+        console.error('Erro ao confirmar pagamento:', err);
+        res.status(500).send('Erro no servidor');
+    }
+};
 
-    exports.confirmarPagamentoCliente = async (req, res) => {
+exports.confirmarPagamentoCliente = async (req, res) => {
 
-        console.log('Dados recebidos:', req.body);
+    console.log('Dados recebidos:', req.body);
 
-        const { id_fatura, metodo } = req.body;
+    const { id_fatura, metodo } = req.body;
 
-        if (!id_fatura || !metodo) {
-            return res.status(400).send('Dados incompletos');
-        }
+    if (!id_fatura || !metodo) {
+        return res.status(400).send('Dados incompletos');
+    }
 
-        try {
-            const dataPagamento = new Date().toISOString().split('T')[0];
+    try {
+        const dataPagamento = new Date().toISOString().split('T')[0];
 
-            await db.query(`
+        await db.query(`
       UPDATE pagamento_cliente
       SET status_pagamento = 'PAGO',
           data_pagamento = ?,
@@ -841,176 +929,176 @@ exports.processaSimulacao = (req, res) => {
       WHERE id_pagamento = ?
     `, [dataPagamento, metodo, id_fatura]);
 
-            res.redirect('/home_consumidor'); // ajuste o redirecionamento conforme necessário
-        } catch (err) {
-            console.error('Erro ao confirmar pagamento:', err);
-            res.status(500).send('Erro no servidor');
-        }
-    };
+        res.redirect('/home_consumidor'); // ajuste o redirecionamento conforme necessário
+    } catch (err) {
+        console.error('Erro ao confirmar pagamento:', err);
+        res.status(500).send('Erro no servidor');
+    }
+};
 
-    exports.getDashboard = async (req, res) => {
-        const sqlFornecedores = `
+exports.getDashboard = async (req, res) => {
+    const sqlFornecedores = `
     SELECT COUNT(*) AS total FROM contratos_fornecedores WHERE status = ?
   `;
-        const dadosFornecedores = ['AT'];
+    const dadosFornecedores = ['AT'];
 
-        const sqlClientes = `
+    const sqlClientes = `
     SELECT COUNT(*) AS total FROM contratos_clientes WHERE status = ?
   `;
-        const dadosClientes = ['A'];
+    const dadosClientes = ['A'];
 
-        const sqlKwh = `
+    const sqlKwh = `
     SELECT estado, kwh_disponivel FROM estoque_kwh_estado
   `;
 
-        const sqlFornecedoresEstado = `
+    const sqlFornecedoresEstado = `
     SELECT estado_fazenda, COUNT(*) AS total 
     FROM contratos_fornecedores 
     WHERE status = ?
     GROUP BY estado_fazenda
   `;
-        const dadosFornecedoresEstado = ['AT'];
+    const dadosFornecedoresEstado = ['AT'];
 
-        const sqlClientesEstado = `
+    const sqlClientesEstado = `
     SELECT estado_cliente, COUNT(*) AS total 
     FROM contratos_clientes 
     WHERE status = ?
     GROUP BY estado_cliente
   `;
-        const dadosClientesEstado = ['A'];
+    const dadosClientesEstado = ['A'];
 
-        db.query(sqlFornecedores, dadosFornecedores, (err, fornecedoresResult) => {
+    db.query(sqlFornecedores, dadosFornecedores, (err, fornecedoresResult) => {
+        if (err) {
+            console.error("Erro ao buscar total fornecedores:", err);
+            return res.status(500).send("Erro ao buscar total fornecedores.");
+        }
+
+        db.query(sqlClientes, dadosClientes, (err, clientesResult) => {
             if (err) {
-                console.error("Erro ao buscar total fornecedores:", err);
-                return res.status(500).send("Erro ao buscar total fornecedores.");
+                console.error("Erro ao buscar total clientes:", err);
+                return res.status(500).send("Erro ao buscar total clientes.");
             }
 
-            db.query(sqlClientes, dadosClientes, (err, clientesResult) => {
+            db.query(sqlKwh, [], (err, kwhResult) => {
                 if (err) {
-                    console.error("Erro ao buscar total clientes:", err);
-                    return res.status(500).send("Erro ao buscar total clientes.");
+                    console.error("Erro ao buscar kWh disponíveis:", err);
+                    return res.status(500).send("Erro ao buscar kWh disponíveis.");
                 }
 
-                db.query(sqlKwh, [], (err, kwhResult) => {
+                db.query(sqlFornecedoresEstado, dadosFornecedoresEstado, (err, fornecedoresEstadoResult) => {
                     if (err) {
-                        console.error("Erro ao buscar kWh disponíveis:", err);
-                        return res.status(500).send("Erro ao buscar kWh disponíveis.");
+                        console.error("Erro ao buscar fornecedores por estado:", err);
+                        return res.status(500).send("Erro ao buscar fornecedores por estado.");
                     }
 
-                    db.query(sqlFornecedoresEstado, dadosFornecedoresEstado, (err, fornecedoresEstadoResult) => {
+                    db.query(sqlClientesEstado, dadosClientesEstado, (err, clientesEstadoResult) => {
                         if (err) {
-                            console.error("Erro ao buscar fornecedores por estado:", err);
-                            return res.status(500).send("Erro ao buscar fornecedores por estado.");
+                            console.error("Erro ao buscar consumidores por estado:", err);
+                            return res.status(500).send("Erro ao buscar consumidores por estado.");
                         }
-
-                        db.query(sqlClientesEstado, dadosClientesEstado, (err, clientesEstadoResult) => {
-                            if (err) {
-                                console.error("Erro ao buscar consumidores por estado:", err);
-                                return res.status(500).send("Erro ao buscar consumidores por estado.");
-                            }
-                            console.log("Fornecedores:", fornecedoresResult[0].total);
-                            console.log("Consumidores:", clientesResult[0].total);
-                            console.log("kwhPorEstado:", JSON.stringify(kwhResult));
-                            console.log("fornecedoresPorEstado:", JSON.stringify(fornecedoresEstadoResult));
-                            console.log("consumidoresPorEstado:", JSON.stringify(clientesEstadoResult));
+                        console.log("Fornecedores:", fornecedoresResult[0].total);
+                        console.log("Consumidores:", clientesResult[0].total);
+                        console.log("kwhPorEstado:", JSON.stringify(kwhResult));
+                        console.log("fornecedoresPorEstado:", JSON.stringify(fornecedoresEstadoResult));
+                        console.log("consumidoresPorEstado:", JSON.stringify(clientesEstadoResult));
 
 
-                            res.render('dash', {
-                                totalFornecedores: fornecedoresResult[0].total,
-                                totalClientes: clientesResult[0].total,
-                                kwhPorEstado: JSON.stringify(kwhResult),
-                                fornecedoresPorEstado: JSON.stringify(fornecedoresEstadoResult),
-                                consumidoresPorEstado: JSON.stringify(clientesEstadoResult)
-                            });
-
+                        res.render('dash', {
+                            totalFornecedores: fornecedoresResult[0].total,
+                            totalClientes: clientesResult[0].total,
+                            kwhPorEstado: JSON.stringify(kwhResult),
+                            fornecedoresPorEstado: JSON.stringify(fornecedoresEstadoResult),
+                            consumidoresPorEstado: JSON.stringify(clientesEstadoResult)
                         });
+
                     });
                 });
             });
         });
-    };
+    });
+};
 
-    exports.rescindirContratoCliente = (req, res) => {
+exports.rescindirContratoCliente = (req, res) => {
 
-        const idUsuario = req.session.usuario.id;
+    const idUsuario = req.session.usuario.id;
 
-        const sqlContrato = `
+    const sqlContrato = `
         SELECT id, consumo_medio_kwh, estado_cliente 
         FROM contratos_clientes 
         WHERE usuario_id = ? AND status = "A"
     `;
-        const dadosContrato = [idUsuario];
+    const dadosContrato = [idUsuario];
 
-        db.query(sqlContrato, dadosContrato, (err, contratoResult) => {
-            if (err) {
-                console.error("Erro ao buscar contrato do usuário:", err);
-                return res.status(500).json({ success: false, message: "Erro ao buscar contrato." });
-            }
+    db.query(sqlContrato, dadosContrato, (err, contratoResult) => {
+        if (err) {
+            console.error("Erro ao buscar contrato do usuário:", err);
+            return res.status(500).json({ success: false, message: "Erro ao buscar contrato." });
+        }
 
-            if (contratoResult.length === 0) {
-                return res.json({ success: false, message: "Contrato ativo não encontrado." });
-            }
+        if (contratoResult.length === 0) {
+            return res.json({ success: false, message: "Contrato ativo não encontrado." });
+        }
 
-            const contrato = contratoResult[0];
+        const contrato = contratoResult[0];
 
-            const sqlPendencias = `
+        const sqlPendencias = `
             SELECT id_pagamento 
             FROM pagamento_cliente 
             WHERE id_contrato = ? AND status_pagamento = "PEND"
         `;
-            const dadosPendencias = [contrato.id];
+        const dadosPendencias = [contrato.id];
 
-            db.query(sqlPendencias, dadosPendencias, (err, pendenciasResult) => {
-                if (err) {
-                    console.error("Erro ao verificar pendências:", err);
-                    return res.status(500).json({ success: false, message: "Erro ao verificar pendências." });
-                }
+        db.query(sqlPendencias, dadosPendencias, (err, pendenciasResult) => {
+            if (err) {
+                console.error("Erro ao verificar pendências:", err);
+                return res.status(500).json({ success: false, message: "Erro ao verificar pendências." });
+            }
 
-                if (pendenciasResult.length > 0) {
-                    return res.json({
-                        success: false,
-                        message: "Existem faturas em aberto. É necessário quitar os débitos para rescindir o contrato."
-                    });
-                }
+            if (pendenciasResult.length > 0) {
+                return res.json({
+                    success: false,
+                    message: "Existem faturas em aberto. É necessário quitar os débitos para rescindir o contrato."
+                });
+            }
 
-                const sqlAtualizaEstoque = `
+            const sqlAtualizaEstoque = `
                 UPDATE estoque_kwh_estado 
                 SET kwh_disponivel = kwh_disponivel + ? 
                 WHERE estado = ?
             `;
-                const dadosEstoque = [contrato.consumo_medio_kwh, contrato.estado_cliente];
+            const dadosEstoque = [contrato.consumo_medio_kwh, contrato.estado_cliente];
 
-                db.query(sqlAtualizaEstoque, dadosEstoque, (err) => {
-                    if (err) {
-                        console.error("Erro ao atualizar estoque:", err);
-                        return res.status(500).json({ success: false, message: "Erro ao atualizar estoque." });
-                    }
+            db.query(sqlAtualizaEstoque, dadosEstoque, (err) => {
+                if (err) {
+                    console.error("Erro ao atualizar estoque:", err);
+                    return res.status(500).json({ success: false, message: "Erro ao atualizar estoque." });
+                }
 
-                    const sqlUpdateContrato = `
+                const sqlUpdateContrato = `
                     UPDATE contratos_clientes 
                     SET data_cancelamento = NOW(), flag_cliente = NULL, status = "C"
                     WHERE id = ?
                 `;
-                    const dadosUpdate = [contrato.id];
+                const dadosUpdate = [contrato.id];
 
-                    db.query(sqlUpdateContrato, dadosUpdate, (err) => {
-                        if (err) {
-                            console.error("Erro ao atualizar contrato:", err);
-                            return res.status(500).json({ success: false, message: "Erro ao cancelar contrato." });
-                        }
+                db.query(sqlUpdateContrato, dadosUpdate, (err) => {
+                    if (err) {
+                        console.error("Erro ao atualizar contrato:", err);
+                        return res.status(500).json({ success: false, message: "Erro ao cancelar contrato." });
+                    }
 
-                        return res.json({ success: true, message: "Contrato rescindido com sucesso." });
-                    });
+                    return res.json({ success: true, message: "Contrato rescindido com sucesso." });
                 });
             });
         });
-    };
+    });
+};
 
 
 
 
 
-    function formatarData(data) {
-        const d = new Date(data);
-        return d.toLocaleDateString('pt-BR');
-    }
+function formatarData(data) {
+    const d = new Date(data);
+    return d.toLocaleDateString('pt-BR');
+}
