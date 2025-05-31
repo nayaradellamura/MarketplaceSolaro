@@ -23,13 +23,13 @@
         <div class="col-md-6">
           <div class="card shadow-sm p-4 card-dashboard">
             <h5 class="text-warning">Preço do kWh</h5>
-            <p class="display-6 fw-bold">R$ {{preco_kwh}}</p>
+            <p class="display-6 fw-bold">R$ {{formatarBR preco_kwh}}</p>
           </div>
         </div>
         <div class="col-md-6">
           <div class="card shadow-sm p-4 card-dashboard">
             <h5 class="text-warning">Geração por Hora</h5>
-            <p class="display-6 fw-bold">{{geracao_kwh}} KWh</p>
+            <p class="display-6 fw-bold">{{formatarBR geracao_kwh}} KWh</p>
           </div>
         </div>
         <div class="col-md-6">
@@ -41,7 +41,7 @@
         <div class="col-md-6">
           <div class="card shadow-sm p-4 card-dashboard border-danger">
             <h5 class="text-danger">A Receber</h5>
-            <p class="display-6 fw-bold">R$ {{repasse}}</p>
+            <p class="display-6 fw-bold">R$ {{formatarBR repasse}}</p>
           </div>
         </div>
       </div>
@@ -51,7 +51,7 @@
       <section class="my-5 border-simulador">
         <h4 class="mb-4 text-center">Simule sua Oferta</h4>
 
-        <form id="simuladorForm" method="POST" action="/Simular-Contrato">
+        <form id="simuladorForm">
           <div class="row g-3">
             <div class="col-md-6">
               <label for="preco_kwh_sim" class="form-label">Preço do kWh (R$)</label>
@@ -105,21 +105,18 @@
                 <option value="SP">São Paulo (SP)</option>
                 <option value="SE">Sergipe (SE)</option>
                 <option value="TO">Tocantins (TO)</option>
-                {{#each estados}}
-                <option value="{{this.sigla}}">{{this.nome}} ({{this.sigla}})</option>
-                {{/each}}
               </select>
             </div>
 
             <div class="col-md-12">
               <label for="resultado_calculado" class="form-label">Valor Mensal com Taxa</label>
               <input type="text" class="form-control bg-light" id="resultado_calculado" name="resultado_calculado"
-                value="{{resultado_calculado}}" readonly>
+                readonly>
             </div>
           </div>
 
           <div class="d-flex justify-content-center mt-4">
-            <button type="submit" class="btn btn-primary px-4 py-2">
+            <button type="button" class="btn btn-primary px-4 py-2" id="btnSimular">
               <i class="bi bi-calculator-fill me-2"></i>Simular Oferta
             </button>
           </div>
@@ -127,6 +124,36 @@
       </section>
     </div>
 
+    <script>
+      document.getElementById('btnSimular').addEventListener('click', function () {
+        const precoKwh = parseFloat(document.getElementById('preco_kwh_sim').value);
+        const geracaoKwh = parseFloat(document.getElementById('geracao_kwh_sim').value);
+        const prazoContrato = parseInt(document.querySelector('select[name="prazo_contrato_sim"]').value);
+        const estado = document.getElementById('estado_fazenda_sim').value;
+
+        if (isNaN(precoKwh) || isNaN(geracaoKwh) || isNaN(prazoContrato) || !estado) {
+          alert('Por favor, preencha todos os campos corretamente.');
+          return;
+        }
+
+        const valorBase = precoKwh * geracaoKwh;
+
+        let taxaMensal = 0;
+        switch (prazoContrato) {
+          case 3: taxaMensal = 0.075; break;
+          case 6: taxaMensal = 0.05; break;
+          case 12: taxaMensal = 0.025; break;
+          default:
+            alert('Prazo de contrato inválido.');
+            return;
+        }
+
+        const valorMensalComTaxa = (valorBase * (1 + taxaMensal)).toFixed(2);
+
+
+        document.getElementById('resultado_calculado').value = `R$ ${valorMensalComTaxa}`;
+      });
+    </script>
 
     <script>
       function calcularVenda() {
@@ -277,7 +304,7 @@
   <!-- Seção de Contrato Ativo -->
   {{#if flag}}
 
-{{#if exibirModalRescisao}}
+  {{#if exibirModalRescisao}}
 
   <!-- Modal de Receber Pagamento -->
   <section class="container my-5">
@@ -294,38 +321,43 @@
     </div>
   </section>
 
-{{/if}}
+  {{/if}}
 
   <!-- Modal para Receber Pagamento -->
-<div class="modal fade" id="modalReceberPagamento" tabindex="-1" aria-labelledby="modalReceberPagamentoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content border-start border-4 shadow-sm" style="border-left-color: var(--primary-color);">
-      <div class="modal-header text-white" style="background-color: var(--primary-color);">
-        <h5 class="modal-title" id="modalReceberPagamentoLabel">Receber Pagamento</h5>
-      </div>
-      <div class="modal-body">
-        <form action="/receber_fornecedor" method="POST">
-          <div class="mb-3">
-            <label for="fornecedor" class="form-label">Fornecedor</label>
-            <p class="form-control">{{nomeFornecedor}}</p>
-          </div>
-          <div class="mb-3">
-            <label for="valor" class="form-label">Valor</label>
-            <input type="text" class="form-control" id="valor" name="valor" placeholder="R$ {{repasse}}" disabled>
-          </div>
-          <div class="mb-3">
-            <label for="data" class="form-label">Data</label>
-            <input type="date" class="form-control" id="data" name="data" required>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn text-white" style="background-color: var(--primary-color);" onclick="gerarRecibo()">Receber e Gerar Recibo</button>
-          </div>
-        </form>
+  <div class="modal fade" id="modalReceberPagamento" tabindex="-1" aria-labelledby="modalReceberPagamentoLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content border-start border-4 shadow-sm" style="border-left-color: var(--primary-color);">
+        <div class="modal-header text-white" style="background-color: var(--primary-color);">
+          <h5 class="modal-title" id="modalReceberPagamentoLabel">Receber Pagamento</h5>
+        </div>
+        <div class="modal-body">
+          <form action="/receber_fornecedor" method="POST">
+            <div class="mb-3">
+              <label for="fornecedor" class="form-label">Fornecedor</label>
+              <input type="text" class="form-control" id="fornecedor" value="{{nomeFornecedor}}" readonly>
+            </div>
+            <div class="mb-3">
+              <label for="valor" class="form-label">Valor</label>
+              <input type="text" class="form-control" id="valor" name="valor" value="R$ {{formatarBR repasse}}"
+                readonly>
+            </div>
+            <div class="mb-3">
+              <label for="data" class="form-label">Data</label>
+              <input type="date" class="form-control" id="data" name="data" required>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn text-white" style="background-color: var(--primary-color);"
+                id="btnReceber">
+                Receber e Gerar Recibo
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <section class="container my-5">
     <div class="card border-start border-4 shadow-sm p-4 oferta-card">
@@ -375,10 +407,10 @@
             <dd class="col-sm-8">{{estado_fazenda}}</dd>
 
             <dt class="col-sm-4">Preço kWh</dt>
-            <dd class="col-sm-8">R$ {{preco_kwh}}</dd>
+            <dd class="col-sm-8">R$ {{formatarBR preco_kwh}}</dd>
 
             <dt class="col-sm-4">Geração por Hora</dt>
-            <dd class="col-sm-8">{{geracao_kwh}} kWh</dd>
+            <dd class="col-sm-8">{{formatarBR geracao_kwh}} kWh</dd>
 
             <dt class="col-sm-4">Prazo</dt>
             <dd class="col-sm-8">{{prazoContrato}} meses</dd>
@@ -432,7 +464,7 @@
     </div>
   </div> --}}
 
-    <!-- Histórico de Contratos -->
+  <!-- Histórico de Contratos -->
   <section class="container my-5">
     <div class="card border-start border-4 shadow-sm p-4 oferta-card">
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -476,8 +508,8 @@
                 <td>{{formatarData this.data_final}}</td>
                 <td>{{this.prazo_contrato}}</td>
                 <td>{{this.estado_fazenda}}</td>
-                <td>{{this.preco_kwh}}</td>
-                <td>{{this.geracao_kwh}} kWh</td>
+                <td>{{formatarBR this.preco_kwh}}</td>
+                <td>{{formatarBR this.geracao_kwh}} kWh</td>
                 <td>
                   {{#if (eq this.status "AT")}}
                   <span class="badge bg-success">Ativo</span>
@@ -618,8 +650,44 @@
   </script>
 
 
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+    document.getElementById('btnReceber').addEventListener('click', function (e) {
+      e.preventDefault(); // Impede envio imediato do form
+
+      const fornecedor = document.getElementById('fornecedor').value;
+      const valor = document.getElementById('valor').value;
+      const data = document.getElementById('data').value;
+
+      if (!data) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Data obrigatória',
+          text: 'Por favor, selecione a data do pagamento.'
+        });
+        return;
+      }
+
+      Swal.fire({
+        title: 'Confirmar Pagamento?',
+        html: `
+        <p><strong>Fornecedor:</strong> ${fornecedor}</p>
+        <p><strong>Valor:</strong> ${valor}</p>
+        <p><strong>Data:</strong> ${new Date(data).toLocaleDateString('pt-BR')}</p>
+      `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, receber!',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#198754'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          gerarRecibo(); // Função existente
+          document.querySelector('#modalReceberPagamento form').submit();
+        }
+      });
+    });
+
     function gerarRecibo() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
@@ -627,7 +695,6 @@
       const fornecedor = document.getElementById('fornecedor').value || 'Fornecedor não informado';
       const valor = document.getElementById('valor').value || 'Valor não informado';
       const data = document.getElementById('data').value || new Date().toISOString().split('T')[0];
-
       const dataFormatada = new Date(data).toLocaleDateString('pt-BR');
 
       doc.setFontSize(14);
@@ -640,12 +707,9 @@
       doc.text("Assinatura: ____________________________", 20, 90);
 
       doc.save("recibo.pdf");
-
-      // Fecha o modal
-      const modal = bootstrap.Modal.getInstance(document.getElementById('modalReceberPagamento'));
-      if (modal) modal.hide();
     }
   </script>
+
 
   <!-- Bootstrap JS e Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

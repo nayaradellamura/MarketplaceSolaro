@@ -44,6 +44,13 @@ hbs.registerHelper('json', function (context) {
   return JSON.stringify(context);
 });
 
+hbs.registerHelper('formatarBR', function (valor) {
+  if (typeof valor !== 'number') valor = parseFloat(valor);
+  return valor.toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+});
 
 
 app.listen(5000, () => {

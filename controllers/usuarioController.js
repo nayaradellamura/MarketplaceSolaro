@@ -1,6 +1,5 @@
 const db = require('../db/db');
 const bcrypt = require('bcryptjs');
-const Swal = require('sweetalert2');
 const moment = require('moment');
 
 
@@ -13,30 +12,24 @@ exports.cadastrarUsuario = async (req, res) => {
     } = req.body;
 
     try {
-        const verificarSQL = `
+        const verificarEmailSQL = `
             SELECT * FROM usuarios 
-            WHERE cpf_cnpj = ? OR email = ?
-        `;
+            WHERE email = ?
+            `;
 
-        db.query(verificarSQL, [cpf_cnpj, cadastroEmail], async (err, results) => {
+        db.query(verificarEmailSQL, [cadastroEmail], async (err, results) => {
             if (err) {
-                console.error("Erro ao verificar usuário:", err);
-                return res.status(500).send('Erro interno ao verificar usuário.');
+                console.error("Erro ao verificar email:", err);
+                return res.status(500).send('Erro interno ao verificar email.');
             }
 
             if (results.length > 0) {
-                const usuarioExistente = results[0];
-                const campoRepetido = usuarioExistente.cpf_cnpj === cpf_cnpj ? 'CPF/CNPJ' : 'Email';
-                const valorRepetido = usuarioExistente.cpf_cnpj === cpf_cnpj ? cpf_cnpj : cadastroEmail;
-
                 req.session.alertaCadastro = {
-                    campo: campoRepetido,
-                    valor: valorRepetido
+                    campo: 'Email',
+                    valor: cadastroEmail
                 };
-
                 return res.redirect('/form_cadastro');
             }
-
 
             // Continua cadastro normalmente
             const hashedSenha = await bcrypt.hash(cadastroSenha, 10);
@@ -83,7 +76,6 @@ exports.cadastrarUsuario = async (req, res) => {
         res.status(500).send('Erro ao processar cadastro.');
     }
 };
-
 
 // LOGIN DE USUÁRIO
 exports.loginUsuario = async (req, res) => {
@@ -162,7 +154,7 @@ exports.loginUsuario = async (req, res) => {
                         }),
                         flag_fornecedor: contrato.flag_fornecedor
                     };
-                    
+
                     const valorBase = contrato.preco_kwh * contrato.geracao_kwh;
                     let taxaMensal = 0;
 
@@ -228,7 +220,7 @@ exports.loginUsuario = async (req, res) => {
                                 }
 
                                 return res.json({ sucesso: true, redirect: '/home_fornecedor' });
-                                
+
                             });
 
                         } else {
@@ -346,9 +338,9 @@ exports.cadastrarContrato = (req, res) => {
                     console.error('Erro ao inserir primeiro repasse:', errRepasse);
                     return res.status(500).send('Erro ao registrar repasse inicial.');
                 }
-                req.session.usuario.valorMensalComTaxa = valorMensalComTaxa;
+                //   req.session.usuario.valorMensal = valorRepasse;
                 return res.redirect('/home_fornecedor');
-                
+
             });
         });
     });
@@ -737,40 +729,40 @@ exports.renderHomeFornecedor = (req, res) => {
     res.render('home_fornecedor', { resultado_calculado: null });
 };
 
-exports.processaSimulacao = (req, res) => {
-    const { preco_kwh_sim, geracao_kwh_sim, prazo_contrato_sim, estado_fazenda_sim } = req.body;
+// exports.processaSimulacao = (req, res) => {
+//     const { preco_kwh_sim, geracao_kwh_sim, prazo_contrato_sim, estado_fazenda_sim } = req.body;
 
-    // const taxaSQL = `
-    //     SELECT taxa FROM taxa_estaduais WHERE estado = ? LIMIT 1;
-    // `;
+//     // const taxaSQL = `
+//     //     SELECT taxa FROM taxa_estaduais WHERE estado = ? LIMIT 1;
+//     // `;
 
-    // db.query(taxaSQL, [estado_fazenda_sim], (err, resultadosTaxa) => {
-    //     if (err) return res.status(500).send('Erro interno no servidor.');
-    //     if (resultadosTaxa.length === 0) return res.status(400).send('Estado não encontrado.');
+//     // db.query(taxaSQL, [estado_fazenda_sim], (err, resultadosTaxa) => {
+//     //     if (err) return res.status(500).send('Erro interno no servidor.');
+//     //     if (resultadosTaxa.length === 0) return res.status(400).send('Estado não encontrado.');
 
-    //    const taxaEstadual = resultadosTaxa[0].taxa / 100;
-    //    const precoComTaxa = preco_kwh_sim * (1 + taxaEstadual);
-  
-    const valorBase = preco_kwh_sim * geracao_kwh_sim;
+//     //    const taxaEstadual = resultadosTaxa[0].taxa / 100;
+//     //    const precoComTaxa = preco_kwh_sim * (1 + taxaEstadual);
 
-    let taxaMensal = 0;
-    switch (parseInt(prazo_contrato_sim)) {
-        case 3: taxaMensal = 0.075; break;
-        case 6: taxaMensal = 0.05; break;
-        case 12: taxaMensal = 0.025; break;
-    }
+//     const valorBase = preco_kwh_sim * geracao_kwh_sim;
 
-    const valorMensalComTaxa = parseFloat((valorBase * (1 + taxaMensal)).toFixed(2));
-    resultado_calculado = valorMensalComTaxa;
+//     let taxaMensal = 0;
+//     switch (parseInt(prazo_contrato_sim)) {
+//         case 3: taxaMensal = 0.075; break;
+//         case 6: taxaMensal = 0.05; break;
+//         case 12: taxaMensal = 0.025; break;
+//     }
+
+//     const valorMensalComTaxa = parseFloat((valorBase * (1 + taxaMensal)).toFixed(2));
+//     resultado_calculado = valorMensalComTaxa;
 
 
-    
-    res.render('home_fornecedor', {
-        ...req.session.usuario,
-        resultado_calculado
-    });
-    // });
-};
+
+//     res.render('home_fornecedor', {
+//         ...req.session.usuario,
+//         resultado_calculado
+//     });
+//     // });
+// };
 
 exports.rescindirContrato = (req, res) => {
     if (!req.session.usuario) {

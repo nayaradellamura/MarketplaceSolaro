@@ -23,25 +23,25 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-warning">Total de KWh consumido no mês:</h5>
-                        <p class="display-5 fw-bold">{{consumo_medio}} kWh</p>
+                        <p class="display-5 fw-bold">{{formatarBR consumo_medio}} kWh</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-warning">Valor Total da Fatura</h5>
-                        <p class="display-5 fw-bold">R$ {{valor_medio_contas}}</p>
+                        <p class="display-5 fw-bold">R$ {{formatarBR valor_medio_contas}}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-warning">Valor com Desconto SOLARO</h5>
-                        <p class="display-5 fw-bold">R$ {{valor_com_desconto}}</p>
+                        <p class="display-5 fw-bold">R$ {{formatarBR valor_com_desconto}}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-success">Valor Economizado</h5>
-                        <p class="display-5 fw-bold">R$ {{economia_estimada}}</p>
+                        <p class="display-5 fw-bold">R$ {{formatarBR economia_estimada}}</p>
                     </div>
                 </div>
             </div>
@@ -280,7 +280,7 @@
                                 {{#each faturas}}
                                 <tr>
                                     <td>{{mes}}</td>
-                                    <td>{{kwh}}</td>
+                                    <td>{{formatarBR kwh}}</td>
                                     <td>{{valor}}</td>
                                     <td><span class="badge bg-{{statusClass}}">{{status}}</span></td>
                                 </tr>
@@ -416,13 +416,11 @@
             </div>
 
             <script>
-                // Variável global para armazenar dados da fatura
                 let dadosFatura = { mes: "", valor: "R$ 0,00" };
 
-                // Função para preparar o modal com os dados da fatura ao abrir o modal
                 function prepararPagamento(button) {
                     const mes = button.getAttribute('data-mes');
-                    const valor = button.getAttribute('data-valor') || "R$ 0,00";
+                    const valor = button.getAttribute('data-valor') || "0,00";
                     dadosFatura = { mes, valor };
 
                     // Atualiza o valor exibido no modal
@@ -568,10 +566,10 @@
                         <dd class="col-sm-8">{{estado_cliente}}</dd>
 
                         <dt class="col-sm-4">Média de consumo de kWh</dt>
-                        <dd class="col-sm-8">{{consumo_medio}} kWh</dd>
+                        <dd class="col-sm-8">{{formatarBR consumo_medio}} kWh</dd>
 
                         <dt class="col-sm-4">Média de valor de contas</dt>
-                        <dd class="col-sm-8">R$ {{valor_com_desconto}}</dd>
+                        <dd class="col-sm-8">R$ {{formatarBR valor_com_desconto}}</dd>
 
                         <dt class="col-sm-4">Data de Início</dt>
                         <dd class="col-sm-8">{{data_assinatura}}</dd>
@@ -659,8 +657,8 @@
                             <tr>
                                 <td>{{formatarData this.data_inicio}}</td>
                                 <td>{{this.estado_cliente}}</td>
-                                <td>{{this.valor_fatura_3}}</td>
-                                <td>{{this.valor_economizado}}</td>
+                                <td>{{formatarBR this.valor_fatura_3}}</td>
+                                <td>{{formatarBR this.valor_economizado}}</td>
                                 <td>
                                     {{#if (eq this.status "A")}}
                                     <span class="badge bg-success">Ativo</span>
@@ -818,7 +816,7 @@
                     document.getElementById("inputIdFatura").value = idFatura;
                     document.getElementById("inputValorFatura").value = valor;
 
-                    document.getElementById("valorFatura").textContent = `R$ ${valor}`;
+                    document.getElementById("valorFatura").textContent = ` R$ ${valor}`;
                 });
             });
 
