@@ -67,6 +67,7 @@ DATABASE_HOST =localhost
 DATABASE_USER =seu_usuario_mysql
 DATABASE_PASS = sua_senha_mysql
 PORTA =sua_porta_mysql
+```
 ---
 
 ### 5. 🌞 Executar o servidor em modo produção
