@@ -104,12 +104,13 @@ exports.loginUsuario = async (req, res) => {
             };
 
             if (usuario.tipo === 'C') {
-                return res.json({ sucesso: true, redirect: '/home_consumidor' });
-            }
 
-            // TIPO FORNECEDOR
-            if (usuario.tipo === 'F') {
-                const contratoSQL = `
+                    return res.json({ sucesso: true, redirect: '/home_consumidor' });
+                }
+
+                // TIPO FORNECEDOR
+                if (usuario.tipo === 'F') {
+                    const contratoSQL = `
                     SELECT 
                         id,
                         usuario_id,
@@ -129,109 +130,109 @@ exports.loginUsuario = async (req, res) => {
                         id DESC LIMIT 1;
                 `;
 
-                db.query(contratoSQL, [usuario.id], (errContrato, resultadosContrato) => {
-                    if (errContrato) return res.status(500).json({ erro: 'Erro ao buscar contrato.' });
+                    db.query(contratoSQL, [usuario.id], (errContrato, resultadosContrato) => {
+                        if (errContrato) return res.status(500).json({ erro: 'Erro ao buscar contrato.' });
 
-                    if (resultadosContrato.length === 0) {
-                        return res.json({ sucesso: true, redirect: '/home_fornecedor' });
-                    }
+                        if (resultadosContrato.length === 0) {
+                            return res.json({ sucesso: true, redirect: '/home_fornecedor' });
+                        }
 
-                    const contrato = resultadosContrato[0];
+                        const contrato = resultadosContrato[0];
 
-                    req.session.usuario = {
-                        ...req.session.usuario,
-                        contrato_id: contrato.id,
-                        usuario_id: contrato.usuario_id,
-                        data_assinatura: formatarData(contrato.data_assinatura),
-                        dataFinal: formatarData(contrato.dataFinal),
-                        prazoContrato: contrato.prazo_contrato,
-                        estado_fazenda: contrato.estado_fazenda,
-                        preco_kwh: contrato.preco_kwh,
-                        status: contrato.status,
-                        geracao_kwh: contrato.geracao_kwh.toLocaleString('pt-BR', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }),
-                        flag_fornecedor: contrato.flag_fornecedor
-                    };
+                        req.session.usuario = {
+                            ...req.session.usuario,
+                            contrato_id: contrato.id,
+                            usuario_id: contrato.usuario_id,
+                            data_assinatura: formatarData(contrato.data_assinatura),
+                            dataFinal: formatarData(contrato.dataFinal),
+                            prazoContrato: contrato.prazo_contrato,
+                            estado_fazenda: contrato.estado_fazenda,
+                            preco_kwh: contrato.preco_kwh,
+                            status: contrato.status,
+                            geracao_kwh: contrato.geracao_kwh.toLocaleString('pt-BR', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }),
+                            flag_fornecedor: contrato.flag_fornecedor
+                        };
 
-                    const valorBase = contrato.preco_kwh * contrato.geracao_kwh;
-                    let taxaMensal = 0;
+                        const valorBase = contrato.preco_kwh * contrato.geracao_kwh;
+                        let taxaMensal = 0;
 
-                    switch (contrato.prazo_contrato) {
-                        case 3: taxaMensal = 0.075; break;
-                        case 6: taxaMensal = 0.05; break;
-                        case 12: taxaMensal = 0.025; break;
-                    }
+                        switch (contrato.prazo_contrato) {
+                            case 3: taxaMensal = 0.075; break;
+                            case 6: taxaMensal = 0.05; break;
+                            case 12: taxaMensal = 0.025; break;
+                        }
 
-                    const valorMensalComTaxa = parseFloat((valorBase * (1 + taxaMensal)).toFixed(2));
-                    req.session.usuario.valorMensalComTaxa = valorMensalComTaxa;
+                        const valorMensalComTaxa = parseFloat((valorBase * (1 + taxaMensal)).toFixed(2));
+                        req.session.usuario.valorMensalComTaxa = valorMensalComTaxa;
 
-                    const verificaRepasseSQL = `
+                        const verificaRepasseSQL = `
                         SELECT * FROM recebimento_fornecedor 
                         WHERE id_contrato = ? 
                         ORDER BY dh_inclusao DESC 
                         LIMIT 1;
                     `;
 
-                    db.query(verificaRepasseSQL, [contrato.id], (errRepasse, resultadosRepasse) => {
-                        if (errRepasse) {
-                            console.error("Erro ao verificar repasse:", errRepasse);
-                            return res.status(500).json({ erro: 'Erro ao verificar repasse.' });
-                        }
-
-                        const hoje = new Date();
-                        const mesAtual = hoje.getMonth();
-                        const anoAtual = hoje.getFullYear();
-                        let deveInserir = false;
-
-                        if (resultadosRepasse.length === 0) {
-                            deveInserir = true;
-                        } else {
-                            const ultimaData = new Date(resultadosRepasse[0].dh_inclusao);
-                            if (
-                                ultimaData.getMonth() !== mesAtual ||
-                                ultimaData.getFullYear() !== anoAtual
-                            ) {
-                                deveInserir = true;
+                        db.query(verificaRepasseSQL, [contrato.id], (errRepasse, resultadosRepasse) => {
+                            if (errRepasse) {
+                                console.error("Erro ao verificar repasse:", errRepasse);
+                                return res.status(500).json({ erro: 'Erro ao verificar repasse.' });
                             }
-                        }
 
-                        if (deveInserir) {
-                            const valorMensal = valorMensalComTaxa;
-                            const taxaAdm = parseFloat((taxaMensal * valorMensal).toFixed(2));
-                            const valorRepasse = parseFloat((valorMensal - taxaAdm).toFixed(2));
+                            const hoje = new Date();
+                            const mesAtual = hoje.getMonth();
+                            const anoAtual = hoje.getFullYear();
+                            let deveInserir = false;
 
-                            const insertRepasseSQL = `
+                            if (resultadosRepasse.length === 0) {
+                                deveInserir = true;
+                            } else {
+                                const ultimaData = new Date(resultadosRepasse[0].dh_inclusao);
+                                if (
+                                    ultimaData.getMonth() !== mesAtual ||
+                                    ultimaData.getFullYear() !== anoAtual
+                                ) {
+                                    deveInserir = true;
+                                }
+                            }
+
+                            if (deveInserir) {
+                                const valorMensal = valorMensalComTaxa;
+                                const taxaAdm = parseFloat((taxaMensal * valorMensal).toFixed(2));
+                                const valorRepasse = parseFloat((valorMensal - taxaAdm).toFixed(2));
+
+                                const insertRepasseSQL = `
                                 INSERT INTO recebimento_fornecedor
                                 (id_contrato, id_fornecedor, valor_repasse, taxa_administrativa)
                                 VALUES (?, ?, ?, ?);
                             `;
 
-                            db.query(insertRepasseSQL, [
-                                contrato.id,
-                                contrato.usuario_id,
-                                valorRepasse,
-                                taxaAdm
-                            ], (errInsert) => {
-                                if (errInsert) {
-                                    console.error("Erro ao inserir repasse:", errInsert);
-                                    return res.status(500).json({ erro: 'Erro ao inserir repasse.' });
-                                }
+                                db.query(insertRepasseSQL, [
+                                    contrato.id,
+                                    contrato.usuario_id,
+                                    valorRepasse,
+                                    taxaAdm
+                                ], (errInsert) => {
+                                    if (errInsert) {
+                                        console.error("Erro ao inserir repasse:", errInsert);
+                                        return res.status(500).json({ erro: 'Erro ao inserir repasse.' });
+                                    }
 
+                                    return res.json({ sucesso: true, redirect: '/home_fornecedor' });
+
+                                });
+
+                            } else {
                                 return res.json({ sucesso: true, redirect: '/home_fornecedor' });
-
-                            });
-
-                        } else {
-                            return res.json({ sucesso: true, redirect: '/home_fornecedor' });
-                        }
+                            }
+                        });
                     });
-                });
-            } else {
-                return res.json({ sucesso: true, redirect: '/' });
-            }
-        });
+                } else {
+                    return res.json({ sucesso: true, redirect: '/' });
+                }
+            });
     } catch (e) {
         console.error(e);
         return res.status(500).json({ erro: 'Erro inesperado no login.' });
@@ -437,20 +438,25 @@ exports.cadastrarContratoCliente = (req, res) => {
                     }
 
                     const taxa = parseFloat(resultadosTaxa[0].taxa);
-                    const precoFinalKwh = parseFloat((mediaPrecos * (1 + taxa / 100)).toFixed(4));
+                    const precoFinalComDesconto = parseFloat((mediaPrecos * (1 + taxa / 100)).toFixed(4));
+                    const precoFinalKwh = precoFinalComDesconto * 0.85;
+                    const valorComNovoPreco = precoFinalKwh * consumoMedio;
+                    const vlrEconomizado = parseFloat((mediaFatura - valorComNovoPreco).toFixed(2));
+
+                    console.log("vlrEconomizado ", vlrEconomizado);
 
                     // Inserir contrato do cliente
                     const sqlContratoCliente = `
                         INSERT INTO contratos_clientes 
                         (usuario_id, data_inicio, estado_cliente, consumo_medio_kwh, preco_final_kwh, status,
                         consumo_fatura_1, consumo_fatura_2, consumo_fatura_3,
-                        consumo_media_fatura, valor_fatura_1, valor_fatura_2, valor_fatura_3, media_valor_fatura, flag_cliente)
-                        VALUES (?, NOW(), ?, ?, ?, 'A', ?, ?, ?, ?, ?, ?, ?, ?, 1)
+                        consumo_media_fatura, valor_fatura_1, valor_fatura_2, valor_fatura_3, media_valor_fatura, flag_cliente, valor_economizado)
+                        VALUES (?, NOW(), ?, ?, ?, 'A', ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
                     `;
                     const paramsContrato = [
                         usuarioId, estadoCliente, consumoMedio, precoFinalKwh,
                         kwh1f, kwh2f, kwh3f, consumoMedio,
-                        conta1f, conta2f, conta3f, mediaFatura
+                        conta1f, conta2f, conta3f, mediaFatura, vlrEconomizado
                     ];
 
                     db.query(sqlContratoCliente, paramsContrato, (errContrato, resultContrato) => {
@@ -675,22 +681,28 @@ exports.salvarKwh = (req, res) => {
                             const novoValorFatura = parseFloat((precoFinalKwh * consumoNovo).toFixed(2));
                             const sqlAtualizaFatura = `
                                 UPDATE contratos_clientes
-                                SET media_valor_fatura = ?
+                                SET media_valor_fatura = ?, valor_economizado = ?
                                 WHERE id = ?
                             `;
 
-                            // 7. Criar pagamento pendente para o próximo mês
-                            const valorFaturaComDesconto = parseFloat((consumoNovo * precoFinalKwh).toFixed(2));
-                            const hoje = new Date();
-                            //     const primeiroDiaProximoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
+                            // 7. Calcular valor economizado
+                            const precoMedioAnteriorKwh = mediaValorFatura / consumoAntigo;
+                            const valorAnterior = consumoNovo * precoMedioAnteriorKwh;
+                            const valorAtual = consumoNovo * precoFinalKwh;
+                            const valorEconomizado = parseFloat((valorAnterior - valorAtual).toFixed(2));
+
+                            // Criar pagamento pendente para o próximo mês
+                            const valorFaturaComDesconto = parseFloat(valorAtual.toFixed(2));
                             const dataPagamento = new Date(dataReferencia).toISOString().split('T')[0];
 
+                            console.log("Valor economizado:", valorEconomizado);
 
                             const sqlPagamento = `
-                                INSERT INTO pagamento_cliente
-                                (id_contrato, id_cliente, valor_total, data_pagamento, forma_pagamento, status_pagamento)
-                                VALUES (?, ?, ?, ?, ?, ?)
-                            `;
+                                        INSERT INTO pagamento_cliente
+                                        (id_contrato, id_cliente, valor_total, data_pagamento, forma_pagamento, status_pagamento)
+                                        VALUES (?, ?, ?, ?, ?, ?)
+                                    `;
+
                             const dadosPagamento = [
                                 idContrato,
                                 userId,
@@ -700,6 +712,7 @@ exports.salvarKwh = (req, res) => {
                                 'PEND'
                             ];
 
+
                             db.query(sqlPagamento, dadosPagamento, (errPagamento) => {
                                 if (errPagamento) {
                                     console.error("Erro ao inserir pagamento pendente:", errPagamento);
@@ -707,7 +720,7 @@ exports.salvarKwh = (req, res) => {
                                 }
 
                                 // 8. Atualizar valor médio da fatura no contrato
-                                db.query(sqlAtualizaFatura, [novoValorFatura, idContrato], (err5) => {
+                                db.query(sqlAtualizaFatura, [novoValorFatura, valorEconomizado, idContrato], (err5) => {
                                     if (err5) return res.status(500).send('Erro ao atualizar fatura.');
 
                                     return res.redirect('/home_consumidor?refresh=1');
@@ -729,32 +742,90 @@ exports.renderHomeFornecedor = (req, res) => {
     res.render('home_fornecedor', { resultado_calculado: null });
 };
 
-// exports.processaSimulacao = (req, res) => {
-//     const { preco_kwh_sim, geracao_kwh_sim, prazo_contrato_sim, estado_fazenda_sim } = req.body;
+exports.processaSimulacao = (req, res) => {
+    const { kwh1, kwh2, kwh3, conta1, conta2, conta3 } = req.body;
 
-//     // const taxaSQL = `
-//     //     SELECT taxa FROM taxa_estaduais WHERE estado = ? LIMIT 1;
-//     // `;
+    const usuario_id = req.session.usuario?.id;
 
-//     // db.query(taxaSQL, [estado_fazenda_sim], (err, resultadosTaxa) => {
-//     //     if (err) return res.status(500).send('Erro interno no servidor.');
-//     //     if (resultadosTaxa.length === 0) return res.status(400).send('Estado não encontrado.');
+    if (!usuario_id) {
+        return res.status(401).send("Usuário não autenticado.");
+    }
 
-//     //    const taxaEstadual = resultadosTaxa[0].taxa / 100;
-//     //    const precoComTaxa = preco_kwh_sim * (1 + taxaEstadual);
+    // Buscar o estado do endereço do usuário
+    const sqlEstado = `SELECT estado FROM enderecos WHERE usuario_id = ? LIMIT 1`;
 
-//     const valorBase = preco_kwh_sim * geracao_kwh_sim;
+    db.query(sqlEstado, [usuario_id], (errEstado, resultadoEstado) => {
+        if (errEstado) {
+            console.error("Erro ao buscar estado do usuário:", errEstado);
+            return res.status(500).send("Erro ao buscar endereço do usuário.");
+        }
 
-//     let taxaMensal = 0;
-//     switch (parseInt(prazo_contrato_sim)) {
-//         case 3: taxaMensal = 0.075; break;
-//         case 6: taxaMensal = 0.05; break;
-//         case 12: taxaMensal = 0.025; break;
-//     }
+        if (resultadoEstado.length === 0) {
+            return res.status(400).send("Endereço do usuário não encontrado.");
+        }
 
-//     const valorMensalComTaxa = parseFloat((valorBase * (1 + taxaMensal)).toFixed(2));
-//     resultado_calculado = valorMensalComTaxa;
+        const estado_fazenda_sim = resultadoEstado[0].estado;
+        console.log('UF: ', estado_fazenda_sim);
 
+        // Converter os valores recebidos
+        const kwh1f = parseFloat(kwh1);
+        const kwh2f = parseFloat(kwh2);
+        const kwh3f = parseFloat(kwh3);
+        const conta1f = parseFloat(conta1);
+        const conta2f = parseFloat(conta2);
+        const conta3f = parseFloat(conta3);
+
+        // Calcular médias
+        const consumoMedio = (kwh1f + kwh2f + kwh3f) / 3;
+        const mediaFatura = (conta1f + conta2f + conta3f) / 3;
+
+        if (isNaN(consumoMedio) || isNaN(mediaFatura)) {
+            return res.status(400).send("Valores numéricos inválidos.");
+        }
+
+        // Buscar preços dos fornecedores ativos no estado
+        const sqlPrecos = `
+            SELECT preco_kwh 
+            FROM contratos_fornecedores 
+            WHERE estado_fazenda = ? AND status = 'AT' AND flag_fornecedor = 1
+        `;
+
+        db.query(sqlPrecos, [estado_fazenda_sim], (errPrecos, resultadosPrecos) => {
+            if (errPrecos) {
+                console.error("Erro ao buscar preços dos fornecedores:", errPrecos);
+                return res.status(500).send("Erro ao buscar preços dos fornecedores.");
+            }
+
+            if (resultadosPrecos.length === 0) {
+                return res.status(400).send("Nenhum fornecedor ativo encontrado no estado.");
+            }
+
+            const somaPrecos = resultadosPrecos.reduce((total, row) => total + parseFloat(row.preco_kwh), 0);
+            const mediaPrecos = somaPrecos / resultadosPrecos.length;
+
+            // Buscar taxa estadual
+            const taxaSQL = `SELECT taxa FROM taxa_estaduais WHERE estado = ? LIMIT 1`;
+            db.query(taxaSQL, [estado_fazenda_sim], (errTaxa, resultadosTaxa) => {
+                if (errTaxa) return res.status(500).send('Erro ao buscar taxa estadual.');
+                if (resultadosTaxa.length === 0) return res.status(400).send('Taxa estadual não encontrada.');
+
+                const taxaEstadual = resultadosTaxa[0].taxa / 100;
+
+                // Calcular o preço final do kWh com taxa e desconto
+                const precoComTaxa = mediaPrecos * (1 + taxaEstadual);
+                const precoFinalComDesconto = precoComTaxa * 0.85;
+
+                // Calcular valor mensal estimado com base no consumo médio
+                const valorMensalFinal = parseFloat((precoFinalComDesconto * consumoMedio).toFixed(2));
+
+                res.render('home_consumidor', {
+                    ...req.session.usuario,
+                    resultado_calculado: valorMensalFinal
+                });
+            });
+        });
+    });
+};
 
 
 //     res.render('home_fornecedor', {
@@ -772,6 +843,11 @@ exports.rescindirContrato = (req, res) => {
     const usuario_id = req.session.usuario.id;
     const dataRescisao = new Date();
     const geracaoKwh = req.session.usuario.geracao_kwh;
+
+    if (!geracaoKwh) {
+        return res.status(400).send('Valor de geração kWh não disponível na sessão.');
+    }
+
     const kwhFormatado = parseFloat(
         geracaoKwh.replace('.', '').replace(',', '.')
     ) * -1;
@@ -804,6 +880,7 @@ exports.rescindirContrato = (req, res) => {
         if (result.affectedRows === 0) return res.status(404).send('Nenhum contrato ativo encontrado para rescindir.');
         flagRescisao = 1;
         return res.json({ success: true, message: "Contrato rescindido com sucesso." });
+
     });
 };
 

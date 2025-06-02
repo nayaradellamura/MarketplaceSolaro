@@ -34,7 +34,7 @@ router.get('/cookies', (req, res) => res.render('cookies'));
 router.post('/cadastro', usuarioController.cadastrarUsuario);
 router.post('/login', usuarioController.loginUsuario);
 router.post('/cadastro_oferta', usuarioController.cadastrarContrato);
-// router.post('/Simular-Contrato', usuarioController.processaSimulacao);
+router.post('/Simular-Contrato', usuarioController.processaSimulacao);
 router.post('/rescindir_contrato', usuarioController.rescindirContrato);
 router.post('/cadastro_contrato_cliente', usuarioController.cadastrarContratoCliente);
 router.post('/salvar_kwh', usuarioController.salvarKwh);
@@ -47,50 +47,66 @@ router.post('/receber_fornecedor', usuarioController.recebimentoFornecedor);
 
 
 router.get('/home_consumidor', (req, res) => {
-  if (req.session.usuario?.tipo === 'C') {
+  if (req.session.usuario?.tipo !== 'C') {
+    return res.redirect('/login');
+  }
 
-    const usuario_id = req.session.usuario.id;
+  const usuario_id = req.session.usuario.id;
 
-    const todosContratosConsumidorQuery = `
-      SELECT * FROM contratos_clientes
-      WHERE usuario_id = ? 
-      ORDER BY data_inicio DESC
-      LIMIT 1
-    `;
+  // Corrigido: status = 'A'
+  const sqlContratoAtivo = `
+    SELECT * FROM contratos_clientes
+    WHERE usuario_id = ? AND status = 'A'
+    ORDER BY data_inicio DESC
+    LIMIT 1
+  `;
 
-    db.query(todosContratosConsumidorQuery, [usuario_id], (err, ativoClientesResults) => {
+  const todosContratosConsumidorQuery = `
+    SELECT * FROM contratos_clientes
+    WHERE usuario_id = ?
+    ORDER BY data_inicio DESC
+  `;
+
+  db.query(sqlContratoAtivo, [usuario_id], (err, ContratosAtivos) => {
+    if (err) {
+      console.error('Erro ao buscar contrato ativo:', err);
+      return res.status(500).send('Erro ao carregar página do consumidor.');
+    }
+
+    const contratoAtivo = ContratosAtivos.length > 0 ? ContratosAtivos[0] : null;
+
+    db.query(todosContratosConsumidorQuery, [usuario_id], (err, todosContratos) => {
       if (err) {
-        console.error('Erro ao buscar contrato ativo:', err);
+        console.error('Erro ao buscar contratos:', err);
         return res.status(500).send('Erro ao carregar página do consumidor.');
       }
 
-      if (ativoClientesResults.length === 0) {
+      if (!contratoAtivo) {
         return res.render('home_consumidor', {
+          contratosCliente: todosContratos,
+          flag: null,
+          faturas: [],
           nomeFornecedor: req.session.usuario.nome,
           data_assinatura: '',
           consumo_medio: 0,
           valor_medio_contas: '0.00',
           valor_com_desconto: '0.00',
           economia_estimada: '0.00',
-          flag: req.session.usuario.flag_cliente,
-          contratosCliente: [],
-          faturas: []
+          estado_cliente: '',
+          status: '',
         });
       }
 
-      const contratoCliente = ativoClientesResults[0];
-      const contratoId = contratoCliente.id;
+      const contratoId = contratoAtivo.id;
+      const vlr1 = parseFloat(contratoAtivo.valor_fatura_1) || 0;
+      const vlr2 = parseFloat(contratoAtivo.valor_fatura_2) || 0;
+      const vlr3 = parseFloat(contratoAtivo.valor_fatura_3) || 0;
+      const consumo1 = parseFloat(contratoAtivo.consumo_fatura_1) || 0;
+      const consumo2 = parseFloat(contratoAtivo.consumo_fatura_2) || 0;
+      const consumo3 = parseFloat(contratoAtivo.consumo_fatura_3) || 0;
 
-      const vlr1 = parseFloat(contratoCliente.valor_fatura_1) || 0;
-      const vlr2 = parseFloat(contratoCliente.valor_fatura_2) || 0;
-      const vlr3 = parseFloat(contratoCliente.valor_fatura_3) || 0;
-
-      const consumo1 = parseFloat(contratoCliente.consumo_fatura_1) || 0;
-      const consumo2 = parseFloat(contratoCliente.consumo_fatura_2) || 0;
-      const consumo3 = parseFloat(contratoCliente.consumo_fatura_3) || 0;
-
-      const atualLance = parseFloat(contratoCliente.consumo_medio_kwh) || 0;
-      const precoFinalKwh = parseFloat(contratoCliente.preco_final_kwh) || 0;
+      const atualLance = parseFloat(contratoAtivo.consumo_medio_kwh) || 0;
+      const precoFinalKwh = parseFloat(contratoAtivo.preco_final_kwh) || 0;
 
       const mediaConsumoAntigo = (consumo1 + consumo2 + consumo3) / 3;
       const mediaValorAntigo = (vlr1 + vlr2 + vlr3) / 3;
@@ -100,106 +116,74 @@ router.get('/home_consumidor', (req, res) => {
       const valorComDesconto = atualLance * precoFinalKwh;
       const economiaEstimada = parseFloat((valorSemSolaro - valorComDesconto).toFixed(2));
 
-      const economiaEstimadaFinal = (typeof economiaEstimada === 'number' && !isNaN(economiaEstimada))
-        ? economiaEstimada.toFixed(2)
-        : '0.00';
-
-
-
-      const sqlEconomiaEstimado = `
-        UPDATE  contratos_clientes SET valor_economizado = ? 
-        WHERE id = ? AND valor_economizado IS NOT NULL
+      const sqlPagamentos = `
+        SELECT id_pagamento, data_pagamento, valor_total, status_pagamento, forma_pagamento
+        FROM pagamento_cliente
+        WHERE id_contrato = ?
+        ORDER BY data_pagamento DESC
+        LIMIT 6
       `;
 
-      const sqlPagamentos = `
-          SELECT id_pagamento, data_pagamento, valor_total, status_pagamento, forma_pagamento
-          FROM pagamento_cliente
-          WHERE id_contrato = ?
-          ORDER BY data_pagamento DESC
-          LIMIT 6
-        `;
-
-      db.query(sqlEconomiaEstimado, [economiaEstimadaFinal, contratoId], async (errPagamentos, resultPagamentos) => {
+      db.query(sqlPagamentos, [contratoId], async (errPagamentos, resultPagamentos) => {
         if (errPagamentos) {
           console.error('Erro ao buscar faturas:', errPagamentos);
           return res.status(500).send('Erro ao carregar faturas do cliente.');
         }
 
-
-        db.query(sqlPagamentos, [contratoId], async (errPagamentos, resultPagamentos) => {
-          if (errPagamentos) {
-            console.error('Erro ao buscar faturas:', errPagamentos);
-            return res.status(500).send('Erro ao carregar faturas do cliente.');
-          }
-
-          // Função para buscar o preço do kWh mais recente até a data da fatura
-          const buscarPrecoKwh = (contratoClienteId, dataPagamento) => {
-            return new Promise((resolve, reject) => {
-              const sqlPreco = `
-        SELECT preco_final_cliente
-        FROM historico_precos
-        WHERE contrato_cliente_id = ?
-          AND data_inicio <= ?
-        ORDER BY data_inicio DESC
-        LIMIT 1
-      `;
-
-              db.query(sqlPreco, [contratoClienteId, dataPagamento], (err, result) => {
-                if (err) return reject(err);
-                if (result.length === 0) return resolve(null);
-                resolve(result[0].preco_final_cliente);
-              });
+        const buscarPrecoKwh = (contratoClienteId, dataPagamento) => {
+          return new Promise((resolve, reject) => {
+            const sqlPreco = `
+              SELECT preco_final_cliente
+              FROM historico_precos
+              WHERE contrato_cliente_id = ?
+                AND data_inicio <= ?
+              ORDER BY data_inicio DESC
+              LIMIT 1
+            `;
+            db.query(sqlPreco, [contratoClienteId, dataPagamento], (err, result) => {
+              if (err) return reject(err);
+              if (result.length === 0) return resolve(null);
+              resolve(result[0].preco_final_cliente);
             });
-          };
-
-          // Para cada fatura, buscar o preço e calcular o kWh estimado
-          const faturas = await Promise.all(
-            resultPagamentos.map(async (pag) => {
-              const data = moment(pag.data_pagamento);
-              const pendente = pag.status_pagamento === 'PEND';
-
-              let precoKwh = await buscarPrecoKwh(contratoId, pag.data_pagamento);
-              let kwhEstimado = precoKwh > 0 ? (pag.valor_total / precoKwh) : 0;
-
-              return {
-                id_pagamento_cliente: pag.id_pagamento,
-                mes: data.format('MMM/YYYY'),
-                valor: pag.valor_total > 0 ? `R$ ${pag.valor_total.toFixed(2)}` : '--',
-                status: pendente ? 'Pendente' : 'Pago',
-                statusClass: pendente ? 'danger' : 'success',
-                mostrarBotaoPagar: pendente,
-                forma_pagamento: !pendente && pag.forma_pagamento ? pag.forma_pagamento : '-',
-                kwh: kwhEstimado.toFixed(2) + ' kWh'
-              };
-            })
-          );
-
-
-          const faturasLimpo = faturas.map(f => {
-            const { ...resto } = f;
-            return resto;
           });
+        };
 
+        const faturas = await Promise.all(
+          resultPagamentos.map(async (pag) => {
+            const data = moment(pag.data_pagamento);
+            const pendente = pag.status_pagamento === 'PEND';
+            let precoKwh = await buscarPrecoKwh(contratoId, pag.data_pagamento);
+            let kwhEstimado = precoKwh > 0 ? (pag.valor_total / precoKwh) : 0;
 
-          res.render('home_consumidor', {
-            nomeFornecedor: req.session.usuario.nome,
-            consumo_medio: atualLance.toFixed(2),
-            valor_medio_contas: valorSemSolaro.toFixed(2),
-            valor_com_desconto: valorComDesconto.toFixed(2),
-            economia_estimada: economiaEstimadaFinal,
-            flag: contratoCliente.flag_cliente,
-            data_assinatura: formatarData(contratoCliente.data_inicio),
-            estado_cliente: contratoCliente.estado_cliente,
-            contratosCliente: ativoClientesResults,
-            status: contratoCliente.status,
-            faturas: faturasLimpo
-          });
+            return {
+              id_pagamento_cliente: pag.id_pagamento,
+              mes: data.format('MMM/YYYY'),
+              valor: pag.valor_total > 0 ? `R$ ${pag.valor_total.toFixed(2)}` : '--',
+              status: pendente ? 'Pendente' : 'Pago',
+              statusClass: pendente ? 'danger' : 'success',
+              mostrarBotaoPagar: pendente,
+              forma_pagamento: !pendente && pag.forma_pagamento ? pag.forma_pagamento : '-',
+              kwh: kwhEstimado.toFixed(2) + ' kWh'
+            };
+          })
+        );
+
+        res.render('home_consumidor', {
+          nomeFornecedor: req.session.usuario.nome,
+          consumo_medio: atualLance.toFixed(2),
+          valor_medio_contas: valorSemSolaro.toFixed(2),
+          valor_com_desconto: valorComDesconto.toFixed(2),
+          economia_estimada: contratoAtivo.valor_economizado,
+          flag: contratoAtivo.flag_cliente,
+          data_assinatura: formatarData(contratoAtivo.data_inicio),
+          estado_cliente: contratoAtivo.estado_cliente,
+          contratosCliente: todosContratos,
+          status: contratoAtivo.status,
+          faturas
         });
       });
     });
-  } else {
-    return res.redirect('/login');
-  }
+  });
 });
 
 

@@ -149,9 +149,13 @@
         }
 
         const valorMensalComTaxa = (valorBase * (1 + taxaMensal)).toFixed(2);
+        const taxaAdm = ((taxaMensal * valorMensalComTaxa).toFixed(2));
+        const valorRepasse = ((valorMensalComTaxa - taxaAdm).toFixed(2));
 
 
-        document.getElementById('resultado_calculado').value = `R$ ${valorMensalComTaxa}`;
+        document.getElementById('resultado_calculado').value = `R$ ${valorRepasse}`;
+
+
       });
     </script>
 
