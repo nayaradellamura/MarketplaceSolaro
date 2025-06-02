@@ -23,25 +23,25 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-warning">Total de KWh consumido no mês:</h5>
-                        <p class="display-5 fw-bold">{{consumo_medio}} kWh</p>
+                        <p class="display-5 fw-bold">{{formatarBR consumo_medio}} kWh</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-warning">Valor Total da Fatura</h5>
-                        <p class="display-5 fw-bold">R$ {{valor_medio_contas}}</p>
+                        <p class="display-5 fw-bold">R$ {{formatarBR valor_medio_contas}}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-warning">Valor com Desconto SOLARO</h5>
-                        <p class="display-5 fw-bold">R$ {{valor_com_desconto}}</p>
+                        <p class="display-5 fw-bold">R$ {{formatarBR valor_com_desconto}}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card shadow-sm p-4 card-dashboard">
                         <h5 class="text-success">Valor Economizado</h5>
-                        <p class="display-5 fw-bold">R$ {{economia_estimada}}</p>
+                        <p class="display-5 fw-bold">R$ {{formatarBR economia_estimada}}</p>
                     </div>
                 </div>
             </div>
@@ -64,12 +64,13 @@
                                 </div>
                             </label>
 
-                            <input type="number" step="0.01" class="form-control mb-2" id="kwh1"
+                            <input type="number" step="0.01" class="form-control mb-2" id="kwh1" name="kwh1"
                                 placeholder="Mês 1 (kWh)" required>
-                            <input type="number" step="0.01" class="form-control mb-2" id="kwh2"
+                            <input type="number" step="0.01" class="form-control mb-2" id="kwh2" name="kwh2"
                                 placeholder="Mês 2 (kWh)" required>
-                            <input type="number" step="0.01" class="form-control" id="kwh3" placeholder="Mês 3 (kWh)"
-                                required>
+                            <input type="number" step="0.01" class="form-control" id="kwh3" name="kwh3"
+                                placeholder="Mês 3 (kWh)" required>
+
                         </div>
 
                         <div class="col-md-6">
@@ -80,18 +81,20 @@
                                     <i class="bi bi-info-circle-fill text-dark"></i>
                                 </div>
                             </label>
-                            <input type="number" step="0.01" class="form-control mb-2" id="conta1"
+                            <input type="number" step="0.01" class="form-control mb-2" id="conta1" name="conta1"
                                 placeholder="Valor Conta 1 (R$)" required>
-                            <input type="number" step="0.01" class="form-control mb-2" id="conta2"
+                            <input type="number" step="0.01" class="form-control mb-2" id="conta2" name="conta2"
                                 placeholder="Valor Conta 2 (R$)" required>
-                            <input type="number" step="0.01" class="form-control" id="conta3"
+                            <input type="number" step="0.01" class="form-control" id="conta3" name="conta3"
                                 placeholder="Valor Conta 3 (R$)" required>
+
                         </div>
+
 
                         <div class="col-md-12">
                             <label for="resultado_calculado" class="form-label">Valor Mensal com Taxa</label>
                             <input type="text" class="form-control bg-light" id="resultado_calculado"
-                                name="resultado_calculado" value="{{resultado_calculado}}" readonly>
+                                name="resultado_calculado" value="R$ {{formatarBR resultado_calculado}}" readonly>
                         </div>
                     </div>
 
@@ -280,7 +283,7 @@
                                 {{#each faturas}}
                                 <tr>
                                     <td>{{mes}}</td>
-                                    <td>{{kwh}}</td>
+                                    <td>{{formatarBR kwh}}</td>
                                     <td>{{valor}}</td>
                                     <td><span class="badge bg-{{statusClass}}">{{status}}</span></td>
                                 </tr>
@@ -302,7 +305,7 @@
                             <h4 class="mb-1">Minhas Faturas</h4>
                             <small class="text-muted">Pagamento dos contratos ativos</small>
                         </div>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalPagamento">
+                        <button class="btn btn-success" data-bs-toggle="modal">
                             <i class="bi bi-credit-card-2-front me-2"></i> Efetuar Pagamento
                         </button>
                     </div>
@@ -348,8 +351,7 @@
                 aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <form onsubmit="event.preventDefault(); gerarRecibo(); this.submit();"
-                            action="/confirmar_pagamento" method="POST">
+                        <form id="formPagamento" action="/confirmar_pagamento" method="POST">
                             <input type="hidden" name="id_fatura" id="inputIdFatura" />
                             <input type="hidden" name="valor" id="inputValorFatura" />
 
@@ -362,7 +364,7 @@
                             </div>
 
                             <div class="modal-body">
-                                <p>Valor da fatura: <strong id="valorFatura">R$ 0,00</strong></p>
+                                <p>Valor da fatura: <strong id="valorFatura"> </strong></p>
 
                                 <div class="mb-3">
                                     <label for="metodoPagamento" class="form-label">Método de Pagamento</label>
@@ -416,103 +418,109 @@
             </div>
 
             <script>
-                // Variável global para armazenar dados da fatura
-                let dadosFatura = { mes: "", valor: "R$ 0,00" };
+                document.addEventListener("DOMContentLoaded", function () {
+                    let dadosFatura = { mes: "", valor: "0,00" };
 
-                // Função para preparar o modal com os dados da fatura ao abrir o modal
-                function prepararPagamento(button) {
-                    const mes = button.getAttribute('data-mes');
-                    const valor = button.getAttribute('data-valor') || "R$ 0,00";
-                    dadosFatura = { mes, valor };
+                    const botoesPagar = document.querySelectorAll(".btn-pagar");
+                    const inputIdFatura = document.getElementById("inputIdFatura");
+                    const inputValorFatura = document.getElementById("inputValorFatura");
+                    const spanValorFatura = document.getElementById("valorFatura");
 
-                    // Atualiza o valor exibido no modal
-                    document.getElementById('valorFatura').innerText = valor;
-                }
+                    botoesPagar.forEach((btn) => {
+                        btn.addEventListener("click", () => {
+                            const id = btn.getAttribute("data-id");
+                            const now = new Date();
+                            const mes = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+                            const valor = btn.getAttribute("data-valor") || "0,00";
 
-                // Listener para exibir os campos de acordo com o método de pagamento
-                document.getElementById('metodoPagamento').addEventListener('change', function () {
-                    const pix = document.getElementById('infoPix');
-                    const cartao = document.getElementById('infoCartao');
-                    const boleto = document.getElementById('infoBoleto');
+                            dadosFatura = { mes, valor };
 
-                    pix.classList.add('d-none');
-                    cartao.classList.add('d-none');
-                    boleto.classList.add('d-none');
+                            inputIdFatura.value = id;
+                            inputValorFatura.value = valor;
+                            spanValorFatura.textContent = `R$ ${valor}`;
+                        });
+                    });
 
-                    if (this.value === 'pix') {
-                        pix.classList.remove('d-none');
-                    } else if (this.value === 'cartao') {
-                        cartao.classList.remove('d-none');
-                    } else if (this.value === 'boleto') {
-                        boleto.classList.remove('d-none');
+                    document.getElementById('metodoPagamento').addEventListener('change', function () {
+                        const pix = document.getElementById('infoPix');
+                        const cartao = document.getElementById('infoCartao');
+                        const boleto = document.getElementById('infoBoleto');
+
+                        pix.classList.add('d-none');
+                        cartao.classList.add('d-none');
+                        boleto.classList.add('d-none');
+
+                        if (this.value === 'pix') pix.classList.remove('d-none');
+                        else if (this.value === 'cartao') cartao.classList.remove('d-none');
+                        else if (this.value === 'boleto') boleto.classList.remove('d-none');
+                    });
+
+                    const formPagamento = document.getElementById("formPagamento");
+                    formPagamento.addEventListener("submit", async function (e) {
+                        e.preventDefault(); // evita envio imediato
+
+                        await gerarRecibo(); // espera gerar recibo
+                        formPagamento.submit(); // envia depois que recibo for salvo
+                    });
+
+                    async function gerarRecibo() {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF();
+                        const data = new Date().toLocaleDateString("pt-BR");
+                        const metodo = document.querySelector('[name="metodo"]').value || "Não informado";
+
+                        doc.setFont("helvetica");
+                        doc.setFontSize(18);
+                        doc.setFont(undefined, "bold");
+                        doc.text("Recibo de Pagamento", doc.internal.pageSize.getWidth() / 2, 20, { align: "center" });
+
+                        doc.setDrawColor(0);
+                        doc.setLineWidth(0.5);
+                        doc.line(20, 25, doc.internal.pageSize.getWidth() - 20, 25);
+
+                        doc.setFontSize(12);
+                        doc.setFont(undefined, "normal");
+                        const startY = 40;
+                        const lineHeight = 10;
+
+                        function addLabelValue(label, value, y) {
+                            if (typeof value !== "string") value = String(value); // Segurança extra
+                            doc.setFont(undefined, "bold");
+                            doc.text(`${label}:`, 20, y);
+                            doc.setFont(undefined, "normal");
+                            doc.text(value, 60, y);
+                        }
+
+                        addLabelValue("Mês Referente", dadosFatura.mes || "Não informado", startY);
+                        addLabelValue("Valor Pago", `R$ ${dadosFatura.valor}`, startY + lineHeight);
+                        addLabelValue("Método", metodo.toUpperCase(), startY + lineHeight * 2);
+                        addLabelValue("Data do Pagamento ", data, startY + lineHeight * 3);
+
+                        doc.setFont(undefined, "italic");
+                        doc.setFontSize(11);
+                        doc.text(
+                            "Obrigado por utilizar o Solaro Marketplace!",
+                            doc.internal.pageSize.getWidth() / 2,
+                            startY + lineHeight * 6,
+                            { align: "center" }
+                        );
+
+                        doc.save(`recibo_solaro_${(dadosFatura.mes || "pagamento").replace("/", "-")}.pdf`);
+
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Pagamento confirmado!',
+                            text: 'Recibo gerado com sucesso.',
+                            confirmButtonText: 'OK'
+                        });
+
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalPagamento'));
+                        if (modal) modal.hide();
                     }
                 });
 
-                async function gerarRecibo() {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-                    const data = new Date().toLocaleDateString("pt-BR");
-                    const metodo = document.querySelector('[name="metodo"]').value || "Não informado";
-
-                    // Configurações básicas
-                    doc.setFont("helvetica");
-
-                    // Título centralizado e negrito
-                    doc.setFontSize(18);
-                    doc.setFont(undefined, "bold");
-                    doc.text("Recibo de Pagamento", doc.internal.pageSize.getWidth() / 2, 20, { align: "center" });
-
-                    // Linha horizontal abaixo do título
-                    doc.setDrawColor(0);
-                    doc.setLineWidth(0.5);
-                    doc.line(20, 25, doc.internal.pageSize.getWidth() - 20, 25);
-
-                    // Corpo do recibo
-                    doc.setFontSize(12);
-                    doc.setFont(undefined, "normal");
-                    const startY = 40;
-                    const lineHeight = 10;
-
-                    // Função para facilitar texto com label negrito
-                    function addLabelValue(label, value, y) {
-                        doc.setFont(undefined, "bold");
-                        doc.text(`${label}:`, 20, y);
-                        doc.setFont(undefined, "normal");
-                        doc.text(value, 60, y);
-                    }
-
-                    addLabelValue("Mês Referente", dadosFatura.mes, startY);
-                    addLabelValue("Valor Pago", dadosFatura.valor, startY + lineHeight);
-                    addLabelValue("Método", metodo.toUpperCase(), startY + lineHeight * 2);
-                    addLabelValue("Data do Pagamento ", data, startY + lineHeight * 3);
-
-                    // Mensagem final
-                    doc.setFont(undefined, "italic");
-                    doc.setFontSize(11);
-                    doc.text(
-                        "Obrigado por utilizar o Solaro Marketplace!",
-                        doc.internal.pageSize.getWidth() / 2,
-                        startY + lineHeight * 6,
-                        { align: "center" }
-                    );
-
-                    // Salvar o arquivo
-                    doc.save(`recibo_solaro_${dadosFatura.mes.replace("/", "-")}.pdf`);
-
-
-                    // Alerta 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Pagamento confirmado!',
-                        text: 'Recibo gerado com sucesso.',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        // Fecha o modal após fechar o alerta
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalPagamento'));
-                        if (modal) modal.hide();
-                    });
-                }
             </script>
+
         </div>
     </div>
 
@@ -568,10 +576,10 @@
                         <dd class="col-sm-8">{{estado_cliente}}</dd>
 
                         <dt class="col-sm-4">Média de consumo de kWh</dt>
-                        <dd class="col-sm-8">R$ {{valor_com_desconto}}</dd>
+                        <dd class="col-sm-8">{{formatarBR consumo_medio}} kWh</dd>
 
                         <dt class="col-sm-4">Média de valor de contas</dt>
-                        <dd class="col-sm-8">{{consumo_medio}} kWh</dd>
+                        <dd class="col-sm-8">R$ {{formatarBR valor_com_desconto}}</dd>
 
                         <dt class="col-sm-4">Data de Início</dt>
                         <dd class="col-sm-8">{{data_assinatura}}</dd>
@@ -659,8 +667,8 @@
                             <tr>
                                 <td>{{formatarData this.data_inicio}}</td>
                                 <td>{{this.estado_cliente}}</td>
-                                <td>{{this.valor_fatura_3}}</td>
-                                <td>{{this.valor_economizado}}</td>
+                                <td>{{formatarBR this.valor_fatura_3}}</td>
+                                <td>{{formatarBR this.valor_economizado}}</td>
                                 <td>
                                     {{#if (eq this.status "A")}}
                                     <span class="badge bg-success">Ativo</span>
@@ -818,7 +826,7 @@
                     document.getElementById("inputIdFatura").value = idFatura;
                     document.getElementById("inputValorFatura").value = valor;
 
-                    document.getElementById("valorFatura").textContent = `R$ ${valor}`;
+                    document.getElementById("valorFatura").textContent = ` R$ ${valor}`;
                 });
             });
 

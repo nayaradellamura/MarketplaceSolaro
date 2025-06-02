@@ -17,37 +17,32 @@
 
   <section id="contato" class="py-5 bg-light">
     <div class="container">
-      <h2 class="text-center mb-4">Fale Conosco</h2>
-      <p class="text-center mb-5">Tem alguma dúvida ou sugestão? Entre em contato conosco preenchendo o formulário
-        abaixo.</p>
-
-      <div class="row justify-content-center">
-        <div class="col-md-8">
-          <form>
-            <div class="mb-3">
-              <label for="nome" class="form-label">Nome</label>
-              <input type="text" class="form-control" id="nome" placeholder="Seu nome" required>
+        <h2 class="text-center mb-4">Fale Conosco</h2>
+        <p class="text-center mb-5">Tem alguma dúvida ou sugestão? Entre em contato conosco preenchendo o formulário abaixo.</p>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form id="contatoForm">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="nome" name="nome" placeholder="Seu nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-mail</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="seuemail@exemplo.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="mensagem" class="form-label">Mensagem</label>
+                        <textarea class="form-control" id="mensagem" name="mensagem" rows="5" placeholder="Digite sua mensagem aqui..." required></textarea>
+                    </div>
+                    <div id="formFeedback" class="mb-3"></div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
+                    </div>
+                </form>
             </div>
-
-            <div class="mb-3">
-              <label for="email" class="form-label">E-mail</label>
-              <input type="email" class="form-control" id="email" placeholder="seuemail@exemplo.com" required>
-            </div>
-
-            <div class="mb-3">
-              <label for="mensagem" class="form-label">Mensagem</label>
-              <textarea class="form-control" id="mensagem" rows="5" placeholder="Digite sua mensagem aqui..."
-                required></textarea>
-            </div>
-
-            <div class="text-center">
-              <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
-            </div>
-          </form>
         </div>
-      </div>
     </div>
-  </section>
+</section>
 
   <!-- Código do Tawk.to -->
   <script type="text/javascript">
@@ -62,6 +57,41 @@
     })();
   </script>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const contatoForm = document.getElementById('contatoForm');
+    const formFeedback = document.getElementById('formFeedback');
+
+    if (contatoForm) {
+        contatoForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(contatoForm);
+            const data = Object.fromEntries(formData.entries());
+
+            formFeedback.textContent = 'Enviando...';
+            formFeedback.className = 'alert alert-info';
+
+            fetch('/api/enviar-contato', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json().then(body => ({ ok: response.ok, body })))
+            .then(({ ok, body }) => {
+                if (!ok) throw body; 
+                formFeedback.textContent = body.message || 'Mensagem enviada com sucesso!';
+                formFeedback.className = 'alert alert-success';
+                contatoForm.reset();
+            })
+            .catch(error => {
+                console.error('Erro ao enviar formulário:', error);
+                formFeedback.textContent = error.message || 'Ocorreu um erro. Tente novamente.';
+                formFeedback.className = 'alert alert-danger';
+            });
+        });
+    }
+});
+  </script>
 
   <!-- Espaçamento -->
   <div style="height: 100px;"></div>
