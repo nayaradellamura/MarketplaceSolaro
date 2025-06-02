@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Tempo de geração: 21/05/2025 às 01:23
+-- Tempo de geração: 02/06/2025 às 19:45
 -- Versão do servidor: 8.0.42-0ubuntu0.24.04.1
 -- Versão do PHP: 8.3.6
 
@@ -35,16 +35,18 @@ CREATE TABLE `contratos_clientes` (
   `estado_cliente` varchar(2) NOT NULL,
   `consumo_medio_kwh` decimal(10,2) DEFAULT NULL,
   `preco_final_kwh` decimal(6,4) DEFAULT NULL,
-  `status` enum('A','C') DEFAULT 'A',
+  `status` enum('A','C') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'A',
   `historico_preco_id` int DEFAULT NULL,
   `consumo_fatura_1` decimal(10,2) DEFAULT NULL,
   `consumo_fatura_2` decimal(10,2) DEFAULT NULL,
   `consumo_fatura_3` decimal(10,2) DEFAULT NULL,
   `consumo_media_fatura` decimal(10,2) DEFAULT NULL,
-  `valor_fatura_1` decimal(6,4) DEFAULT NULL,
-  `valor_fatura_2` decimal(6,4) DEFAULT NULL,
-  `valor_fatura_3` decimal(6,4) DEFAULT NULL,
-  `media_valor_fatura` decimal(6,4) DEFAULT NULL
+  `valor_fatura_1` decimal(8,2) DEFAULT NULL,
+  `valor_fatura_2` decimal(8,2) DEFAULT NULL,
+  `valor_fatura_3` decimal(8,2) DEFAULT NULL,
+  `media_valor_fatura` decimal(10,4) DEFAULT NULL,
+  `flag_cliente` int DEFAULT NULL,
+  `valor_economizado` decimal(10,4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -63,7 +65,9 @@ CREATE TABLE `contratos_fornecedores` (
   `preco_kwh` decimal(6,4) NOT NULL,
   `geracao_kwh` decimal(10,2) NOT NULL,
   `status` enum('AT','RE') DEFAULT 'AT',
-  `receita_prevista` decimal(10,2) DEFAULT NULL
+  `receita_prevista` decimal(10,2) DEFAULT NULL,
+  `data_rescisao` date DEFAULT NULL,
+  `flag_fornecedor` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -97,6 +101,39 @@ CREATE TABLE `estoque_kwh_estado` (
   `kwh_disponivel` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Despejando dados para a tabela `estoque_kwh_estado`
+--
+
+INSERT INTO `estoque_kwh_estado` (`id`, `estado`, `mes_referencia`, `kwh_disponivel`) VALUES
+(1, 'AC', '2025-05-28', 29566.04),
+(2, 'AL', '2025-05-28', 66313.31),
+(3, 'AM', '2025-05-28', 31762.69),
+(4, 'AP', '2025-05-28', 1873.53),
+(5, 'BA', '2025-05-28', 3079.58),
+(6, 'CE', '2025-05-28', 54777.30),
+(7, 'DF', '2025-05-28', 63647.77),
+(8, 'ES', '2025-05-28', 51672.93),
+(9, 'GO', '2025-05-28', 72591.37),
+(10, 'MA', '2025-05-28', 3236.07),
+(11, 'MG', '2025-05-28', 97406.23),
+(12, 'MS', '2025-05-28', 76322.96),
+(13, 'MT', '2025-05-28', 88396.10),
+(14, 'PA', '2025-05-28', 12111.62),
+(15, 'PB', '2025-05-28', 93869.81),
+(16, 'PE', '2025-05-28', 32314.18),
+(17, 'PI', '2025-05-28', 78961.47),
+(18, 'PR', '2025-05-28', 96864.81),
+(19, 'RJ', '2025-05-28', 50939.66),
+(20, 'RN', '2025-05-28', 40603.86),
+(21, 'RO', '2025-05-28', 62700.33),
+(22, 'RR', '2025-05-28', 90690.06),
+(23, 'RS', '2025-05-28', 64349.33),
+(24, 'SC', '2025-05-28', 48676.46),
+(25, 'SE', '2025-05-28', 49334.31),
+(26, 'SP', '2025-05-28', 150000.00),
+(27, 'TO', '2025-05-28', 49207.99);
+
 -- --------------------------------------------------------
 
 --
@@ -105,12 +142,14 @@ CREATE TABLE `estoque_kwh_estado` (
 
 CREATE TABLE `historico_precos` (
   `id` int NOT NULL,
+  `usuario_id` int DEFAULT NULL,
   `estado` varchar(2) NOT NULL,
-  `preco_base_fornecedor` decimal(6,4) NOT NULL,
+  `preco_base_fornecedor` decimal(8,4) NOT NULL,
   `taxa_percentual` decimal(5,2) NOT NULL,
-  `preco_final_cliente` decimal(6,4) NOT NULL,
+  `preco_final_cliente` decimal(8,4) NOT NULL,
   `data_inicio` date NOT NULL,
-  `data_fim` date DEFAULT NULL
+  `data_fim` date DEFAULT NULL,
+  `contrato_cliente_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -139,7 +178,7 @@ CREATE TABLE `pagamento_cliente` (
   `valor_total` decimal(10,2) NOT NULL,
   `data_pagamento` date DEFAULT NULL,
   `forma_pagamento` varchar(30) DEFAULT NULL,
-  `status_pagamento` varchar(20) DEFAULT 'P',
+  `status_pagamento` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'PEND',
   `dh_inclusao` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -155,7 +194,7 @@ CREATE TABLE `recebimento_fornecedor` (
   `id_fornecedor` int NOT NULL,
   `valor_repasse` decimal(10,2) NOT NULL,
   `data_repasse` date DEFAULT NULL,
-  `status_repasse` varchar(20) DEFAULT 'PENDENTE',
+  `status_repasse` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'PEND',
   `taxa_administrativa` decimal(10,2) DEFAULT '0.00',
   `dh_inclusao` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -257,7 +296,8 @@ ALTER TABLE `estoque_kwh_estado`
 -- Índices de tabela `historico_precos`
 --
 ALTER TABLE `historico_precos`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_historico_usuario` (`usuario_id`);
 
 --
 -- Índices de tabela `leituras_consumo`
@@ -321,7 +361,7 @@ ALTER TABLE `enderecos`
 -- AUTO_INCREMENT de tabela `estoque_kwh_estado`
 --
 ALTER TABLE `estoque_kwh_estado`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de tabela `historico_precos`
@@ -381,6 +421,12 @@ ALTER TABLE `contratos_fornecedores`
 --
 ALTER TABLE `enderecos`
   ADD CONSTRAINT `enderecos_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
+
+--
+-- Restrições para tabelas `historico_precos`
+--
+ALTER TABLE `historico_precos`
+  ADD CONSTRAINT `fk_historico_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Restrições para tabelas `leituras_consumo`

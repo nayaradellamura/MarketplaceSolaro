@@ -53,7 +53,6 @@ router.get('/home_consumidor', (req, res) => {
 
   const usuario_id = req.session.usuario.id;
 
-  // Corrigido: status = 'A'
   const sqlContratoAtivo = `
     SELECT * FROM contratos_clientes
     WHERE usuario_id = ? AND status = 'A'
@@ -232,7 +231,6 @@ router.get('/home_fornecedor', (req, res) => {
           return res.status(500).send('Erro ao carregar todos os repasses.');
         }
 
-        // Verifica se há contrato ativo
         if (ativoResults.length === 0) {
           return res.render('home_fornecedor', {
             nomeFornecedor: req.session.usuario.nome,
